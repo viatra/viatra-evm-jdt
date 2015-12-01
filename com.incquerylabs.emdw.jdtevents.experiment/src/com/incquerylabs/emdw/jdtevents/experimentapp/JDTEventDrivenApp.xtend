@@ -17,11 +17,8 @@ import org.eclipse.incquery.runtime.evm.api.RuleEngine
 import org.eclipse.incquery.runtime.evm.api.RuleSpecification
 import org.eclipse.incquery.runtime.evm.api.event.EventType.RuleEngineEventType
 import org.eclipse.jdt.core.IJavaElementDelta
-import com.incquerylabs.emdw.jdtutil.JDTChangeFlagDecoder
 
 import static extension com.incquerylabs.emdw.jdtutil.JDTChangeFlagDecoder.toChangeFlags
-import com.incquerylabs.emdw.jdtutil.ChangeFlag
-import com.google.common.collect.ImmutableList.Builder
 
 class JDTEventDrivenApp {
 	final RuleEngine engine
@@ -36,11 +33,14 @@ class JDTEventDrivenApp {
 	def void start() {
 		engine.getLogger().setLevel(Level::DEBUG)
 		val ActivationLifeCycle lifeCycle = ActivationLifeCycle::create(JDTActivationState::INACTIVE)
-		lifeCycle.addStateTransition(JDTActivationState::INACTIVE, JDTEventType::ELEMENT_CHANGED,
-			JDTActivationState::ACTIVE)
-		lifeCycle.addStateTransition(JDTActivationState::ACTIVE, RuleEngineEventType::FIRE,
-			JDTActivationState::INACTIVE)
-		val Job<IJavaElementDelta> job = new Job<IJavaElementDelta>(JDTActivationState::ACTIVE) {
+		lifeCycle.addStateTransition(JDTActivationState::INACTIVE, JDTEventType::APPEARED, JDTActivationState::APPEARED)
+		lifeCycle.addStateTransition(JDTActivationState::INACTIVE, JDTEventType::DISAPPEARED, JDTActivationState::DISAPPEARED)
+		lifeCycle.addStateTransition(JDTActivationState::INACTIVE, JDTEventType::UPDATED, JDTActivationState::UPDATED)
+		lifeCycle.addStateTransition(JDTActivationState::APPEARED, RuleEngineEventType::FIRE, JDTActivationState::INACTIVE)
+		lifeCycle.addStateTransition(JDTActivationState::DISAPPEARED, RuleEngineEventType::FIRE, JDTActivationState::INACTIVE)
+		lifeCycle.addStateTransition(JDTActivationState::UPDATED, RuleEngineEventType::FIRE, JDTActivationState::INACTIVE)
+		
+		val Job<IJavaElementDelta> job = new Job<IJavaElementDelta>(JDTActivationState::UPDATED) {
 			override protected void execute(Activation<? extends IJavaElementDelta> activation, Context context) {
 				val IJavaElementDelta delta = activation.getAtom()
 				System::out.println("********** An element has changed **********")

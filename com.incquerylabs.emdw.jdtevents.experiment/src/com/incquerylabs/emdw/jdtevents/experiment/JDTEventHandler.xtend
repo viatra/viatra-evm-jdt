@@ -1,6 +1,5 @@
 package com.incquerylabs.emdw.jdtevents.experiment
 
-import org.eclipse.incquery.runtime.evm.api.Activation
 import org.eclipse.incquery.runtime.evm.api.RuleInstance
 import org.eclipse.incquery.runtime.evm.api.event.Event
 import org.eclipse.incquery.runtime.evm.api.event.EventFilter
@@ -17,8 +16,16 @@ class JDTEventHandler implements EventHandler<IJavaElementDelta>{
 		var IJavaElementDelta eventAtom=event.getEventAtom() 
 		
 		switch (type) {
-			case ELEMENT_CHANGED:{
-				var Activation<IJavaElementDelta> activation=instance.createActivation(eventAtom) 
+			case APPEARED:{
+				var activation=instance.createActivation(eventAtom) 
+				instance.activationStateTransition(activation, type)
+			}
+			case DISAPPEARED:{
+				var activation=instance.createActivation(eventAtom) 
+				instance.activationStateTransition(activation, type)
+			}
+			case UPDATED:{
+				var activation=instance.createActivation(eventAtom) 
 				instance.activationStateTransition(activation, type)
 			}
 			default :{

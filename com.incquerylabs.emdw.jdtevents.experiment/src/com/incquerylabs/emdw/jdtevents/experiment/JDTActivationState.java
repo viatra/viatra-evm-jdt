@@ -3,7 +3,9 @@ package com.incquerylabs.emdw.jdtevents.experiment;
 import org.eclipse.incquery.runtime.evm.api.event.ActivationState;
 
 public enum JDTActivationState implements ActivationState {
-	ACTIVE,
+	APPEARED,
+	DISAPPEARED,
+	UPDATED,
 	INACTIVE;
 
 	@Override

@@ -7,6 +7,8 @@ import org.eclipse.incquery.runtime.evm.api.event.EventSourceSpecification
 import org.eclipse.jdt.core.IJavaElementDelta
 import com.google.common.collect.Sets
 
+import static extension com.incquerylabs.emdw.jdtutil.JDTEventTypeDecoder.toEventType
+
 class JDTEventSource implements EventSource<IJavaElementDelta> {
 	JDTEventSourceSpecification spec
 	JDTRealm realm
@@ -24,7 +26,7 @@ class JDTEventSource implements EventSource<IJavaElementDelta> {
 	}
 
 	def void pushChange(IJavaElementDelta delta) {
-		var JDTEvent event = new JDTEvent(JDTEventType::ELEMENT_CHANGED, delta)
+		var JDTEvent event = new JDTEvent(delta.kind.toEventType, delta)
 		for (JDTEventHandler handler : handlers) {
 			handler.handleEvent(event)
 		}
