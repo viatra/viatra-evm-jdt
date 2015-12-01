@@ -11,9 +11,16 @@
     xmlns:setup.p2="http://www.eclipse.org/oomph/setup/p2/1.0"
     xmlns:setup.targlets="http://www.eclipse.org/oomph/setup/targlets/1.0"
     xmlns:setup.workingsets="http://www.eclipse.org/oomph/setup/workingsets/1.0"
-    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/jdt/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/JDT.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 index:/models/Projects.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
+    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/jdt/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/JDT.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Projects.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
     name="evm-jdt"
     label="EVM-JDT">
+  <setupTask
+      xsi:type="setup:EclipseIniTask"
+      option="-Doomph.redirection.incquert-evm-jdt.setup"
+      value="=https://raw.githubusercontent.com/IncQueryLabs/incquery-evm-jdt/master/com.incquerylabs.jdtuml.setup/EVM-JDT.setup->${git.clone.incquery-evm-jdt.location|uri}/com.incquerylabs.jdtuml.setup/EVM-JDT.setup"
+      vm="true">
+    <description></description>
+  </setupTask>
   <setupTask
       xsi:type="setup:EclipseIniTask"
       excludedTriggers="STARTUP"
@@ -53,8 +60,6 @@
         url="http://download.eclipse.org/modeling/tmf/xtext/updates/composite/releases/"/>
     <repository
         url="http://download.eclipse.org/viatra2/emf/updates/release"/>
-    <repository
-        url="http://sourceforge.net/projects/xsemantics/files/updates/releases/1.8"/>
     <repository
         url="http://download.eclipse.org/modeling/mdt/papyrus/updates/releases/mars"/>
   </setupTask>
@@ -121,6 +126,10 @@
           name="org.eclipse.jdt.core.manipulation"/>
       <requirement
           name="org.junit"/>
+      <requirement
+          name="org.mockito"/>
+      <requirement
+          name="org.hamcrest"/>
       <requirement
           name="org.mockito"/>
       <repositoryList
