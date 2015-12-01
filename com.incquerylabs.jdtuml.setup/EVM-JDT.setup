@@ -127,8 +127,6 @@
       <requirement
           name="org.junit"/>
       <requirement
-          name="org.mockito"/>
-      <requirement
           name="org.hamcrest"/>
       <requirement
           name="org.mockito"/>
