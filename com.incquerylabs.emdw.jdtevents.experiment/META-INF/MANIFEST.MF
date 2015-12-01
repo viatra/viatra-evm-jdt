@@ -3,6 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Experiment
 Bundle-SymbolicName: com.incquerylabs.emdw.jdtevents.experiment
 Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: com.incquerylabs.emdw.jdtevents.experiment,
  com.incquerylabs.emdw.jdtevents.experimentapp
 Require-Bundle: org.eclipse.incquery.runtime.evm;bundle-version="1.0.1",
