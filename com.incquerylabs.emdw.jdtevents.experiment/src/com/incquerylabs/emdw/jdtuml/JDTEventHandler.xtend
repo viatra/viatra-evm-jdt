@@ -1,4 +1,4 @@
-package com.incquerylabs.emdw.jdtevents.experiment
+package com.incquerylabs.emdw.jdtuml
 
 import org.eclipse.incquery.runtime.evm.api.RuleInstance
 import org.eclipse.incquery.runtime.evm.api.event.Event

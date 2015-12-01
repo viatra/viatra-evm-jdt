@@ -1,11 +1,11 @@
-package com.incquerylabs.emdw.jdtevents.experimentapp
+package com.incquerylabs.emdw.jdtuml.application
 
 import com.google.common.collect.Sets
-import com.incquerylabs.emdw.jdtevents.experiment.JDTActivationState
-import com.incquerylabs.emdw.jdtevents.experiment.JDTEventFilter
-import com.incquerylabs.emdw.jdtevents.experiment.JDTEventSourceSpecification
-import com.incquerylabs.emdw.jdtevents.experiment.JDTEventType
-import com.incquerylabs.emdw.jdtevents.experiment.JDTRealm
+import com.incquerylabs.emdw.jdtuml.JDTActivationState
+import com.incquerylabs.emdw.jdtuml.JDTEventFilter
+import com.incquerylabs.emdw.jdtuml.JDTEventSourceSpecification
+import com.incquerylabs.emdw.jdtuml.JDTEventType
+import com.incquerylabs.emdw.jdtuml.JDTRealm
 import java.util.Arrays
 import org.apache.log4j.Level
 import org.eclipse.incquery.runtime.evm.api.Activation
@@ -18,7 +18,7 @@ import org.eclipse.incquery.runtime.evm.api.RuleSpecification
 import org.eclipse.incquery.runtime.evm.api.event.EventType.RuleEngineEventType
 import org.eclipse.jdt.core.IJavaElementDelta
 
-import static extension com.incquerylabs.emdw.jdtutil.JDTChangeFlagDecoder.toChangeFlags
+import static extension com.incquerylabs.emdw.jdtuml.util.JDTChangeFlagDecoder.toChangeFlags
 
 class JDTEventDrivenApp {
 	final RuleEngine engine

@@ -1,4 +1,4 @@
-package com.incquerylabs.emdw.jdtutil;
+package com.incquerylabs.emdw.jdtuml.util;
 
 import org.eclipse.jdt.core.IJavaElementDelta;
 

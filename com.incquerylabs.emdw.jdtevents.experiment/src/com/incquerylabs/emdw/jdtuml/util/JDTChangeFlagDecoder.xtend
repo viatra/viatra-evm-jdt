@@ -1,4 +1,4 @@
-package com.incquerylabs.emdw.jdtutil
+package com.incquerylabs.emdw.jdtuml.util
 
 class JDTChangeFlagDecoder {
 	public static def toChangeFlag(int value){

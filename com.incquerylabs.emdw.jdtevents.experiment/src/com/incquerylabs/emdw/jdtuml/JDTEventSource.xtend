@@ -1,13 +1,13 @@
-package com.incquerylabs.emdw.jdtevents.experiment
+package com.incquerylabs.emdw.jdtuml
 
+import com.google.common.collect.Sets
 import java.util.Set
 import org.eclipse.incquery.runtime.evm.api.event.EventRealm
 import org.eclipse.incquery.runtime.evm.api.event.EventSource
 import org.eclipse.incquery.runtime.evm.api.event.EventSourceSpecification
 import org.eclipse.jdt.core.IJavaElementDelta
-import com.google.common.collect.Sets
 
-import static extension com.incquerylabs.emdw.jdtutil.JDTEventTypeDecoder.toEventType
+import static extension com.incquerylabs.emdw.jdtuml.util.JDTEventTypeDecoder.toEventType
 
 class JDTEventSource implements EventSource<IJavaElementDelta> {
 	JDTEventSourceSpecification spec
