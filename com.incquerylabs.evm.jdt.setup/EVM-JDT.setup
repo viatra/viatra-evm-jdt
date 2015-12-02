@@ -17,7 +17,7 @@
   <setupTask
       xsi:type="setup:EclipseIniTask"
       option="-Doomph.redirection.incquert-evm-jdt.setup"
-      value="=https://raw.githubusercontent.com/IncQueryLabs/incquery-evm-jdt/master/com.incquerylabs.jdtuml.setup/EVM-JDT.setup->${git.clone.incquery-evm-jdt.location|uri}/com.incquerylabs.jdtuml.setup/EVM-JDT.setup"
+      value="=https://raw.githubusercontent.com/IncQueryLabs/incquery-evm-jdt/master/com.incquerylabs.evm.jdt.setup/EVM-JDT.setup->${git.clone.incquery-evm-jdt.location|uri}/com.incquerylabs.evm.jdt.setup/EVM-JDT.setup"
       vm="true">
     <description></description>
   </setupTask>
