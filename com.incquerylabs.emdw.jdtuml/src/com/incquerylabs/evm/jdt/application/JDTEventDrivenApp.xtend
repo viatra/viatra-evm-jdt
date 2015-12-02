@@ -1,11 +1,11 @@
-package com.incquerylabs.emdw.jdtuml.application
+package com.incquerylabs.evm.jdt.application
 
-import com.incquerylabs.emdw.jdtuml.JDTActivationLifeCycle
-import com.incquerylabs.emdw.jdtuml.JDTActivationState
-import com.incquerylabs.emdw.jdtuml.JDTEventFilter
-import com.incquerylabs.emdw.jdtuml.JDTEventSourceSpecification
-import com.incquerylabs.emdw.jdtuml.JDTRealm
-import com.incquerylabs.emdw.jdtuml.job.JDTLoggerJob
+import com.incquerylabs.evm.jdt.JDTActivationLifeCycle
+import com.incquerylabs.evm.jdt.JDTActivationState
+import com.incquerylabs.evm.jdt.JDTEventFilter
+import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
+import com.incquerylabs.evm.jdt.JDTRealm
+import com.incquerylabs.evm.jdt.job.JDTLoggerJob
 import java.util.Set
 import org.apache.log4j.Level
 import org.apache.log4j.Logger

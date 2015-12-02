@@ -1,10 +1,10 @@
-package com.incquerylabs.emdw.jdtuml.test
+package com.incquerylabs.evm.jdt.test
 
-import com.incquerylabs.emdw.jdtuml.JDTEvent
-import com.incquerylabs.emdw.jdtuml.JDTEventHandler
-import com.incquerylabs.emdw.jdtuml.JDTEventSource
-import com.incquerylabs.emdw.jdtuml.JDTEventSourceSpecification
-import com.incquerylabs.emdw.jdtuml.JDTRealm
+import com.incquerylabs.evm.jdt.JDTEvent
+import com.incquerylabs.evm.jdt.JDTEventHandler
+import com.incquerylabs.evm.jdt.JDTEventSource
+import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
+import com.incquerylabs.evm.jdt.JDTRealm
 import org.eclipse.jdt.core.IJavaElementDelta
 import org.junit.Before
 import org.junit.Test

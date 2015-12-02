@@ -6,7 +6,7 @@
       <menuContribution
             locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
          <command
-               commandId="com.incquerylabs.emdw.jdtuml.ui.starttransform"
+               commandId="com.incquerylabs.evm.jdt.ui.starttransform"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -20,8 +20,8 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="com.incquerylabs.emdw.jdtuml.ui.JavaProjectHandler"
-            id="com.incquerylabs.emdw.jdtuml.ui.starttransform"
+            defaultHandler="com.incquerylabs.evm.jdt.ui.JavaProjectHandler"
+            id="com.incquerylabs.evm.jdt.ui.starttransform"
             name="Start Java to UML transformation">
       </command>
    </extension>

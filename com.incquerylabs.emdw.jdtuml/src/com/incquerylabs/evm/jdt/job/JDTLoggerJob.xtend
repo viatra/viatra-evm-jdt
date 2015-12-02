@@ -1,6 +1,6 @@
-package com.incquerylabs.emdw.jdtuml.job
+package com.incquerylabs.evm.jdt.job
 
-import com.incquerylabs.emdw.jdtuml.JDTActivationState
+import com.incquerylabs.evm.jdt.JDTActivationState
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.incquery.runtime.evm.api.Activation

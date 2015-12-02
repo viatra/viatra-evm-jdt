@@ -1,11 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Test
-Bundle-SymbolicName: com.incquerylabs.emdw.jdtuml.test
+Bundle-SymbolicName: com.incquerylabs.evm.jdt.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: INCQUERYLABS
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: com.incquerylabs.emdw.jdtuml;bundle-version="1.0.0",
+Require-Bundle: com.incquerylabs.evm.jdt;bundle-version="1.0.0",
  org.hamcrest;bundle-version="1.1.0",
  org.mockito;bundle-version="1.9.5",
  org.junit,
@@ -15,5 +15,5 @@ Require-Bundle: com.incquerylabs.emdw.jdtuml;bundle-version="1.0.0",
  org.eclipse.xtend.lib.macro,
  org.eclipse.jdt.core;bundle-version="3.11.1",
  org.eclipse.incquery.runtime.evm;bundle-version="1.0.1"
-Export-Package: com.incquerylabs.emdw.jdtuml.test
+Export-Package: com.incquerylabs.evm.jdt.test
 

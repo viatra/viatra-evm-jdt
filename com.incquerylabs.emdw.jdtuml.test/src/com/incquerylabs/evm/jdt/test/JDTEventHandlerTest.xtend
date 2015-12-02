@@ -1,8 +1,8 @@
-package com.incquerylabs.emdw.jdtuml.test
+package com.incquerylabs.evm.jdt.test
 
-import com.incquerylabs.emdw.jdtuml.JDTEvent
-import com.incquerylabs.emdw.jdtuml.JDTEventHandler
-import com.incquerylabs.emdw.jdtuml.JDTEventType
+import com.incquerylabs.evm.jdt.JDTEvent
+import com.incquerylabs.evm.jdt.JDTEventHandler
+import com.incquerylabs.evm.jdt.JDTEventType
 import org.eclipse.incquery.runtime.evm.api.Activation
 import org.eclipse.incquery.runtime.evm.api.RuleInstance
 import org.eclipse.jdt.core.IJavaElement

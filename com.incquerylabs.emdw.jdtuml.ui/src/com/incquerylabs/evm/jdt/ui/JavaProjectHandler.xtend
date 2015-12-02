@@ -1,6 +1,6 @@
-package com.incquerylabs.emdw.jdtuml.ui
+package com.incquerylabs.evm.jdt.ui
 
-import com.incquerylabs.emdw.jdtuml.application.JDTEventDrivenApp
+import com.incquerylabs.evm.jdt.application.JDTEventDrivenApp
 import org.eclipse.core.commands.AbstractHandler
 import org.eclipse.core.commands.ExecutionEvent
 import org.eclipse.core.commands.ExecutionException

@@ -1,6 +1,6 @@
-package com.incquerylabs.emdw.jdtuml.util
+package com.incquerylabs.evm.jdt.util
 
-import com.incquerylabs.emdw.jdtuml.JDTEventType
+import com.incquerylabs.evm.jdt.JDTEventType
 import org.eclipse.jdt.core.IJavaElementDelta
 
 class JDTEventTypeDecoder {

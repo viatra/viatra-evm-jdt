@@ -1,4 +1,4 @@
-package com.incquerylabs.emdw.jdtuml
+package com.incquerylabs.evm.jdt
 
 import com.google.common.collect.Sets
 import java.util.Set
@@ -7,7 +7,7 @@ import org.eclipse.incquery.runtime.evm.api.event.EventSource
 import org.eclipse.incquery.runtime.evm.api.event.EventSourceSpecification
 import org.eclipse.jdt.core.IJavaElementDelta
 
-import static extension com.incquerylabs.emdw.jdtuml.util.JDTEventTypeDecoder.toEventType
+import static extension com.incquerylabs.evm.jdt.util.JDTEventTypeDecoder.toEventType
 import org.eclipse.jdt.core.IJavaElement
 
 class JDTEventSource implements EventSource<IJavaElement> {
