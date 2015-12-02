@@ -8,8 +8,9 @@ import org.eclipse.incquery.runtime.evm.api.event.EventSourceSpecification
 import org.eclipse.jdt.core.IJavaElementDelta
 
 import static extension com.incquerylabs.emdw.jdtuml.util.JDTEventTypeDecoder.toEventType
+import org.eclipse.jdt.core.IJavaElement
 
-class JDTEventSource implements EventSource<IJavaElementDelta> {
+class JDTEventSource implements EventSource<IJavaElement> {
 	JDTEventSourceSpecification spec
 	JDTRealm realm
 	Set<JDTEventHandler> handlers = Sets::newHashSet()
@@ -20,7 +21,7 @@ class JDTEventSource implements EventSource<IJavaElementDelta> {
 		realm.addSource(this)
 	}
 
-	override EventSourceSpecification<IJavaElementDelta> getSourceSpecification() {
+	override EventSourceSpecification<IJavaElement> getSourceSpecification() {
 		return spec
 	}
 
@@ -32,7 +33,8 @@ class JDTEventSource implements EventSource<IJavaElementDelta> {
 	}
 
 	def void pushChange(IJavaElementDelta delta) {
-		val JDTEvent event = new JDTEvent(delta.kind.toEventType, delta)
+		val javaElement = delta.element
+		val JDTEvent event = new JDTEvent(delta.kind.toEventType, javaElement)
 		handlers.forEach[handleEvent(event)]
 		delta.affectedChildren.forEach[affectedChildren |
 			pushChange(affectedChildren)

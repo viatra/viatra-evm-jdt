@@ -2,27 +2,27 @@ package com.incquerylabs.emdw.jdtuml
 
 import org.eclipse.incquery.runtime.evm.api.event.Event
 import org.eclipse.incquery.runtime.evm.api.event.EventType
-import org.eclipse.jdt.core.IJavaElementDelta
+import org.eclipse.jdt.core.IJavaElement
 
-class JDTEvent implements Event<IJavaElementDelta> {
+class JDTEvent implements Event<IJavaElement> {
 	JDTEventType type
+	IJavaElement atom
 
 	/** 
 	 * @param type
 	 * @param atom
 	 */
-	new(JDTEventType type, IJavaElementDelta atom) {
+	new(JDTEventType type, IJavaElement atom) {
 		this.type = type
 		this.atom = atom
 	}
 
-	IJavaElementDelta atom
 
 	override EventType getEventType() {
 		return type
 	}
 
-	override IJavaElementDelta getEventAtom() {
+	override IJavaElement getEventAtom() {
 		return atom
 	}
 

@@ -1,10 +1,10 @@
 package com.incquerylabs.emdw.jdtuml
 
 import org.eclipse.incquery.runtime.evm.api.event.EventFilter
-import org.eclipse.jdt.core.IJavaElementDelta
+import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaProject
 
-class JDTEventFilter implements EventFilter<IJavaElementDelta> {
+class JDTEventFilter implements EventFilter<IJavaElement> {
 	IJavaProject project
 	
 	new(){
@@ -14,8 +14,8 @@ class JDTEventFilter implements EventFilter<IJavaElementDelta> {
 		this.project = project
 	}
 
-	override boolean isProcessable(IJavaElementDelta eventAtom) {
-		eventAtom.element.javaProject == this.project
+	override boolean isProcessable(IJavaElement eventAtom) {
+		eventAtom.javaProject == this.project
 	}
 
 }

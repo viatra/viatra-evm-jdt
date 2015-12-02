@@ -5,7 +5,7 @@ import com.incquerylabs.emdw.jdtuml.JDTEventHandler
 import com.incquerylabs.emdw.jdtuml.JDTEventType
 import org.eclipse.incquery.runtime.evm.api.Activation
 import org.eclipse.incquery.runtime.evm.api.RuleInstance
-import org.eclipse.jdt.core.IJavaElementDelta
+import org.eclipse.jdt.core.IJavaElement
 import org.junit.Before
 import org.junit.Test
 import org.mockito.InjectMocks
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*
 
 class JDTEventHandlerTest {
 	@Mock(name = "ruleInstanceMock") 
-	private RuleInstance<IJavaElementDelta> ruleInstance
+	private RuleInstance<IJavaElement> ruleInstance
 	@InjectMocks 
 	private JDTEventHandler eventHandler
 	
@@ -30,7 +30,7 @@ class JDTEventHandlerTest {
 	def void handleEvent_appearedEvent_lifecycleTransitionCalled() {
 		// Arrange
 		val eventType = JDTEventType.APPEARED
-		val eventAtom = mock(IJavaElementDelta, "eventAtomMock")
+		val eventAtom = mock(IJavaElement, "eventAtomMock")
 		val event = mock(JDTEvent, "eventMock")
 		when(event.eventType).thenReturn(eventType)
 		when(event.eventAtom).thenReturn(eventAtom)

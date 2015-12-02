@@ -6,6 +6,7 @@ import com.incquerylabs.emdw.jdtuml.JDTEventFilter
 import com.incquerylabs.emdw.jdtuml.JDTEventSourceSpecification
 import com.incquerylabs.emdw.jdtuml.JDTRealm
 import com.incquerylabs.emdw.jdtuml.job.JDTLoggerJob
+import java.util.Set
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
@@ -16,10 +17,9 @@ import org.eclipse.incquery.runtime.evm.api.RuleEngine
 import org.eclipse.incquery.runtime.evm.api.RuleSpecification
 import org.eclipse.jdt.core.ElementChangedEvent
 import org.eclipse.jdt.core.IElementChangedListener
-import org.eclipse.jdt.core.IJavaElementDelta
+import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.JavaCore
-import java.util.Set
 
 class JDTEventDrivenApp {
 	extension val Logger logger = Logger.getLogger(this.class)
@@ -38,11 +38,11 @@ class JDTEventDrivenApp {
 		debug('''Transformation starting...''')
 		
 		val ActivationLifeCycle lifeCycle = new JDTActivationLifeCycle
-		val jobs = <Job<IJavaElementDelta>>newHashSet()
+		val jobs = <Job<IJavaElement>>newHashSet()
 		jobs.addLoggerJobs
 		
 		val JDTEventSourceSpecification sourceSpec = new JDTEventSourceSpecification
-		val RuleSpecification<IJavaElementDelta> ruleSpec = new RuleSpecification<IJavaElementDelta>(
+		val RuleSpecification<IJavaElement> ruleSpec = new RuleSpecification<IJavaElement>(
 			sourceSpec, lifeCycle, jobs
 		)
 		val JDTEventFilter filter = sourceSpec.createEmptyFilter() as JDTEventFilter
@@ -60,7 +60,7 @@ class JDTEventDrivenApp {
 		] as IElementChangedListener))
 	}
 	
-	private def addLoggerJobs(Set<Job<IJavaElementDelta>> jobs){
+	private def addLoggerJobs(Set<Job<IJavaElement>> jobs){
 		jobs.add(new JDTLoggerJob(JDTActivationState::APPEARED))
 		jobs.add(new JDTLoggerJob(JDTActivationState::DISAPPEARED))
 		jobs.add(new JDTLoggerJob(JDTActivationState::UPDATED))
