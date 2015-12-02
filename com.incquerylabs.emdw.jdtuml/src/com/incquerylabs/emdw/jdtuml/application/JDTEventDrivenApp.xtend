@@ -1,15 +1,13 @@
 package com.incquerylabs.emdw.jdtuml.application
 
-import com.google.common.collect.Sets
 import com.incquerylabs.emdw.jdtuml.JDTActivationLifeCycle
 import com.incquerylabs.emdw.jdtuml.JDTActivationState
 import com.incquerylabs.emdw.jdtuml.JDTEventFilter
 import com.incquerylabs.emdw.jdtuml.JDTEventSourceSpecification
 import com.incquerylabs.emdw.jdtuml.JDTRealm
-import java.util.Arrays
+import com.incquerylabs.emdw.jdtuml.job.JDTLoggerJob
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.incquery.runtime.evm.api.Activation
 import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
 import org.eclipse.incquery.runtime.evm.api.Context
 import org.eclipse.incquery.runtime.evm.api.EventDrivenVM
@@ -21,8 +19,7 @@ import org.eclipse.jdt.core.IElementChangedListener
 import org.eclipse.jdt.core.IJavaElementDelta
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.JavaCore
-
-import static extension com.incquerylabs.emdw.jdtuml.util.JDTChangeFlagDecoder.toChangeFlags
+import java.util.Set
 
 class JDTEventDrivenApp {
 	extension val Logger logger = Logger.getLogger(this.class)
@@ -41,11 +38,12 @@ class JDTEventDrivenApp {
 		debug('''Transformation starting...''')
 		
 		val ActivationLifeCycle lifeCycle = new JDTActivationLifeCycle
-		val Job<IJavaElementDelta> job = defaultJob
+		val jobs = <Job<IJavaElementDelta>>newHashSet()
+		jobs.addLoggerJobs
 		
 		val JDTEventSourceSpecification sourceSpec = new JDTEventSourceSpecification
 		val RuleSpecification<IJavaElementDelta> ruleSpec = new RuleSpecification<IJavaElementDelta>(
-			sourceSpec, lifeCycle, Sets::newHashSet(job)
+			sourceSpec, lifeCycle, jobs
 		)
 		val JDTEventFilter filter = sourceSpec.createEmptyFilter() as JDTEventFilter
 		filter.project = project
@@ -55,30 +53,17 @@ class JDTEventDrivenApp {
 		addJDTEventListener
 	}
 	
-	private def Job<IJavaElementDelta> getDefaultJob() {
-		new Job<IJavaElementDelta>(JDTActivationState::UPDATED) {
-			override protected void execute(Activation<? extends IJavaElementDelta> activation, Context context) {
-				val IJavaElementDelta delta = activation.getAtom()
-				System::out.println("********** An element has changed **********")
-				System::out.println('''Delta: «delta.toString»''')
-				System::out.println('''Affected children: «Arrays::toString(delta.affectedChildren)»''')
-				System::out.println('''AST: «delta.compilationUnitAST»''')
-				System::out.println('''Change flags: «delta.flags.toChangeFlags»''')
-				System::out.println("********************************************")
-			}
-
-			override protected void handleError(Activation<? extends IJavaElementDelta> activation, Exception exception,
-				Context context) {
-				// not gonna happen
-			}
-		}
-	}
-	
 	private def addJDTEventListener() {
 		JavaCore::addElementChangedListener(([ ElementChangedEvent event |
 			jdtRealm.pushChange(event.delta)
 			this.fire()
 		] as IElementChangedListener))
+	}
+	
+	private def addLoggerJobs(Set<Job<IJavaElementDelta>> jobs){
+		jobs.add(new JDTLoggerJob(JDTActivationState::APPEARED))
+		jobs.add(new JDTLoggerJob(JDTActivationState::DISAPPEARED))
+		jobs.add(new JDTLoggerJob(JDTActivationState::UPDATED))
 	}
 
 	def void fire() {
