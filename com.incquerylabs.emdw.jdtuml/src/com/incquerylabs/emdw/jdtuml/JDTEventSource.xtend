@@ -26,11 +26,11 @@ class JDTEventSource implements EventSource<IJavaElementDelta> {
 	}
 
 	def void pushChange(IJavaElementDelta delta) {
-		var JDTEvent event = new JDTEvent(delta.kind.toEventType, delta)
-		for (JDTEventHandler handler : handlers) {
-			handler.handleEvent(event)
-		}
-
+		val JDTEvent event = new JDTEvent(delta.kind.toEventType, delta)
+		handlers.forEach[handleEvent(event)]
+		delta.affectedChildren.forEach[affectedChildren |
+			pushChange(affectedChildren)
+		]
 	}
 
 	def protected void addHandler(JDTEventHandler handler) {
