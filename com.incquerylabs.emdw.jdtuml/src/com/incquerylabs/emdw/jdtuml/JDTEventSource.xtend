@@ -13,6 +13,12 @@ class JDTEventSource implements EventSource<IJavaElementDelta> {
 	JDTEventSourceSpecification spec
 	JDTRealm realm
 	Set<JDTEventHandler> handlers = Sets::newHashSet()
+	
+	new(JDTEventSourceSpecification spec, JDTRealm realm) {
+		this.spec = spec
+		this.realm = realm
+		realm.addSource(this)
+	}
 
 	override EventSourceSpecification<IJavaElementDelta> getSourceSpecification() {
 		return spec
@@ -33,14 +39,7 @@ class JDTEventSource implements EventSource<IJavaElementDelta> {
 		]
 	}
 
-	def protected void addHandler(JDTEventHandler handler) {
+	def void addHandler(JDTEventHandler handler) {
 		handlers.add(handler)
 	}
-
-	new(JDTEventSourceSpecification spec, JDTRealm realm) {
-		this.spec = spec
-		this.realm = realm
-		realm.addSource(this)
-	}
-
 }
