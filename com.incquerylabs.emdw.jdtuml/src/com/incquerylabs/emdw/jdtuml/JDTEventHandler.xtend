@@ -20,20 +20,18 @@ class JDTEventHandler implements EventHandler<IJavaElement>{
 	}
 	
 	override void handleEvent(Event<IJavaElement> event) {
-		var JDTEventType type=event.getEventType() as JDTEventType 
-		var IJavaElement eventAtom=event.getEventAtom() 
+		val type=event.getEventType() as JDTEventType 
+		val eventAtom=event.getEventAtom() 
+		val activation = getOrCreateActivation(eventAtom)
 		
 		switch (type) {
 			case APPEARED:{
-				var activation=instance.createActivation(eventAtom)
 				instance.activationStateTransition(activation, type)
 			}
 			case DISAPPEARED:{
-				var activation=instance.createActivation(eventAtom) 
 				instance.activationStateTransition(activation, type)
 			}
 			case UPDATED:{
-				var activation=instance.createActivation(eventAtom) 
 				instance.activationStateTransition(activation, type)
 			}
 			default :{
@@ -49,5 +47,15 @@ class JDTEventHandler implements EventHandler<IJavaElement>{
 	}
 	override void dispose() {
 		
+	}
+	
+	private def getOrCreateActivation(IJavaElement eventAtom){
+		val activations = instance.allActivations
+		val activation = activations.findFirst[it.atom == eventAtom]
+
+		if(activation == null){
+			return instance.createActivation(eventAtom)
+		}
+		return activation
 	}
 }

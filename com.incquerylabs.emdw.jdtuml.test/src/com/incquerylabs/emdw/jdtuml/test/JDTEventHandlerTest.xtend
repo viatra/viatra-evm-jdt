@@ -47,4 +47,29 @@ class JDTEventHandlerTest {
 		// Life cycle transition is called on the new activation
 		verify(ruleInstance).activationStateTransition(activation, eventType)
 	}
+	
+	@Test
+	def void handleEvent_withExistingActivation_lifecycleTransitionCalled() {
+		// Arrange
+		// The new event with a type and an atom
+		val eventType = JDTEventType.DISAPPEARED
+		val eventAtom = mock(IJavaElement, "eventAtomMock")
+		val event = mock(JDTEvent, "eventMock")
+		when(event.eventType).thenReturn(eventType)
+		when(event.eventAtom).thenReturn(eventAtom)
+		
+		// Exisiting activation with same event atom
+		val Activation<IJavaElement> activation = mock(Activation, "activationMock")
+		when(activation.atom).thenReturn(eventAtom)
+		when(ruleInstance.allActivations).thenReturn(#[activation])
+		
+		// Act
+		eventHandler.handleEvent(event)
+		
+		// Assert
+		// New activation is NOT created
+		verify(ruleInstance, never).createActivation(any(IJavaElement))
+		// Life cycle transition is called on the new activation
+		verify(ruleInstance).activationStateTransition(activation, eventType)
+	}
 }
