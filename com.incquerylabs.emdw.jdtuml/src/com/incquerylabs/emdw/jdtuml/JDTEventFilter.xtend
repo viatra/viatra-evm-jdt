@@ -2,17 +2,20 @@ package com.incquerylabs.emdw.jdtuml
 
 import org.eclipse.incquery.runtime.evm.api.event.EventFilter
 import org.eclipse.jdt.core.IJavaElementDelta
+import org.eclipse.jdt.core.IJavaProject
 
 class JDTEventFilter implements EventFilter<IJavaElementDelta> {
-	// private String regexp;
-	new() {
+	IJavaProject project
+	
+	new(){
+	}
+	
+	def setProject(IJavaProject project) {
+		this.project = project
 	}
 
-	// public JDTEventFilter(String regexp) {
-	// this.regexp = regexp;
-	// }
 	override boolean isProcessable(IJavaElementDelta eventAtom) {
-		return true
+		eventAtom.element.javaProject == this.project
 	}
 
 }

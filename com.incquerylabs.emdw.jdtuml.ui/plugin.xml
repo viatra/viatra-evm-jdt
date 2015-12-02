@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+         <command
+               commandId="com.incquerylabs.emdw.jdtuml.ui.starttransform"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <adapt
+                     type="java.lang.Object">
+               </adapt>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.incquerylabs.emdw.jdtuml.ui.JavaProjectHandler"
+            id="com.incquerylabs.emdw.jdtuml.ui.starttransform"
+            name="Start Java to UML transformation">
+      </command>
+   </extension>
+
+
+</plugin>
