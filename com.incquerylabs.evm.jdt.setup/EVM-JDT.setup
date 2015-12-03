@@ -159,8 +159,14 @@
         <operand
             xsi:type="predicates:NotPredicate">
           <operand
-              xsi:type="predicates:NamePredicate"
-              pattern=".*test"/>
+              xsi:type="predicates:AndPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*test"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*setup"/>
+          </operand>
         </operand>
       </predicate>
     </workingSet>
