@@ -1,8 +1,9 @@
 package com.incquerylabs.evm.jdt.fqnutil
 
 import java.util.Optional
+import java.util.Iterator
 
-abstract class QualifiedName {
+abstract class QualifiedName implements Iterable<String> {
 	
 	protected val String name
 	protected val Optional<? extends QualifiedName> parent
@@ -20,6 +21,10 @@ abstract class QualifiedName {
 		return parent
 	}
 
+	override iterator() {
+		return new QualifiedNameIterator(this)
+	}
+
 	override toString() {
 		val builder = new StringBuilder()
 		parent.ifPresent[
@@ -29,4 +34,26 @@ abstract class QualifiedName {
 	}
 	
 	abstract def String getSeparator()
+	
+	private static class QualifiedNameIterator implements Iterator<String> {
+		
+		QualifiedName current
+		
+		new (QualifiedName current) {
+			this.current = current
+		}
+		
+		override hasNext() {
+			return current != null
+		}
+		
+		override next() {
+			val name = current.name
+			
+			current = current.parent.orElse(null)
+			
+			return name
+		}
+		
+	}
 }
