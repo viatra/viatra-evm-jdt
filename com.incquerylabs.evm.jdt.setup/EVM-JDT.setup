@@ -159,7 +159,7 @@
         <operand
             xsi:type="predicates:NotPredicate">
           <operand
-              xsi:type="predicates:AndPredicate">
+              xsi:type="predicates:OrPredicate">
             <operand
                 xsi:type="predicates:NamePredicate"
                 pattern=".*test"/>
