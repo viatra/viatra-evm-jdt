@@ -152,8 +152,41 @@
     <workingSet
         name="EVM-JDT">
       <predicate
-          xsi:type="predicates:RepositoryPredicate"
-          project="com.incquerylabs.evm.jdt"/>
+          xsi:type="predicates:AndPredicate">
+        <operand
+            xsi:type="predicates:RepositoryPredicate"
+            project="com.incquerylabs.evm.jdt"/>
+        <operand
+            xsi:type="predicates:NotPredicate">
+          <operand
+              xsi:type="predicates:NamePredicate"
+              pattern=".*test"/>
+        </operand>
+      </predicate>
+    </workingSet>
+    <workingSet
+        name="Tests">
+      <predicate
+          xsi:type="predicates:AndPredicate">
+        <operand
+            xsi:type="predicates:RepositoryPredicate"
+            project="com.incquerylabs.evm.jdt"/>
+        <operand
+            xsi:type="predicates:NamePredicate"
+            pattern=".*test"/>
+      </predicate>
+    </workingSet>
+    <workingSet
+        name="Release Engineering">
+      <predicate
+          xsi:type="predicates:AndPredicate">
+        <operand
+            xsi:type="predicates:RepositoryPredicate"
+            project="com.incquerylabs.evm.jdt"/>
+        <operand
+            xsi:type="predicates:NamePredicate"
+            pattern=".*setup"/>
+      </predicate>
     </workingSet>
   </setupTask>
   <stream name="master"/>
