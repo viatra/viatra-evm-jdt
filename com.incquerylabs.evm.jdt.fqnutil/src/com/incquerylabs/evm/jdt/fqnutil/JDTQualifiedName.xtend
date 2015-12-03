@@ -7,9 +7,9 @@ class JDTQualifiedName extends QualifiedName {
 	static def QualifiedName create(String qualifiedName) {
 		val lastIndexOfSeparator = qualifiedName.lastIndexOf(JDT_SEPARATOR)
 		if(lastIndexOfSeparator == -1) {
-			return new UMLQualifiedName(qualifiedName, null) 
+			return new JDTQualifiedName(qualifiedName, null) 
 		} else {
-			return new UMLQualifiedName(qualifiedName, create(qualifiedName.substring(lastIndexOfSeparator + JDT_SEPARATOR.length)))
+			return new JDTQualifiedName(qualifiedName.substring(lastIndexOfSeparator + JDT_SEPARATOR.length), create(qualifiedName.substring(0, lastIndexOfSeparator)))
 		}
 	}
 	

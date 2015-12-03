@@ -9,7 +9,7 @@ class UMLQualifiedName extends QualifiedName {
 		if(lastIndexOfSeparator == -1) {
 			return new UMLQualifiedName(qualifiedName, null) 
 		} else {
-			return new UMLQualifiedName(qualifiedName, create(qualifiedName.substring(lastIndexOfSeparator + UML_SEPARATOR.length)))
+			return new UMLQualifiedName(qualifiedName.substring(lastIndexOfSeparator + UML_SEPARATOR.length), create(qualifiedName.substring(0, lastIndexOfSeparator)))
 		}
 	}
 	

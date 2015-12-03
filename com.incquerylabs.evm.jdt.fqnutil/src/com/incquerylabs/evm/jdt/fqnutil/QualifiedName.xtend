@@ -8,7 +8,7 @@ abstract class QualifiedName {
 	protected val Optional<? extends QualifiedName> parent
 	
 	protected new(String qualifiedName, QualifiedName parent) {
-		this.name = name
+		this.name = qualifiedName
 		this.parent = Optional::ofNullable(parent)
 	}
 	
@@ -23,7 +23,7 @@ abstract class QualifiedName {
 	override toString() {
 		val builder = new StringBuilder()
 		parent.ifPresent[
-			builder.append(it.toString) + separator
+			builder.append(it.toString).append(separator)
 		]
 		return builder.append(name).toString		 
 	}
