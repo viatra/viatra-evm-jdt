@@ -1,4 +1,4 @@
-package hu.incquerylabs.evm.jdt.fqnutil
+package com.incquerylabs.evm.jdt.fqnutil
 
 import org.eclipse.uml2.uml.Element
 

@@ -1,4 +1,4 @@
-package hu.incquerylabs.evm.jdt.fqnutil
+package com.incquerylabs.evm.jdt.fqnutil
 
 import java.util.Optional
 

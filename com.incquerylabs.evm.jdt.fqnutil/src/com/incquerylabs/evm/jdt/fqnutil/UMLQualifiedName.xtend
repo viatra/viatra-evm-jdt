@@ -1,4 +1,4 @@
-package hu.incquerylabs.evm.jdt.fqnutil
+package com.incquerylabs.evm.jdt.fqnutil
 
 class UMLQualifiedName extends QualifiedName {
 	

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FQN Utility
-Bundle-SymbolicName: hu.incquerylabs.evm.jdt.fqnutil
+Bundle-SymbolicName: com.incquerylabs.evm.jdt.fqnutil
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: com.google.guava,
@@ -10,5 +10,5 @@ Require-Bundle: com.google.guava,
  org.eclipse.xtend.lib.macro,
  org.eclipse.jdt.core;bundle-version="3.11.1",
  org.eclipse.uml2.uml;bundle-version="5.1.0"
-Export-Package: hu.incquerylabs.evm.jdt.fqnutil
+Export-Package: com.incquerylabs.evm.jdt.fqnutil
 

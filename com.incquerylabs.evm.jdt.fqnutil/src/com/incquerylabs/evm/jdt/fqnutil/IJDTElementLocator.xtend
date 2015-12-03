@@ -1,4 +1,4 @@
-package hu.incquerylabs.evm.jdt.fqnutil
+package com.incquerylabs.evm.jdt.fqnutil
 
 import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.dom.ASTNode
