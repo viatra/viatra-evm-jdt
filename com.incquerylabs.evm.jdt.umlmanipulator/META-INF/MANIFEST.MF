@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Umlmanipulator
+Bundle-SymbolicName: com.incquerylabs.evm.jdt.umlmanipulator
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: INCQUERYLABS
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.uml2.uml;bundle-version="5.1.0",
+ com.google.guava,
+ org.eclipse.xtext.xbase.lib,
+ org.eclipse.xtend.lib,
+ org.eclipse.xtend.lib.macro,
+ org.apache.log4j;bundle-version="1.2.15"
+Export-Package: com.incquerylabs.evm.jdt.umlmanipulator,
+ com.incquerylabs.evm.jdt.umlmanipulator.impl,
+ com.incquerylabs.evm.jdt.umlmanipulator.impl.logger
+
