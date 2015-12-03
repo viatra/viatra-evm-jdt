@@ -1,6 +1,6 @@
 package com.incquerylabs.evm.jdt.ui
 
-import com.incquerylabs.evm.jdt.application.JDTEventDrivenApp
+import com.incquerylabs.evm.jdt.uml.transformation.JDTUMLTransformation
 import org.eclipse.core.commands.AbstractHandler
 import org.eclipse.core.commands.ExecutionEvent
 import org.eclipse.core.commands.ExecutionException
@@ -43,8 +43,8 @@ class JavaProjectHandler extends AbstractHandler {
 
 	def private void startTransformation(IJavaProject project) {
 		System::out.println('''Working on project «project.elementName»'''.toString)
-		val JDTEventDrivenApp jdtApp = new JDTEventDrivenApp()
-		jdtApp.start(project)
+		val JDTUMLTransformation umlTransformation = new JDTUMLTransformation()
+		umlTransformation.start(project)
 	}
 	
 	def reportError(Shell shell, Throwable exception, String message, String details) {
