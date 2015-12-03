@@ -3,5 +3,5 @@ package hu.incquerylabs.evm.jdt.fqnutil
 import org.eclipse.uml2.uml.Element
 
 interface IUMLElementLocator {
-	def Element locate(String qualifiedName)
+	def Element locate(QualifiedName qualifiedName)
 }

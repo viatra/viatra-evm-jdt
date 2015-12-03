@@ -1,7 +1,10 @@
 package hu.incquerylabs.evm.jdt.fqnutil
 
 import org.eclipse.jdt.core.IJavaElement
+import org.eclipse.jdt.core.dom.ASTNode
 
 interface IJDTElementLocator {
-	def IJavaElement locate(String qualifiedName)
+	def IJavaElement locateJavaElement(QualifiedName qualifiedName)
+	
+	def ASTNode locateASTNode(QualifiedName qualifiedName)
 }
