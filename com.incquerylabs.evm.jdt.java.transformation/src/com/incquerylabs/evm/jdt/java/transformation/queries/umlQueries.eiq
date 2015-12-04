@@ -1,0 +1,14 @@
+package com.incquerylabs.evm.jdt.^java.transformation.queries
+
+import "http://www.eclipse.org/uml2/5.0.0/UML"
+
+pattern umlClass(class:Class) {
+	Class(class);
+}
+
+pattern associationOfClass(class: Class, association: Association, endType: Class) {
+	find umlClass(class);
+	Association.ownedEnd.type(association, class);
+	Association.navigableOwnedEnd.type(association, endType);
+	class != endType;
+}
