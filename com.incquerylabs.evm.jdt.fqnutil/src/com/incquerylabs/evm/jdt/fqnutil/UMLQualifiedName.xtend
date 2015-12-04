@@ -16,7 +16,7 @@ class UMLQualifiedName extends QualifiedName {
 	}
 	
 	static def QualifiedName create(QualifiedName qualifiedName) {
-		create(Joiner::on(UML_SEPARATOR).join(qualifiedName))
+		create(Joiner::on(UML_SEPARATOR).join(qualifiedName.toList.reverse))
 	}
 	
 	protected new(String qualifiedName, QualifiedName parent) {
