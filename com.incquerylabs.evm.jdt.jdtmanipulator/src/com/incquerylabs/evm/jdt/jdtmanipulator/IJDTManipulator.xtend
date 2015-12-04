@@ -6,7 +6,7 @@ interface IJDTManipulator {
 
 	def void createPackage(QualifiedName qualifiedName)
 	def void createClass(QualifiedName qualifiedName)
-	def void createField(QualifiedName qualifiedName, QualifiedName type)
+	def void createField(QualifiedName containerName, String fieldName, QualifiedName type)
 	def void createMethod(QualifiedName qualifiedName)
 	
 	def void deletePackage(QualifiedName qualifiedName)
