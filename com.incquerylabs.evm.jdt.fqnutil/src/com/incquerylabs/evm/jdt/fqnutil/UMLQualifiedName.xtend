@@ -1,5 +1,7 @@
 package com.incquerylabs.evm.jdt.fqnutil
 
+import com.google.common.base.Joiner
+
 class UMLQualifiedName extends QualifiedName {
 	
 	static val UML_SEPARATOR = "::"
@@ -11,6 +13,10 @@ class UMLQualifiedName extends QualifiedName {
 		} else {
 			return new UMLQualifiedName(qualifiedName.substring(lastIndexOfSeparator + UML_SEPARATOR.length), create(qualifiedName.substring(0, lastIndexOfSeparator)))
 		}
+	}
+	
+	static def QualifiedName create(QualifiedName qualifiedName) {
+		create(Joiner::on(UML_SEPARATOR).join(qualifiedName))
 	}
 	
 	protected new(String qualifiedName, QualifiedName parent) {
