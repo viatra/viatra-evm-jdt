@@ -3,17 +3,18 @@ package com.incquerylabs.evm.jdt.uml.transformation.rules
 import com.incquerylabs.evm.jdt.JDTActivationState
 import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
 import com.incquerylabs.evm.jdt.JDTRule
+import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
 import com.incquerylabs.evm.jdt.job.JDTJobFactory
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
+import org.eclipse.jdt.core.IField
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IType
-import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
 
-class ClassRule extends JDTRule {
+class AssociationRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
 	extension val IUMLManipulator umlManipulator
 	
@@ -30,30 +31,19 @@ class ClassRule extends JDTRule {
 	
 	override initialize() {
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.APPEARED)[activation, context |
-			val javaClass = activation.atom
-			if(javaClass instanceof IType){
-				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
-				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
-				createClass(umlQualifiedName)
+			val javaField = activation.atom
+			if(javaField instanceof IField) {
+				val parentClass = javaField.parent
+				if(parentClass instanceof IType) {
+					val javaQualifiedName = JDTQualifiedName::create('''«parentClass.fullyQualifiedName»::«javaField.elementName»''')
+					val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
+					val typeUmlQualifiedName = UMLQualifiedName::create('''«umlQualifiedName.parent.get»::«javaField.typeSignature»''')
+					val typeRoot = javaField.typeRoot
+					val typeAsd = javaField.getType(javaField.elementName, javaField.occurrenceCount)
+					createAssociation(umlQualifiedName, typeUmlQualifiedName)
+					
+				}
 				save
-			}
-		])
-		jobs.add(JDTJobFactory.createJob(JDTActivationState.DISAPPEARED)[activation, context |
-			val javaClass = activation.atom
-			if(javaClass instanceof IType){
-				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
-				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
-				deleteClass(umlQualifiedName)
-				save
-			}
-		])
-		jobs.add(JDTJobFactory.createJob(JDTActivationState.UPDATED)[activation, context |
-			val javaClass = activation.atom
-			if(javaClass instanceof IType){
-				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
-				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
-//				updateName(umlQualifiedName)
-//				save
 			}
 		])
 	}
