@@ -1,7 +1,7 @@
 package com.incquerylabs.evm.jdt.fqnutil
 
-import java.util.Optional
 import java.util.Iterator
+import java.util.Optional
 
 abstract class QualifiedName implements Iterable<String> {
 	
@@ -56,4 +56,12 @@ abstract class QualifiedName implements Iterable<String> {
 		}
 		
 	}
+	
+	override equals(Object obj) {
+		if(obj instanceof QualifiedName) {
+			return this.toString.equals(obj.toString)
+		}
+		return false
+	}
+	
 }
