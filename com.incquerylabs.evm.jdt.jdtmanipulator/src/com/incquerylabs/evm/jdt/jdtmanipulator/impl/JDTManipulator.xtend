@@ -19,8 +19,8 @@ class JDTManipulator implements IJDTManipulator {
 	IJavaProject rootProject
 	IJDTElementLocator elementLocator
 
-	new(IJavaProject rootProject, IJDTElementLocator elementLocator) {
-		this.rootProject = rootProject
+	new(IJDTElementLocator elementLocator) {
+		this.rootProject = elementLocator.javaProject
 		this.elementLocator = elementLocator
 	}
 
@@ -30,15 +30,20 @@ class JDTManipulator implements IJDTManipulator {
 		val packageName = qualifiedName.parent.map[toString].orElse("")
 
 		val package = packageRoot.createPackageFragment(packageName, false, new NullProgressMonitor)
-		package.createCompilationUnit(qualifiedName.name + ".java", '''«IF packageName != ""»package «packageName»;«ENDIF»''', false, new NullProgressMonitor)
+		package.createCompilationUnit(qualifiedName.name + ".java", getClassBody(packageName, qualifiedName.name), false, new NullProgressMonitor)
+	}
+	
+	private def getClassBody(String packageName, String className) {
+		'''«IF packageName != ""»package «packageName»;«ENDIF»
+		
+		public class «className» {
+			
+		}		
+		'''.toString
 	}
 
-	override def createField(QualifiedName qualifiedName, QualifiedName type) {
-		val parentName = qualifiedName.parent.orElseThrow [
-			new IllegalArgumentException(
-				String::format(JDTManipulator.ASSOCIATION_REQUIRES_QUALIFIED_NAME, qualifiedName.toString))
-		]
-		elementLocator.locateClass(parentName).createField('''«type.toString» «qualifiedName.name»;''', null, false, new NullProgressMonitor)
+	override def createField(QualifiedName containerName, String fieldName, QualifiedName type) {
+		elementLocator.locateClass(containerName).createField('''«type.toString» «fieldName»;''', null, false, new NullProgressMonitor)
 	}
 
 	override createPackage(QualifiedName qualifiedName) {
