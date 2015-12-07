@@ -43,4 +43,15 @@ class UMLElementLocator implements IUMLElementLocator {
 		umlModel
 	}
 	
+	override locateElement(QualifiedName qualifiedName) {
+		val modelQualifiedName = UMLQualifiedName::create(umlModel.qualifiedName)
+		if(modelQualifiedName == qualifiedName) {
+			return umlModel
+		} else {
+			umlModel.allOwnedElements.filter(NamedElement).findFirst[element|
+				UMLQualifiedName.create(element.qualifiedName) == qualifiedName
+			]
+		}
+	}
+	
 }
