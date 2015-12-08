@@ -33,6 +33,10 @@ class UMLManipulationLogger implements IUMLManipulator {
 		debug('''Deleted UML association: «fqn»''')
 	}
 	
+	override updateType(QualifiedName fqn, QualifiedName typeQualifiedName) {
+		debug('''Updated type of «fqn» to «typeQualifiedName»''')
+	}
+	
 	override save() {
 		debug('''Saved UML resource''')
 	}

@@ -13,6 +13,12 @@ import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
 import org.eclipse.jdt.core.IField
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IType
+import org.eclipse.jdt.core.dom.ASTParser
+import org.eclipse.jdt.core.dom.AST
+import org.eclipse.core.runtime.NullProgressMonitor
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment
+import org.eclipse.jdt.core.dom.ASTVisitor
+import org.eclipse.jdt.core.dom.FieldDeclaration
 
 class AssociationRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
@@ -37,13 +43,80 @@ class AssociationRule extends JDTRule {
 				if(parentClass instanceof IType) {
 					val javaQualifiedName = JDTQualifiedName::create('''«parentClass.fullyQualifiedName»::«javaField.elementName»''')
 					val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
-					val typeUmlQualifiedName = UMLQualifiedName::create('''«umlQualifiedName.parent.get»::«javaField.typeSignature»''')
-					val typeRoot = javaField.typeRoot
-					val typeAsd = javaField.getType(javaField.elementName, javaField.occurrenceCount)
-					createAssociation(umlQualifiedName, typeUmlQualifiedName)
 					
+					val parser = ASTParser.newParser(AST.JLS8)
+					parser.resolveBindings = true
+					parser.source = javaField.compilationUnit
+					val unitNode = parser.createAST(new NullProgressMonitor)
+					
+					unitNode.accept(new ASTVisitor{
+						override visit(VariableDeclarationFragment node){
+							val binding = node.resolveBinding
+							if(binding == null) {
+								return false
+							}
+							val element = binding.javaElement
+							if(javaField == element) {
+								val fieldDeclaration = node.parent as FieldDeclaration
+								val type = fieldDeclaration.type.resolveBinding.javaElement as IType
+								val typeJavaQualifiedName = JDTQualifiedName.create(type.fullyQualifiedName)
+								val typeQualifiedName = UMLQualifiedName.create(typeJavaQualifiedName)
+								createAssociation(umlQualifiedName, typeQualifiedName)
+								save
+								return false
+							}
+							return true
+						}
+					})
 				}
-				save
+			}
+		])
+		
+		jobs.add(JDTJobFactory.createJob(JDTActivationState.DISAPPEARED)[activation, context |
+			val javaField = activation.atom
+			if(javaField instanceof IField) {
+				val parentClass = javaField.declaringType
+				if(parentClass != null) {
+					val javaQualifiedName = JDTQualifiedName::create('''«parentClass.fullyQualifiedName»::«javaField.elementName»''')
+					val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
+					deleteAssociation(umlQualifiedName)
+					save
+				}
+			}
+		])
+		
+		jobs.add(JDTJobFactory.createJob(JDTActivationState.UPDATED)[activation, context |
+			val javaField = activation.atom
+			if(javaField instanceof IField) {
+				val parentClass = javaField.declaringType
+				if(parentClass != null) {
+					val javaQualifiedName = JDTQualifiedName::create('''«parentClass.fullyQualifiedName»::«javaField.elementName»''')
+					val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
+					val parser = ASTParser.newParser(AST.JLS8)
+					parser.resolveBindings = true
+					parser.source = javaField.compilationUnit
+					val unitNode = parser.createAST(new NullProgressMonitor)
+					
+					unitNode.accept(new ASTVisitor{
+						override visit(VariableDeclarationFragment node){
+							val binding = node.resolveBinding
+							if(binding == null) {
+								return false
+							}
+							val element = binding.javaElement
+							if(javaField == element) {
+								val fieldDeclaration = node.parent as FieldDeclaration
+								val type = fieldDeclaration.type.resolveBinding.javaElement as IType
+								val typeJavaQualifiedName = JDTQualifiedName.create(type.fullyQualifiedName)
+								val typeQualifiedName = UMLQualifiedName.create(typeJavaQualifiedName)
+								updateType(umlQualifiedName, typeQualifiedName)
+								save
+								return false
+							}
+							return true
+						}
+					})
+				}
 			}
 		])
 	}
