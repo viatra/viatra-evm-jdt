@@ -26,6 +26,14 @@
             </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.papyrus.views.modelexplorer.modelexplorer.popup">
+         <command
+               commandId="com.incquerylabs.evm.jdt.ui.modelcodesync"
+               style="push">
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -39,6 +47,37 @@
             id="com.incquerylabs.evm.jdt.ui.starttransform.uml2java"
             name="Start UML to Java transformation">
       </command>
+      <command
+            defaultHandler="com.incquerylabs.evm.jdt.ui.SynchronisationModelHandler"
+            id="com.incquerylabs.evm.jdt.ui.modelcodesync"
+            name="Start code synchronisation">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="com.incquerylabs.evm.jdt.ui.SelectionAdapterTester"
+            id="com.incquerylabs.evm.jdt.ui.adaptertester"
+            namespace="com.incquerylabs.evm.jdt.ui"
+            properties="isumlmodel"
+            type="org.eclipse.core.runtime.IAdaptable">
+      </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="com.incquerylabs.evm.jdt.ui.umlmodeldef">
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false">
+               <test
+                     forcePluginActivation="true"
+                     property="com.incquerylabs.evm.jdt.ui.isumlmodel">
+               </test>
+            </iterate>
+         </with>
+      </definition>
    </extension>
 
 

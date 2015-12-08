@@ -49,6 +49,7 @@ class UMLModelHandler extends AbstractHandler {
 
 		return null
 	}
+	
 
 	def getModel(IStructuredSelection selection) {
 		val firstSelectedElement = selection.firstElement
