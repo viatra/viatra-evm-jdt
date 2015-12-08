@@ -11,6 +11,7 @@ import org.apache.log4j.Logger
 import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IType
+import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
 
 class ClassRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
@@ -31,22 +32,28 @@ class ClassRule extends JDTRule {
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.APPEARED)[activation, context |
 			val javaClass = activation.atom
 			if(javaClass instanceof IType){
-				val qualifiedName = UMLQualifiedName::create(javaClass.fullyQualifiedName)
-				createClass(qualifiedName)
-				updateClass(qualifiedName)
+				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
+				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
+				createClass(umlQualifiedName)
+				save
 			}
 		])
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.DISAPPEARED)[activation, context |
 			val javaClass = activation.atom
 			if(javaClass instanceof IType){
-				deleteClass(UMLQualifiedName::create(javaClass.fullyQualifiedName))
+				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
+				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
+				deleteClass(umlQualifiedName)
+				save
 			}
 		])
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.UPDATED)[activation, context |
 			val javaClass = activation.atom
 			if(javaClass instanceof IType){
-				val qualifiedName = UMLQualifiedName::create(javaClass.fullyQualifiedName)
-				updateClass(qualifiedName)
+				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
+				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
+//				updateName(umlQualifiedName)
+//				save
 			}
 		])
 	}

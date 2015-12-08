@@ -17,7 +17,7 @@ class UMLManipulationLogger implements IUMLManipulator {
 		debug('''Created UML Class: «fqn»''')
 	}
 	
-	override updateClass(QualifiedName fqn) {
+	override updateName(QualifiedName fqn) {
 		debug('''Updated UML Class: «fqn»''')
 	}
 	
@@ -25,15 +25,20 @@ class UMLManipulationLogger implements IUMLManipulator {
 		debug('''Deleted UML Class: «fqn»''')
 	}
 	
-	override createAssociation(QualifiedName fqn) {
+	override createAssociation(QualifiedName fqn, QualifiedName typeQualifiedName) {
 		debug('''Created UML association: «fqn»''')
-	}
-	
-	override updateAssociation(QualifiedName fqn) {
-		debug('''Updated UML association: «fqn»''')
 	}
 	
 	override deleteAssociation(QualifiedName fqn) {
 		debug('''Deleted UML association: «fqn»''')
 	}
+	
+	override updateType(QualifiedName fqn, QualifiedName typeQualifiedName) {
+		debug('''Updated type of «fqn» to «typeQualifiedName»''')
+	}
+	
+	override save() {
+		debug('''Saved UML resource''')
+	}
+	
 }
