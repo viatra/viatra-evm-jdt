@@ -14,7 +14,7 @@ class JDTEventSourceSpecification implements EventSourceSpecification<JDTEventAt
 	override AbstractRuleInstanceBuilder<JDTEventAtom> getRuleInstanceBuilder(EventRealm realm) {
 		return ( [ RuleInstance<JDTEventAtom> ruleInstance, EventFilter<? super JDTEventAtom> filter |
 			var JDTEventSource source = new JDTEventSource(JDTEventSourceSpecification.this, realm as JDTRealm)
-			var JDTEventHandler handler = new JDTEventHandler(source, filter as JDTEventFilter, ruleInstance)
+			var JDTEventHandler handler = new JDTEventHandler(source, filter, ruleInstance)
 			source.addHandler(handler)
 		] as AbstractRuleInstanceBuilder<JDTEventAtom>)
 	}

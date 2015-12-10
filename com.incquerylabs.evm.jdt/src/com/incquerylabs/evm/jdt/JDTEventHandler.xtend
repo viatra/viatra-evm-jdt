@@ -8,11 +8,11 @@ import org.eclipse.incquery.runtime.evm.api.event.EventSource
 
 class JDTEventHandler implements EventHandler<JDTEventAtom>{
 	
-	JDTEventFilter filter
+	EventFilter<? super JDTEventAtom> filter
 	JDTEventSource source
 	RuleInstance<JDTEventAtom> instance
 	
-	new(JDTEventSource source, JDTEventFilter filter, RuleInstance<JDTEventAtom> instance) {
+	new(JDTEventSource source, EventFilter<? super JDTEventAtom> filter, RuleInstance<JDTEventAtom> instance) {
 		this.source=source
 		this.filter=filter
 		this.instance=instance 
@@ -20,29 +20,17 @@ class JDTEventHandler implements EventHandler<JDTEventAtom>{
 	
 	override void handleEvent(Event<JDTEventAtom> event) {
 		val type=event.getEventType() as JDTEventType 
-		val eventAtom=event.getEventAtom() 
-		val activation = getOrCreateActivation(eventAtom)
-		
-		switch (type) {
-			case APPEARED:{
-				instance.activationStateTransition(activation, type)
-			}
-			case DISAPPEARED:{
-				instance.activationStateTransition(activation, type)
-			}
-			case UPDATED:{
-				instance.activationStateTransition(activation, type)
-			}
-			default :{
-				System.err.println("Something bad happened")
-			}
+		val eventAtom=event.getEventAtom()
+		if(filter.isProcessable(eventAtom)){
+			val activation = getOrCreateActivation(eventAtom)
+			instance.activationStateTransition(activation, type)
 		}
 	}
 	override EventSource<JDTEventAtom> getSource() {
 		return source 
 	}
 	override EventFilter<? super JDTEventAtom> getEventFilter() {
-		return filter 
+		return filter
 	}
 	override void dispose() {
 		
