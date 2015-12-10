@@ -54,6 +54,9 @@
         name="org.eclipse.incquery.uml.feature.feature.group"/>
     <requirement
         name="org.eclipse.xtext.sdk.feature.group"/>
+    <requirement
+        name="org.eclipse.modisco.sdk.feature.feature.group"
+        optional="true"/>
     <repository
         url="http://download.eclipse.org/incquery/updates-extra/release"/>
     <repository
