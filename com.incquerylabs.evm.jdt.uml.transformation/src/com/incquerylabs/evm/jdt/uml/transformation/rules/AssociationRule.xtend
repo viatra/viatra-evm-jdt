@@ -62,7 +62,6 @@ class AssociationRule extends JDTRule {
 								val typeJavaQualifiedName = JDTQualifiedName.create(type.fullyQualifiedName)
 								val typeQualifiedName = UMLQualifiedName.create(typeJavaQualifiedName)
 								createAssociation(umlQualifiedName, typeQualifiedName)
-								save
 								return false
 							}
 							return true
@@ -80,7 +79,6 @@ class AssociationRule extends JDTRule {
 					val javaQualifiedName = JDTQualifiedName::create('''«parentClass.fullyQualifiedName»::«javaField.elementName»''')
 					val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
 					deleteAssociation(umlQualifiedName)
-					save
 				}
 			}
 		])
@@ -110,7 +108,6 @@ class AssociationRule extends JDTRule {
 								val typeJavaQualifiedName = JDTQualifiedName.create(type.fullyQualifiedName)
 								val typeQualifiedName = UMLQualifiedName.create(typeJavaQualifiedName)
 								updateType(umlQualifiedName, typeQualifiedName)
-								save
 								return false
 							}
 							return true

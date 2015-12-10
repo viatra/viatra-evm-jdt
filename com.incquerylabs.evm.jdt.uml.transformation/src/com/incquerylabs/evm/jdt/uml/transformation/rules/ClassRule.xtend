@@ -35,7 +35,6 @@ class ClassRule extends JDTRule {
 				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
 				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
 				createClass(umlQualifiedName)
-				save
 			}
 		])
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.DISAPPEARED)[activation, context |
@@ -44,7 +43,6 @@ class ClassRule extends JDTRule {
 				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
 				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
 				deleteClass(umlQualifiedName)
-				save
 			}
 		])
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.UPDATED)[activation, context |
@@ -53,7 +51,6 @@ class ClassRule extends JDTRule {
 				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
 				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
 //				updateName(umlQualifiedName)
-//				save
 			}
 		])
 	}
