@@ -4,8 +4,7 @@ import com.incquerylabs.evm.jdt.JDTActivationLifeCycle
 import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
 import com.incquerylabs.evm.jdt.JDTRealm
 import com.incquerylabs.evm.jdt.JDTRule
-import com.incquerylabs.evm.jdt.uml.transformation.rules.AssociationRule
-import com.incquerylabs.evm.jdt.uml.transformation.rules.ClassRule
+import com.incquerylabs.evm.jdt.uml.transformation.rules.CompilationUnitRule
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import com.incquerylabs.evm.jdt.umlmanipulator.impl.TransactionalManipulator
 import com.incquerylabs.evm.jdt.umlmanipulator.impl.UMLManipulator
@@ -53,10 +52,12 @@ class JDTUMLTransformation {
 		
 //		val loggerRule = new LoggerRule(sourceSpec, lifeCycle, project)
 //		addRule(loggerRule)
-		val classRule = new ClassRule(sourceSpec, lifeCycle, project, umlManipulator)
-		addRule(classRule)
-		val associationRule = new AssociationRule(sourceSpec, lifeCycle, project, umlManipulator)
-		addRule(associationRule)
+//		val classRule = new ClassRule(sourceSpec, lifeCycle, project, umlManipulator)
+//		addRule(classRule)
+//		val associationRule = new AssociationRule(sourceSpec, lifeCycle, project, umlManipulator)
+//		addRule(associationRule)
+		val compilationUnitRule = new CompilationUnitRule(sourceSpec, lifeCycle, project, umlManipulator)
+		addRule(compilationUnitRule)
 		
 		addTimedScheduler(100)
 	}
