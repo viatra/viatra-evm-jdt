@@ -37,7 +37,7 @@ class AssociationRule extends JDTRule {
 	
 	override initialize() {
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.APPEARED)[activation, context |
-			val javaField = activation.atom
+			val javaField = activation.atom.element
 			if(javaField instanceof IField) {
 				val parentClass = javaField.parent
 				if(parentClass instanceof IType) {
@@ -72,7 +72,7 @@ class AssociationRule extends JDTRule {
 		])
 		
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.DISAPPEARED)[activation, context |
-			val javaField = activation.atom
+			val javaField = activation.atom.element
 			if(javaField instanceof IField) {
 				val parentClass = javaField.declaringType
 				if(parentClass != null) {
@@ -84,7 +84,7 @@ class AssociationRule extends JDTRule {
 		])
 		
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.UPDATED)[activation, context |
-			val javaField = activation.atom
+			val javaField = activation.atom.element
 			if(javaField instanceof IField) {
 				val parentClass = javaField.declaringType
 				if(parentClass != null) {

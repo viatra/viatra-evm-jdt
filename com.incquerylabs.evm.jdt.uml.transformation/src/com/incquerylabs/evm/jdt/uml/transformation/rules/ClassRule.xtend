@@ -30,7 +30,7 @@ class ClassRule extends JDTRule {
 	
 	override initialize() {
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.APPEARED)[activation, context |
-			val javaClass = activation.atom
+			val javaClass = activation.atom.element
 			if(javaClass instanceof IType){
 				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
 				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
@@ -38,21 +38,21 @@ class ClassRule extends JDTRule {
 			}
 		])
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.DISAPPEARED)[activation, context |
-			val javaClass = activation.atom
+			val javaClass = activation.atom.element
 			if(javaClass instanceof IType){
 				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
 				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
 				deleteClass(umlQualifiedName)
 			}
 		])
-		jobs.add(JDTJobFactory.createJob(JDTActivationState.UPDATED)[activation, context |
-			val javaClass = activation.atom
-			if(javaClass instanceof IType){
-				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
-				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
+//		jobs.add(JDTJobFactory.createJob(JDTActivationState.UPDATED)[activation, context |
+//			val javaClass = activation.atom
+//			if(javaClass instanceof IType){
+//				val javaQualifiedName = JDTQualifiedName::create(javaClass.fullyQualifiedName)
+//				val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
 //				updateName(umlQualifiedName)
-			}
-		])
+//			}
+//		])
 	}
 	
 }

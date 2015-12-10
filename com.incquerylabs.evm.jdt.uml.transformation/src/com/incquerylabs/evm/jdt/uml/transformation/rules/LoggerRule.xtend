@@ -19,13 +19,13 @@ class LoggerRule extends JDTRule {
 	
 	override initialize() {
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.APPEARED)[activation, context |
-			debug('''Element appeared: «activation.atom»''')
+			debug('''Element appeared: «activation.atom.element»''')
 		])
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.DISAPPEARED)[activation, context |
-			debug('''Element disappeared: «activation.atom»''')
+			debug('''Element disappeared: «activation.atom.element»''')
 		])
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.UPDATED)[activation, context |
-			debug('''Element is updated: «activation.atom»''')
+			debug('''Element is updated: «activation.atom.element»''')
 		])
 	}
 	
