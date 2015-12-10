@@ -5,10 +5,10 @@ import java.util.Set
 import org.eclipse.incquery.runtime.evm.api.event.EventRealm
 import org.eclipse.incquery.runtime.evm.api.event.EventSource
 import org.eclipse.incquery.runtime.evm.api.event.EventSourceSpecification
+import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaElementDelta
 
 import static extension com.incquerylabs.evm.jdt.util.JDTEventTypeDecoder.toEventType
-import org.eclipse.jdt.core.IJavaElement
 
 class JDTEventSource implements EventSource<IJavaElement> {
 	JDTEventSourceSpecification spec
@@ -32,12 +32,12 @@ class JDTEventSource implements EventSource<IJavaElement> {
 	override void dispose() {
 	}
 
-	def void pushChange(IJavaElementDelta delta) {
+	def void createEvent(IJavaElementDelta delta) {
 		val javaElement = delta.element
 		val JDTEvent event = new JDTEvent(delta.kind.toEventType, javaElement)
 		handlers.forEach[handleEvent(event)]
 		delta.affectedChildren.forEach[affectedChildren |
-			pushChange(affectedChildren)
+			createEvent(affectedChildren)
 		]
 	}
 

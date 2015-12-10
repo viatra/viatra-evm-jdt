@@ -41,7 +41,7 @@ class JDTEventSourceTest {
 		val handler = mock(JDTEventHandler, "eventHandlerMock")
 		source.addHandler(handler)
 		// Act
-		source.pushChange(delta)
+		source.createEvent(delta)
 		
 		// Assert
 		var ArgumentCaptor<JDTEvent> eventCaptor = ArgumentCaptor.forClass(JDTEvent);
@@ -68,7 +68,7 @@ class JDTEventSourceTest {
 		val handler = mock(JDTEventHandler, "eventHandlerMock")
 		source.addHandler(handler)
 		// Act
-		source.pushChange(topLevelDelta)
+		source.createEvent(topLevelDelta)
 		
 		// Assert
 		var ArgumentCaptor<JDTEvent> eventCaptor = ArgumentCaptor.forClass(JDTEvent);

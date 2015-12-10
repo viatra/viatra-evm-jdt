@@ -65,7 +65,6 @@ class JDTUMLTransformation {
 		val associationRule = new AssociationRule(sourceSpec, lifeCycle, project, umlManipulator)
 		addRule(associationRule)
 		
-		addJDTEventListener
 		addTimedScheduler(100)
 	}
 	
@@ -78,9 +77,4 @@ class JDTUMLTransformation {
 		ruleEngine.addRule(rule.ruleSpecification, rule.filter)
 	}
 	
-	private def addJDTEventListener() {
-		JavaCore::addElementChangedListener(([ ElementChangedEvent event |
-			jdtRealm.pushChange(event.delta)
-		] as IElementChangedListener))
-	}
 }
