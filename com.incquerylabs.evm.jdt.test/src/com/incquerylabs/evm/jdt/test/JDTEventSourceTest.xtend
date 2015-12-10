@@ -47,7 +47,8 @@ class JDTEventSourceTest {
 		var ArgumentCaptor<JDTEvent> eventCaptor = ArgumentCaptor.forClass(JDTEvent);
 		verify(handler).handleEvent(eventCaptor.capture)
 		
-		assertEquals("No event created for delta", element, eventCaptor.value.eventAtom)
+		assertNotNull("No event created for delta", eventCaptor.value.eventAtom)
+		assertEquals("No event created for delta", element, eventCaptor.value.eventAtom.element)
 	}
 	
 	@Test
@@ -75,7 +76,7 @@ class JDTEventSourceTest {
 		verify(handler, times(2)).handleEvent(eventCaptor.capture)
 		
 		val capturedEvents = eventCaptor.allValues
-		assertTrue("No event created for top level delta", capturedEvents.exists[eventAtom == topLevelElement])
-		assertTrue("No event created for child delta", capturedEvents.exists[eventAtom == childElement])
+		assertTrue("No event created for top level delta", capturedEvents.exists[eventAtom?.element == topLevelElement])
+		assertTrue("No event created for child delta", capturedEvents.exists[eventAtom?.element == childElement])
 	}
 }

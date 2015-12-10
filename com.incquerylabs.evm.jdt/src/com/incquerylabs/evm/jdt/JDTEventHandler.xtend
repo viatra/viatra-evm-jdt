@@ -5,21 +5,20 @@ import org.eclipse.incquery.runtime.evm.api.event.Event
 import org.eclipse.incquery.runtime.evm.api.event.EventFilter
 import org.eclipse.incquery.runtime.evm.api.event.EventHandler
 import org.eclipse.incquery.runtime.evm.api.event.EventSource
-import org.eclipse.jdt.core.IJavaElement
 
-class JDTEventHandler implements EventHandler<IJavaElement>{
+class JDTEventHandler implements EventHandler<JDTEventAtom>{
 	
 	JDTEventFilter filter
 	JDTEventSource source
-	RuleInstance<IJavaElement> instance
+	RuleInstance<JDTEventAtom> instance
 	
-	new(JDTEventSource source, JDTEventFilter filter, RuleInstance<IJavaElement> instance) {
+	new(JDTEventSource source, JDTEventFilter filter, RuleInstance<JDTEventAtom> instance) {
 		this.source=source
 		this.filter=filter
 		this.instance=instance 
 	}
 	
-	override void handleEvent(Event<IJavaElement> event) {
+	override void handleEvent(Event<JDTEventAtom> event) {
 		val type=event.getEventType() as JDTEventType 
 		val eventAtom=event.getEventAtom() 
 		val activation = getOrCreateActivation(eventAtom)
@@ -39,22 +38,24 @@ class JDTEventHandler implements EventHandler<IJavaElement>{
 			}
 		}
 	}
-	override EventSource<IJavaElement> getSource() {
+	override EventSource<JDTEventAtom> getSource() {
 		return source 
 	}
-	override EventFilter<? super IJavaElement> getEventFilter() {
+	override EventFilter<? super JDTEventAtom> getEventFilter() {
 		return filter 
 	}
 	override void dispose() {
 		
 	}
 	
-	private def getOrCreateActivation(IJavaElement eventAtom){
+	private def getOrCreateActivation(JDTEventAtom eventAtom){
 		val activations = instance.allActivations
 		val activation = activations.findFirst[it.atom == eventAtom]
 
 		if(activation == null){
 			return instance.createActivation(eventAtom)
+		} else {
+			activation.atom.delta = eventAtom.delta
 		}
 		return activation
 	}

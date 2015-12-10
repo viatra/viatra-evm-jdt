@@ -2,17 +2,16 @@ package com.incquerylabs.evm.jdt
 
 import org.eclipse.incquery.runtime.evm.api.event.Event
 import org.eclipse.incquery.runtime.evm.api.event.EventType
-import org.eclipse.jdt.core.IJavaElement
 
-class JDTEvent implements Event<IJavaElement> {
+class JDTEvent implements Event<JDTEventAtom> {
 	JDTEventType type
-	IJavaElement atom
+	JDTEventAtom atom
 
 	/** 
 	 * @param type
 	 * @param atom
 	 */
-	new(JDTEventType type, IJavaElement atom) {
+	new(JDTEventType type, JDTEventAtom atom) {
 		this.type = type
 		this.atom = atom
 	}
@@ -22,7 +21,7 @@ class JDTEvent implements Event<IJavaElement> {
 		return type
 	}
 
-	override IJavaElement getEventAtom() {
+	override JDTEventAtom getEventAtom() {
 		return atom
 	}
 

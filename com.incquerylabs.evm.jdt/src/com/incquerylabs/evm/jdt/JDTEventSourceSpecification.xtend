@@ -5,19 +5,18 @@ import org.eclipse.incquery.runtime.evm.api.event.AbstractRuleInstanceBuilder
 import org.eclipse.incquery.runtime.evm.api.event.EventFilter
 import org.eclipse.incquery.runtime.evm.api.event.EventRealm
 import org.eclipse.incquery.runtime.evm.api.event.EventSourceSpecification
-import org.eclipse.jdt.core.IJavaElement
 
-class JDTEventSourceSpecification implements EventSourceSpecification<IJavaElement> {
-	override EventFilter<IJavaElement> createEmptyFilter() {
+class JDTEventSourceSpecification implements EventSourceSpecification<JDTEventAtom> {
+	override EventFilter<JDTEventAtom> createEmptyFilter() {
 		return new JDTEventFilter()
 	}
 
-	override AbstractRuleInstanceBuilder<IJavaElement> getRuleInstanceBuilder(EventRealm realm) {
-		return ( [ RuleInstance<IJavaElement> ruleInstance, EventFilter<? super IJavaElement> filter |
+	override AbstractRuleInstanceBuilder<JDTEventAtom> getRuleInstanceBuilder(EventRealm realm) {
+		return ( [ RuleInstance<JDTEventAtom> ruleInstance, EventFilter<? super JDTEventAtom> filter |
 			var JDTEventSource source = new JDTEventSource(JDTEventSourceSpecification.this, realm as JDTRealm)
 			var JDTEventHandler handler = new JDTEventHandler(source, filter as JDTEventFilter, ruleInstance)
 			source.addHandler(handler)
-		] as AbstractRuleInstanceBuilder<IJavaElement>)
+		] as AbstractRuleInstanceBuilder<JDTEventAtom>)
 	}
 
 }

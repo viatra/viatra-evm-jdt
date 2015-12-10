@@ -13,10 +13,11 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
 import static org.mockito.Mockito.*
+import com.incquerylabs.evm.jdt.JDTEventAtom
 
 class JDTEventHandlerTest {
 	@Mock(name = "ruleInstanceMock") 
-	private RuleInstance<IJavaElement> ruleInstance
+	private RuleInstance<JDTEventAtom> ruleInstance
 	@InjectMocks 
 	private JDTEventHandler eventHandler
 	
@@ -30,10 +31,12 @@ class JDTEventHandlerTest {
 	def void handleEvent_appearedEvent_lifecycleTransitionCalled() {
 		// Arrange
 		val eventType = JDTEventType.APPEARED
-		val eventAtom = mock(IJavaElement, "eventAtomMock")
+		val javaElement = mock(IJavaElement, "javaElementMock")
+		val eventAtom = mock(JDTEventAtom, "eventAtomMock")
 		val event = mock(JDTEvent, "eventMock")
 		when(event.eventType).thenReturn(eventType)
 		when(event.eventAtom).thenReturn(eventAtom)
+		when(eventAtom.element).thenReturn(javaElement)
 		
 		val activation = mock(Activation, "activationMock")
 		when(ruleInstance.createActivation(eventAtom)).thenReturn(activation)
@@ -53,13 +56,15 @@ class JDTEventHandlerTest {
 		// Arrange
 		// The new event with a type and an atom
 		val eventType = JDTEventType.DISAPPEARED
-		val eventAtom = mock(IJavaElement, "eventAtomMock")
+		val javaElement = mock(IJavaElement, "javaElementMock")
+		val eventAtom = mock(JDTEventAtom, "eventAtomMock")
 		val event = mock(JDTEvent, "eventMock")
 		when(event.eventType).thenReturn(eventType)
 		when(event.eventAtom).thenReturn(eventAtom)
+		when(eventAtom.element).thenReturn(javaElement)
 		
 		// Exisiting activation with same event atom
-		val Activation<IJavaElement> activation = mock(Activation, "activationMock")
+		val Activation<JDTEventAtom> activation = mock(Activation, "activationMock")
 		when(activation.atom).thenReturn(eventAtom)
 		when(ruleInstance.allActivations).thenReturn(#[activation])
 		
@@ -68,7 +73,7 @@ class JDTEventHandlerTest {
 		
 		// Assert
 		// New activation is NOT created
-		verify(ruleInstance, never).createActivation(any(IJavaElement))
+		verify(ruleInstance, never).createActivation(any(JDTEventAtom))
 		// Life cycle transition is called on the new activation
 		verify(ruleInstance).activationStateTransition(activation, eventType)
 	}

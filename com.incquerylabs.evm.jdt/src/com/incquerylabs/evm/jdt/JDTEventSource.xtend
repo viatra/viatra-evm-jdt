@@ -5,12 +5,11 @@ import java.util.Set
 import org.eclipse.incquery.runtime.evm.api.event.EventRealm
 import org.eclipse.incquery.runtime.evm.api.event.EventSource
 import org.eclipse.incquery.runtime.evm.api.event.EventSourceSpecification
-import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaElementDelta
 
 import static extension com.incquerylabs.evm.jdt.util.JDTEventTypeDecoder.toEventType
 
-class JDTEventSource implements EventSource<IJavaElement> {
+class JDTEventSource implements EventSource<JDTEventAtom> {
 	JDTEventSourceSpecification spec
 	JDTRealm realm
 	Set<JDTEventHandler> handlers = Sets::newHashSet()
@@ -21,7 +20,7 @@ class JDTEventSource implements EventSource<IJavaElement> {
 		realm.addSource(this)
 	}
 
-	override EventSourceSpecification<IJavaElement> getSourceSpecification() {
+	override EventSourceSpecification<JDTEventAtom> getSourceSpecification() {
 		return spec
 	}
 
@@ -33,8 +32,8 @@ class JDTEventSource implements EventSource<IJavaElement> {
 	}
 
 	def void createEvent(IJavaElementDelta delta) {
-		val javaElement = delta.element
-		val JDTEvent event = new JDTEvent(delta.kind.toEventType, javaElement)
+		val eventAtom = new JDTEventAtom(delta)
+		val JDTEvent event = new JDTEvent(delta.kind.toEventType, eventAtom)
 		handlers.forEach[handleEvent(event)]
 		delta.affectedChildren.forEach[affectedChildren |
 			createEvent(affectedChildren)
