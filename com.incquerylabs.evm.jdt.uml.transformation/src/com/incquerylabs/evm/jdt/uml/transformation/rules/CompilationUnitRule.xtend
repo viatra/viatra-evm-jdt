@@ -10,6 +10,9 @@ import com.incquerylabs.evm.jdt.job.JDTJobFactory
 import com.incquerylabs.evm.jdt.JDTActivationState
 import com.incquerylabs.evm.jdt.uml.transformation.rules.filters.CompilationUnitFilter
 import org.apache.log4j.Level
+import com.incquerylabs.evm.jdt.JDTEventAtom
+import javax.management.RuntimeErrorException
+import com.incquerylabs.evm.jdt.uml.transformation.rules.visitors.TypeVisitor
 
 class CompilationUnitRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
@@ -24,8 +27,9 @@ class CompilationUnitRule extends JDTRule {
 	
 	override initialize() {
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.APPEARED)[activation, context |
-			debug('''Compilation unit appeared: «activation.atom.element»''')
-			
+			val atom = activation.atom
+			debug('''Compilation unit appeared: «atom.element»''')
+			atom.transform
 		])
 		
 		jobs.add(JDTJobFactory.createJob(JDTActivationState.DISAPPEARED)[activation, context |
@@ -39,6 +43,18 @@ class CompilationUnitRule extends JDTRule {
 		])
 	}
 	
-	
+	def transform(JDTEventAtom atom) {
+		val element = atom.element
+		val delta = atom.delta
+		val ast = delta.compilationUnitAST
+		if(ast == null) {
+			error('''AST was null, compilation unit is not transformed: «element»''')
+			return
+		}
+		val typeVisitor = new TypeVisitor(umlManipulator)
+		ast.accept(typeVisitor)
+		
+		return
+	}
 	
 }
