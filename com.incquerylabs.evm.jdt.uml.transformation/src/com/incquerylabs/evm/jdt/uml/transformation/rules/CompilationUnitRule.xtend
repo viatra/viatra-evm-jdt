@@ -62,7 +62,7 @@ class CompilationUnitRule extends JDTRule {
 		var delta = atom.delta
 		var ast = delta.compilationUnitAST
 		if(delta.flags.bitwiseAnd(IJavaElementDelta.F_AST_AFFECTED) != 0) {
-			element.deleteCorrespondingClass
+			element.deleteCorrespondingElements
 			if(ast == null) {
 				throw new IllegalArgumentException('''AST was null, compilation unit is not transformed: «element»''')
 			}
@@ -71,6 +71,11 @@ class CompilationUnitRule extends JDTRule {
 		}
 		
 		return
+	}
+	
+	def deleteCorrespondingElements(ICompilationUnit element) {
+		element.deleteCorrespondingClass
+		element.deleteCorrespondingAssociations
 	}
 	
 	def deleteCorrespondingClass(ICompilationUnit element) {
@@ -82,6 +87,10 @@ class CompilationUnitRule extends JDTRule {
 		val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
 		
 		deleteClass(umlQualifiedName)
+	}
+	
+	def deleteCorrespondingAssociations(ICompilationUnit element) {
+		
 	}
 	
 }
