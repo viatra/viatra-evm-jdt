@@ -2,13 +2,83 @@ package com.incquerylabs.evm.jdt.^java.transformation.queries
 
 import "http://www.eclipse.org/uml2/5.0.0/UML"
 
-pattern umlClass(class:Class) {
-	Class(class);
+pattern umlClass(umlClass: Class) {
+	Class(umlClass);
+	// only accept "real" classes (in UML, it has lots of counterintuitive subclasses)
+	neg find umlAssociationClass(umlClass);
+	neg find behavior(umlClass);
+	neg find umlComponent(umlClass);
+	neg find node(umlClass);
+	neg find stereotype(umlClass);
+	neg find templateParameterClass(umlClass);
+	neg find templateBindingClass(umlClass);
 }
 
-pattern associationOfClass(class: Class, association: Association, endType: Class) {
-	find umlClass(class);
-	Association.ownedEnd.type(association, class);
-	Association.navigableOwnedEnd.type(association, endType);
-	class != endType;
+pattern packageOfClass(umlClass, umlPackage) {
+	find umlClass(umlClass);
+	find umlPackage(umlPackage);
+	Package.packagedElement(umlPackage, umlClass);
+}
+
+private pattern umlAssociationClass(associationClass) {
+	AssociationClass(associationClass);
+}
+
+private pattern behavior(it) {
+	Behavior(it);
+}
+
+pattern umlComponent(component: Component) {
+	Component(component);
+}
+
+private pattern node(it) {
+	Node(it);
+}
+
+private pattern stereotype(it) {
+	Stereotype(it);
+}
+
+private pattern templateParameterClass(umlClass: Class){
+  TemplateSignature.ownedParameter(_, param);
+  ClassifierTemplateParameter.parameteredElement(param, umlClass);
+}
+
+private pattern templateBindingClass(umlClass: Class){
+  TemplateBinding.parameterSubstitution(_, param);
+  TemplateParameterSubstitution.actual(param, umlClass);
+}
+
+pattern umlClassInModel(model: Model, umlClass: Class) {
+	Model.packagedElement(model, umlClass);
+	find umlClass(umlClass);
+}
+
+pattern umlClassInPackage(umlPackage: Package, umlClass: Class) {
+	Package.packagedElement(umlPackage, umlClass);
+	find umlClass(umlClass);
+	find umlPackage(umlPackage);
+}
+
+pattern umlPackage(umlPackage) {
+	Package(umlPackage);
+	neg find model(umlPackage);
+	neg find profile(umlPackage);
+}
+
+private pattern model(model) {
+	Model(model);
+}
+
+private pattern profile(it) {
+	Profile(it);
+}
+
+pattern associationOfClass(trgType : Type, association: Association, srcEnd : Property, trgEnd : Property) {
+	Association.memberEnd(association, srcEnd);
+	Property.type(srcEnd, srcType);
+	Association.navigableOwnedEnd(association, trgEnd);
+	Property.type(trgEnd, trgType);
+	srcType != trgType;
 }

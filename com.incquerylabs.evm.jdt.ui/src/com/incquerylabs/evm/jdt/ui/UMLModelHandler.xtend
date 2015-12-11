@@ -4,12 +4,9 @@ import com.incquerylabs.evm.jdt.java.transformation.UMLToJavaTransformation
 import org.eclipse.core.commands.AbstractHandler
 import org.eclipse.core.commands.ExecutionEvent
 import org.eclipse.core.commands.ExecutionException
-import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IProject
+import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.IAdaptable
-import org.eclipse.emf.common.util.URI
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
-import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.JavaCore
 import org.eclipse.jface.dialogs.MessageDialog
 import org.eclipse.jface.viewers.ISelection
@@ -19,71 +16,43 @@ import org.eclipse.ui.handlers.HandlerUtil
 import org.eclipse.uml2.uml.Model
 
 class UMLModelHandler extends AbstractHandler {
+
 	override Object execute(ExecutionEvent event) throws ExecutionException {
 		val selection = HandlerUtil.getCurrentSelection(event) as IStructuredSelection;
-		val shell = HandlerUtil.getActiveShellChecked(event)
+		//val shell = HandlerUtil.getActiveShellChecked(event)
 
-		val model = selection.getModel
-		if (model == null) {
-			reportError(
-				shell,
-				null,
-				"Invalid target",
-				'''The transformation can only be on an UML model'''
-			)
-			return null
-		}
-		
-		val project = selection.javaProject
-		if (project == null) {
-			reportError(
-				shell,
-				null,
-				"Invalid target",
-				'''The transformation can only be started in Java projects'''
-			)
-			return null
-		}
+		val workspace = ResourcesPlugin.getWorkspace()
+		val root = workspace.getRoot()
+
+		val model = selection.umlModel
+		val umlResource = model.eResource
+		val umlResourceUri = umlResource.URI
+		val projectName = umlResourceUri.segment(1)
+		val project = root.getProject(projectName)
 
 		project.startTransformation(model)
 
 		return null
 	}
-	
 
-	def getModel(IStructuredSelection selection) {
-		val firstSelectedElement = selection.firstElement
-		if (firstSelectedElement instanceof IFile) {
-			val path = firstSelectedElement.fullPath
-			val rs = new ResourceSetImpl
-			val resource = rs.getResource(URI::createPlatformResourceURI(path.toString, true), true)
-			val model = resource.contents.get(0)
-			if(model instanceof Model) {
-				return model
-			}
-		}
-			
-	}
-
-	def private getJavaProject(ISelection selection) {
+	// TODO following code is copied from SyncronisationModelHandler, this needs to be extracted in a common class
+	private def getUmlModel(ISelection selection) {
+		var Model model
 		if (selection instanceof IStructuredSelection) {
-			val selectedElement = selection.firstElement
-			if (selectedElement instanceof IFile) {
-				val project = selectedElement.project
-				if(project instanceof IProject) {
-					return JavaCore.create(project)
-				} else if(project instanceof IJavaProject) {
-					return project as IJavaProject
-				} else if (project instanceof IAdaptable) {
-					return project.getAdapter(IJavaProject)
-				}
+			val selectedElement = selection.toList.head;
+			if (selectedElement instanceof Model) {
+				model = selectedElement
+			} else if (selectedElement instanceof IAdaptable) {
+				val adaptableElement = selectedElement as IAdaptable;
+				model = adaptableElement.getAdapter(Model) as Model
 			}
 		}
 	}
 
-	def private void startTransformation(IJavaProject project, Model model) {
-		System::out.println('''Working on project «project.elementName»'''.toString)
-		val transformation = new UMLToJavaTransformation(project, model)
+	def private void startTransformation(IProject project, Model model) {
+		val javaProject = JavaCore::create(project)
+		System::out.println('''Working on project «javaProject.elementName»'''.toString)
+		val transformation = new UMLToJavaTransformation(javaProject, model)
 		transformation.initialize()
 		transformation.execute
 	}

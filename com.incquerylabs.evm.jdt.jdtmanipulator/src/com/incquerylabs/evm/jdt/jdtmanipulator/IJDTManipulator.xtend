@@ -1,12 +1,14 @@
 package com.incquerylabs.evm.jdt.jdtmanipulator
 
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
+import org.eclipse.jdt.core.IField
+import org.eclipse.jdt.core.IType
 
 interface IJDTManipulator {
 
 	def void createPackage(QualifiedName qualifiedName)
-	def void createClass(QualifiedName qualifiedName)
-	def void createField(QualifiedName containerName, String fieldName, QualifiedName type)
+	def IType createClass(QualifiedName qualifiedName)
+	def IField createField(QualifiedName containerName, String fieldName, QualifiedName type)
 	def void createMethod(QualifiedName qualifiedName)
 	
 	def void deletePackage(QualifiedName qualifiedName)
@@ -15,16 +17,7 @@ interface IJDTManipulator {
 	def void deleteMethod(QualifiedName qualifiedName)
 	
 	def void changePackageName(QualifiedName oldQualifiedName, String name)
-	def void changeClassName(QualifiedName oldQualifiedName, String name)
-	def void changeFieldName(QualifiedName oldQualifiedName, String name)
+	def void updateClass(QualifiedName oldQualifiedName, String name)
+	def void updateField(QualifiedName oldQualifiedName, QualifiedName type, String name)
 	def void changeMethodName(QualifiedName oldQualifiedName, String name)
-	
-	def void changeFieldVisibility(QualifiedName qualifiedName, Visibility visibility)
-	def void changeMethodVisibility(QualifiedName qualifiedName, Visibility visibility)
-	
-	def void changeClassAbstract(QualifiedName qualifiedName, boolean isAbstract)
-	def void changeMethodAbstract(QualifiedName qualifiedName, boolean isAbstract)
-	
-	def void changeFieldFinal(QualifiedName qualifiedName, boolean isFinal)
-	def void changeMethodFinal(QualifiedName qualifiedName, boolean isFinal)
 }

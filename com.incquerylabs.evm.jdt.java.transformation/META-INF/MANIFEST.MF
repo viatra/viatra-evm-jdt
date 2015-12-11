@@ -6,8 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: IncQueryLabs Ltd.
 Export-Package: com.incquerylabs.evm.jdt.java.transformation,
  com.incquerylabs.evm.jdt.java.transformation.queries,
- com.incquerylabs.evm.jdt.java.transformation.queries.util,
- com.incquerylabs.evm.jdt.java.transformation.util
+ com.incquerylabs.evm.jdt.java.transformation.queries.util
 Require-Bundle: com.google.guava,
  org.eclipse.xtext.xbase.lib,
  org.eclipse.xtend.lib,
