@@ -67,6 +67,18 @@ pattern umlPackage(umlPackage) {
 	neg find profile(umlPackage);
 }
 
+pattern leafPackage(umlPackage, qualifiedName) {
+	find umlPackage(umlPackage);
+	neg find packageInPackage(umlPackage, _);
+	Package.qualifiedName(umlPackage, qualifiedName);
+}
+
+private pattern packageInPackage(parent, child) {
+	find umlPackage(parent);
+	find umlPackage(child);
+	Package.packagedElement(parent, child);
+}
+
 private pattern model(model) {
 	Model(model);
 }
@@ -75,10 +87,11 @@ private pattern profile(it) {
 	Profile(it);
 }
 
-pattern associationOfClass(trgType : Type, association: Association, srcEnd : Property, trgEnd : Property) {
+pattern associationOfClass(trgType : Type, srcType : Type, srcQn, association: Association, srcEnd : Property, trgEnd : Property) {
 	Association.memberEnd(association, srcEnd);
 	Property.type(srcEnd, srcType);
 	Association.navigableOwnedEnd(association, trgEnd);
 	Property.type(trgEnd, trgType);
 	srcType != trgType;
+	Type.qualifiedName(srcType, srcQn);
 }

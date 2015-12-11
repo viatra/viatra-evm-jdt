@@ -35,7 +35,7 @@ class ClassRules extends RuleProvider {
 				val qualifiedName = (it.model.qualifiedName + "::" + it.umlClass.name).toJDTQN
 				manipulator.deleteClass(qualifiedName)
 				elementNameRegistry.remove(it.umlClass.name)
-			].addLifeCycle(Lifecycles::getDefault(true, true)).build, 1)
+			].addLifeCycle(Lifecycles::getDefault(false, true)).build, 1)
 			
 		addRule(ruleFactory.createRule.precondition(UmlClassInPackageQuerySpecification::instance)
 			.action(IncQueryActivationStateEnum.APPEARED) [
@@ -53,6 +53,6 @@ class ClassRules extends RuleProvider {
 				val qualifiedName = (it.umlPackage.qualifiedName + "::" + it.umlClass.name).toJDTQN
 				manipulator.deleteClass(qualifiedName)
 				elementNameRegistry.remove(it.umlClass.name)
-			].addLifeCycle(Lifecycles::getDefault(true, true)).build, 1)
+			].addLifeCycle(Lifecycles::getDefault(false, true)).build, 1)
 	}
 }

@@ -36,8 +36,10 @@ class JDTManipulator implements IJDTManipulator {
 
 	override def createClass(QualifiedName qualifiedName) {
 		val clazz = elementLocator.locateClass(qualifiedName)
-		if(clazz != null)
+		if(clazz != null) {
+			debug('''Class <«clazz.fullyQualifiedName»> already exists''')
 			return clazz
+		}
 		val genFolder = rootProject.project.getFolder(GENERATION_FOLDER)
 		val packageRoot = rootProject.getPackageFragmentRoot(genFolder)
 		val packageName = qualifiedName.parent.map[toString].orElse("")
@@ -45,9 +47,9 @@ class JDTManipulator implements IJDTManipulator {
 		val package = packageRoot.createPackageFragment(packageName, false, new NullProgressMonitor)
 		val className = qualifiedName.name
 		val compilationUnitName = '''«className».java'''
-		val cu = package.createCompilationUnit(compilationUnitName, getClassBody(packageName, className), false, new NullProgressMonitor)
-		debug('''Created class <«className»> in package <«packageName»> in file <«compilationUnitName»>''')
-		return cu.types.head
+		return (package.createCompilationUnit(compilationUnitName, getClassBody(packageName, className), false, new NullProgressMonitor) => [
+			debug('''Created class <«className»> in package <«packageName»> in file <«compilationUnitName»>''')
+		]).types.head
 	}
 	
 	private def getClassBody(String packageName, String className) {
@@ -64,15 +66,26 @@ class JDTManipulator implements IJDTManipulator {
 		val clazz = elementLocator.locateClass(containerName)
 		val field = clazz.fields.findFirst[it.elementName == fieldName]
 		if(field != null) {
+			debug('''Field <«field.elementName»> in <«clazz.fullyQualifiedName»> already exists''')
 			return field
 		}
-		val createdField = clazz.createField('''«type.toString» «fieldName»;''', null, false, new NullProgressMonitor)
-		debug('''Created field <«fieldName»> in class <«clazz.fullyQualifiedName»>''')
-		return createdField
+		return clazz.createField('''«type.toString» «fieldName»;''', null, false, new NullProgressMonitor) => [
+			debug('''Created field <«fieldName»> in class <«clazz.fullyQualifiedName»>''')		
+		]
 	}
 
 	override createPackage(QualifiedName qualifiedName) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+		val genFolder = rootProject.project.getFolder(GENERATION_FOLDER)
+		val packageRoot = rootProject.getPackageFragmentRoot(genFolder)
+		val existingPackage = packageRoot.getPackageFragment(qualifiedName.toString)
+		if(existingPackage.exists) {
+			debug('''Package <«existingPackage.elementName»> already exists''')
+			return existingPackage
+		}
+		
+		return packageRoot.createPackageFragment(qualifiedName.toString, false, new NullProgressMonitor) => [
+			debug('''Created package <«qualifiedName»>''')
+		]
 	}
 
 	override createMethod(QualifiedName qualifiedName) {
@@ -80,7 +93,16 @@ class JDTManipulator implements IJDTManipulator {
 	}
 
 	override deletePackage(QualifiedName qualifiedName) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+		val genFolder = rootProject.project.getFolder(GENERATION_FOLDER)
+		val packageRoot = rootProject.getPackageFragmentRoot(genFolder)
+		val existingPackage = packageRoot.getPackageFragment(qualifiedName.toString)
+		if(!existingPackage.exists) {
+			error('''Package <«qualifiedName»> cannot be deleted, does not exist''')
+			return
+		}
+		
+		debug('''Deleting package <«existingPackage.elementName»> ''')
+		existingPackage.deleteJavaElement		
 	}
 
 	override deleteClass(QualifiedName qualifiedName) {

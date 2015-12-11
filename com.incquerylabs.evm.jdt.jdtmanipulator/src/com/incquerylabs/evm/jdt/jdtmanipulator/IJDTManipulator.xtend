@@ -3,10 +3,11 @@ package com.incquerylabs.evm.jdt.jdtmanipulator
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import org.eclipse.jdt.core.IField
 import org.eclipse.jdt.core.IType
+import org.eclipse.jdt.core.IPackageFragment
 
 interface IJDTManipulator {
 
-	def void createPackage(QualifiedName qualifiedName)
+	def IPackageFragment createPackage(QualifiedName qualifiedName)
 	def IType createClass(QualifiedName qualifiedName)
 	def IField createField(QualifiedName containerName, String fieldName, QualifiedName type)
 	def void createMethod(QualifiedName qualifiedName)

@@ -5,6 +5,7 @@ import com.incquerylabs.evm.jdt.fqnutil.impl.JDTElementLocator
 import com.incquerylabs.evm.jdt.java.transformation.queries.UmlQueries
 import com.incquerylabs.evm.jdt.java.transformation.rules.AssociationRules
 import com.incquerylabs.evm.jdt.java.transformation.rules.ClassRules
+import com.incquerylabs.evm.jdt.java.transformation.rules.PackageRules
 import com.incquerylabs.evm.jdt.java.transformation.rules.RuleProvider
 import com.incquerylabs.evm.jdt.jdtmanipulator.impl.JDTManipulator
 import java.util.Map
@@ -51,6 +52,7 @@ class UMLToJavaTransformation {
 		}
 		
 		val ruleProviders = <RuleProvider>newArrayList
+		ruleProviders += new PackageRules
 		ruleProviders += new ClassRules
 		ruleProviders += new AssociationRules
 		
