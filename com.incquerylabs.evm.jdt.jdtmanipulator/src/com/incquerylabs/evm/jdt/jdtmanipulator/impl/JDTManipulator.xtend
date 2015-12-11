@@ -3,6 +3,8 @@ package com.incquerylabs.evm.jdt.jdtmanipulator.impl
 import com.incquerylabs.evm.jdt.fqnutil.IJDTElementLocator
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.jdtmanipulator.IJDTManipulator
+import org.apache.log4j.Level
+import org.apache.log4j.Logger
 import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.jdt.core.ICompilationUnit
 import org.eclipse.jdt.core.IJavaElement
@@ -10,13 +12,15 @@ import org.eclipse.jdt.core.IJavaModel
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTParser
-import org.eclipse.jdt.core.dom.CompilationUnit
 import org.eclipse.jdt.core.dom.ASTVisitor
+import org.eclipse.jdt.core.dom.CompilationUnit
 import org.eclipse.jdt.core.dom.FieldDeclaration
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import org.eclipse.jface.text.Document
 
 class JDTManipulator implements IJDTManipulator {
+
+	extension val Logger logger = Logger.getLogger(this.class)
 
 	// TODO: move this to a common config
 	static val GENERATION_FOLDER = "src" 
@@ -27,6 +31,7 @@ class JDTManipulator implements IJDTManipulator {
 	new(IJDTElementLocator elementLocator) {
 		this.rootProject = elementLocator.javaProject
 		this.elementLocator = elementLocator
+		logger.level = Level.DEBUG
 	}
 
 	override def createClass(QualifiedName qualifiedName) {
@@ -38,7 +43,10 @@ class JDTManipulator implements IJDTManipulator {
 		val packageName = qualifiedName.parent.map[toString].orElse("")
 
 		val package = packageRoot.createPackageFragment(packageName, false, new NullProgressMonitor)
-		val cu = package.createCompilationUnit(qualifiedName.name + ".java", getClassBody(packageName, qualifiedName.name), false, new NullProgressMonitor)
+		val className = qualifiedName.name
+		val compilationUnitName = '''«className».java'''
+		val cu = package.createCompilationUnit(compilationUnitName, getClassBody(packageName, className), false, new NullProgressMonitor)
+		debug('''Created class <«className»> in package <«packageName»> in file <«compilationUnitName»>''')
 		return cu.types.head
 	}
 	
@@ -58,7 +66,9 @@ class JDTManipulator implements IJDTManipulator {
 		if(field != null) {
 			return field
 		}
-		return clazz.createField('''«type.toString» «fieldName»;''', null, false, new NullProgressMonitor)
+		val createdField = clazz.createField('''«type.toString» «fieldName»;''', null, false, new NullProgressMonitor)
+		debug('''Created field <«fieldName»> in class <«clazz.fullyQualifiedName»>''')
+		return createdField
 	}
 
 	override createPackage(QualifiedName qualifiedName) {
@@ -74,11 +84,15 @@ class JDTManipulator implements IJDTManipulator {
 	}
 
 	override deleteClass(QualifiedName qualifiedName) {
-		elementLocator.locateClass(qualifiedName).compilationUnit.deleteJavaElement
+		val clazz = elementLocator.locateClass(qualifiedName)
+		debug('''Deleting class <«clazz.fullyQualifiedName»>''')
+		clazz.compilationUnit.deleteJavaElement		
 	}
 
 	override deleteField(QualifiedName qualifiedName) {
-		elementLocator.locateFieldNode(qualifiedName).deleteJavaElement
+		val field = elementLocator.locateFieldNode(qualifiedName)
+		debug('''Deleting field <«field.elementName»> in class <«field.declaringType.fullyQualifiedName»>''')
+		field.deleteJavaElement
 	}
 
 	override deleteMethod(QualifiedName qualifiedName) {
@@ -91,6 +105,7 @@ class JDTManipulator implements IJDTManipulator {
 
 	override updateClass(QualifiedName oldQualifiedName, String name) {
 		val clazz = elementLocator.locateClass(oldQualifiedName)
+		debug('''Renaming class <«clazz.fullyQualifiedName»> to <«name»>''')
 		clazz.rename(name, true, new NullProgressMonitor)
 	}
 
@@ -103,6 +118,7 @@ class JDTManipulator implements IJDTManipulator {
 			override visit(FieldDeclaration node) {
 				val varDeclaration = node.fragments.head as VariableDeclarationFragment
 				if(varDeclaration.name.toString.equals(oldQualifiedName.name)) {
+					debug('''Updating field <«varDeclaration.name»> in class <«field.declaringType.fullyQualifiedName»> to new name <«name»>, new type <«type»>''')
 					varDeclaration.name = node.AST.newSimpleName(name)
 					node.type = node.AST.newSimpleType(type.toJDTQualifiedName(node.AST))
 				}
