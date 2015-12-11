@@ -15,22 +15,16 @@
                </adapt>
             </visibleWhen>
          </command>
-         <command
-               commandId="com.incquerylabs.evm.jdt.ui.starttransform.uml2java"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <adapt
-                     type="java.lang.Object">
-               </adapt>
-            </visibleWhen>
-         </command>
       </menuContribution>
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.papyrus.views.modelexplorer.modelexplorer.popup">
          <command
                commandId="com.incquerylabs.evm.jdt.ui.modelcodesync"
+               style="push">
+         </command>
+         <command
+               commandId="com.incquerylabs.evm.jdt.ui.uml2java"
                style="push">
          </command>
       </menuContribution>
@@ -44,7 +38,7 @@
       </command>
       <command
             defaultHandler="com.incquerylabs.evm.jdt.ui.UMLModelHandler"
-            id="com.incquerylabs.evm.jdt.ui.starttransform.uml2java"
+            id="com.incquerylabs.evm.jdt.ui.uml2java"
             name="Start UML to Java transformation">
       </command>
       <command
