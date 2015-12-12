@@ -1,9 +1,9 @@
 package com.incquerylabs.evm.jdt.umlmanipulator.impl
 
+import com.incquerylabs.evm.jdt.common.queries.UmlQueries
 import com.incquerylabs.evm.jdt.fqnutil.IUMLElementLocator
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.impl.UMLElementLocator
-import com.incquerylabs.evm.jdt.java.transformation.queries.UmlQueries
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import org.apache.log4j.Level
 import org.apache.log4j.Logger

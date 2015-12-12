@@ -4,6 +4,7 @@ import com.incquerylabs.evm.jdt.JDTActivationLifeCycle
 import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
 import com.incquerylabs.evm.jdt.JDTRealm
 import com.incquerylabs.evm.jdt.JDTRule
+import com.incquerylabs.evm.jdt.common.queries.UmlQueries
 import com.incquerylabs.evm.jdt.uml.transformation.rules.CompilationUnitRule
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import com.incquerylabs.evm.jdt.umlmanipulator.impl.TransactionalManipulator
@@ -22,7 +23,6 @@ import org.eclipse.incquery.runtime.evm.specific.Schedulers
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.papyrus.infra.core.resource.ModelSet
 import org.eclipse.uml2.uml.Model
-import com.incquerylabs.evm.jdt.java.transformation.queries.UmlQueries
 
 class JDTUMLTransformation {
 	extension val Logger logger = Logger.getLogger(this.class)

@@ -1,7 +1,7 @@
 package com.incquerylabs.evm.jdt.java.transformation.rules
 
-import com.incquerylabs.evm.jdt.java.transformation.queries.util.UmlClassInModelQuerySpecification
-import com.incquerylabs.evm.jdt.java.transformation.queries.util.UmlClassInPackageQuerySpecification
+import com.incquerylabs.evm.jdt.common.queries.util.UmlClassInModelQuerySpecification
+import com.incquerylabs.evm.jdt.common.queries.util.UmlClassInPackageQuerySpecification
 import com.incquerylabs.evm.jdt.jdtmanipulator.impl.JDTManipulator
 import java.util.Map
 import org.apache.log4j.Level

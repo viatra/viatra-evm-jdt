@@ -1,8 +1,8 @@
 package com.incquerylabs.evm.jdt.java.transformation
 
 import com.google.common.base.Preconditions
+import com.incquerylabs.evm.jdt.common.queries.UmlQueries
 import com.incquerylabs.evm.jdt.fqnutil.impl.JDTElementLocator
-import com.incquerylabs.evm.jdt.java.transformation.queries.UmlQueries
 import com.incquerylabs.evm.jdt.java.transformation.rules.AssociationRules
 import com.incquerylabs.evm.jdt.java.transformation.rules.ClassRules
 import com.incquerylabs.evm.jdt.java.transformation.rules.PackageRules

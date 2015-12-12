@@ -1,4 +1,4 @@
-package com.incquerylabs.evm.jdt.^java.transformation.queries
+package com.incquerylabs.evm.jdt.common.queries
 
 import "http://www.eclipse.org/uml2/5.0.0/UML"
 
