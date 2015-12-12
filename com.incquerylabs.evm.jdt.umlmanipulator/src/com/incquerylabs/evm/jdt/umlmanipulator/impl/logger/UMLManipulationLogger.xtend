@@ -41,4 +41,8 @@ class UMLManipulationLogger implements IUMLManipulator {
 		debug('''Saved UML resource''')
 	}
 	
+	override deleteClassAndReferences(QualifiedName fqn) {
+		debug('''Deleted UML Class «fqn» and corresponding elements''')
+	}
+	
 }

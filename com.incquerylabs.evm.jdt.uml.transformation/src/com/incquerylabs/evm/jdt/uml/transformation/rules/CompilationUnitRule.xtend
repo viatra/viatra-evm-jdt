@@ -62,7 +62,7 @@ class CompilationUnitRule extends JDTRule {
 		var delta = atom.delta
 		var ast = delta.compilationUnitAST
 		if(delta.flags.bitwiseAnd(IJavaElementDelta.F_AST_AFFECTED) != 0) {
-			element.deleteCorrespondingClass
+			element.deleteCorrespondingElements
 			if(ast == null) {
 				throw new IllegalArgumentException('''AST was null, compilation unit is not transformed: «element»''')
 			}
@@ -73,15 +73,24 @@ class CompilationUnitRule extends JDTRule {
 		return
 	}
 	
+	def deleteCorrespondingElements(ICompilationUnit element) {
+		val umlQualifiedName = element.getUmlClassQualifiedName
+		deleteClassAndReferences(umlQualifiedName)
+	}
+	
 	def deleteCorrespondingClass(ICompilationUnit element) {
-		val packageFragment = element.parent
-		if(!(packageFragment instanceof IPackageFragment)) {
-			throw new IllegalArgumentException('''Compilation unit is not in a package: «element»''')
-		}
-		val javaQualifiedName = JDTQualifiedName::create('''«packageFragment.elementName».«element.elementName»''').parent.get
-		val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
-		
+		val umlQualifiedName = element.getUmlClassQualifiedName
 		deleteClass(umlQualifiedName)
+	}
+	
+	def getUmlClassQualifiedName(ICompilationUnit compilationUnit) {
+		val packageFragment = compilationUnit.parent
+		if(!(packageFragment instanceof IPackageFragment)) {
+			throw new IllegalArgumentException('''Compilation unit is not in a package: «compilationUnit»''')
+		}
+		val javaQualifiedName = JDTQualifiedName::create('''«packageFragment.elementName».«compilationUnit.elementName»''').parent.get
+		val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
+		return umlQualifiedName
 	}
 	
 }

@@ -1,6 +1,6 @@
 package com.incquerylabs.evm.jdt.java.transformation.rules
 
-import com.incquerylabs.evm.jdt.java.transformation.queries.util.AssociationOfClassQuerySpecification
+import com.incquerylabs.evm.jdt.common.queries.util.AssociationOfClassQuerySpecification
 import com.incquerylabs.evm.jdt.jdtmanipulator.impl.JDTManipulator
 import java.util.Map
 import org.apache.log4j.Level
@@ -10,7 +10,7 @@ import org.eclipse.incquery.runtime.evm.specific.event.IncQueryActivationStateEn
 import org.eclipse.uml2.uml.Element
 
 import static extension com.incquerylabs.evm.jdt.java.transformation.util.QualifiedNameUtil.*
-import com.incquerylabs.evm.jdt.java.transformation.queries.util.UmlAssociationQuerySpecification
+import com.incquerylabs.evm.jdt.common.queries.util.UmlAssociationQuerySpecification
 
 class AssociationRules extends RuleProvider {
 

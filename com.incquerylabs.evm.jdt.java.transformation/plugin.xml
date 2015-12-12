@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><?eclipse version="3.4"?><plugin>
-  <extension id="com.incquerylabs.evm.jdt.java.transformation.queries.UmlQueries" point="org.eclipse.incquery.runtime.queryspecification">
-    <group group="org.eclipse.incquery.runtime.extensibility.SingletonExtensionFactory:com.incquerylabs.evm.jdt.java.transformation.queries.UmlQueries" id="com.incquerylabs.evm.jdt.java.transformation.queries.UmlQueries"/>
-  </extension>
-</plugin>
