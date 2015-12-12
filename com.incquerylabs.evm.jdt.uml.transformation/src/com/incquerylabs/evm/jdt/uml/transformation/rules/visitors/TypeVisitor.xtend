@@ -2,11 +2,11 @@ package com.incquerylabs.evm.jdt.uml.transformation.rules.visitors
 
 import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
-import org.eclipse.jdt.core.dom.ASTVisitor
-import org.eclipse.jdt.core.dom.TypeDeclaration
-import org.eclipse.jdt.core.dom.FieldDeclaration
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import java.util.List
+import org.eclipse.jdt.core.dom.ASTVisitor
+import org.eclipse.jdt.core.dom.FieldDeclaration
+import org.eclipse.jdt.core.dom.TypeDeclaration
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 
 class TypeVisitor extends ASTVisitor {
 	val IUMLManipulator manipulator

@@ -11,6 +11,9 @@ import com.incquerylabs.evm.jdt.umlmanipulator.impl.UMLManipulator
 import com.incquerylabs.evm.jdt.umlmanipulator.impl.logger.UMLManipulationLogger
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
+import org.eclipse.incquery.runtime.api.GenericPatternGroup
+import org.eclipse.incquery.runtime.api.IncQueryEngine
+import org.eclipse.incquery.runtime.emf.EMFScope
 import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
 import org.eclipse.incquery.runtime.evm.api.Executor
 import org.eclipse.incquery.runtime.evm.api.RuleEngine
@@ -19,9 +22,11 @@ import org.eclipse.incquery.runtime.evm.specific.Schedulers
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.papyrus.infra.core.resource.ModelSet
 import org.eclipse.uml2.uml.Model
+import com.incquerylabs.evm.jdt.java.transformation.queries.UmlQueries
 
 class JDTUMLTransformation {
 	extension val Logger logger = Logger.getLogger(this.class)
+	static val UmlQueries umlQueries = UmlQueries.instance
 	
 	val JDTRealm jdtRealm
 	val RuleEngine ruleEngine
@@ -29,6 +34,8 @@ class JDTUMLTransformation {
 	Executor executor
 	Scheduler scheduler
 
+	IncQueryEngine engine
+	
 	new() {
 		this.jdtRealm = new JDTRealm
 		this.executor = new Executor(jdtRealm)
@@ -39,26 +46,28 @@ class JDTUMLTransformation {
 	def void start(IJavaProject project, Model model) {
 		ruleEngine.logger.level = Level.INFO
 		logger.level = Level.DEBUG
-		debug('''Transformation starting...''')
+		debug('''Started Java to UML transformation.''')
 		
-		val ActivationLifeCycle lifeCycle = new JDTActivationLifeCycle
-		val JDTEventSourceSpecification sourceSpec = new JDTEventSourceSpecification
+		// Initialize IncQueryEngine
+		this.engine = IncQueryEngine::on(new EMFScope(model))
+		val queries = GenericPatternGroup::of(umlQueries)
+		queries.prepare(engine)
 		
-		umlManipulator = new UMLManipulator(model)
+		// Initialize the UMLManipulator
+		umlManipulator = new UMLManipulator(model, engine)
 		val modelSet = model.eResource.resourceSet
 		if(modelSet instanceof ModelSet) {
 			umlManipulator = new TransactionalManipulator(umlManipulator, modelSet.transactionalEditingDomain)
 		}
 		
-//		val loggerRule = new LoggerRule(sourceSpec, lifeCycle, project)
-//		addRule(loggerRule)
-//		val classRule = new ClassRule(sourceSpec, lifeCycle, project, umlManipulator)
-//		addRule(classRule)
-//		val associationRule = new AssociationRule(sourceSpec, lifeCycle, project, umlManipulator)
-//		addRule(associationRule)
+		// Initialize and add rules
+		val ActivationLifeCycle lifeCycle = new JDTActivationLifeCycle
+		val JDTEventSourceSpecification sourceSpec = new JDTEventSourceSpecification
+
 		val compilationUnitRule = new CompilationUnitRule(sourceSpec, lifeCycle, project, umlManipulator)
 		addRule(compilationUnitRule)
 		
+		// Add scheduler for EVM
 		addTimedScheduler(100)
 	}
 	

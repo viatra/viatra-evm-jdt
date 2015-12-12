@@ -74,23 +74,23 @@ class CompilationUnitRule extends JDTRule {
 	}
 	
 	def deleteCorrespondingElements(ICompilationUnit element) {
-		element.deleteCorrespondingClass
-		element.deleteCorrespondingAssociations
+		val umlQualifiedName = element.getUmlClassQualifiedName
+		deleteClassAndReferences(umlQualifiedName)
 	}
 	
 	def deleteCorrespondingClass(ICompilationUnit element) {
-		val packageFragment = element.parent
-		if(!(packageFragment instanceof IPackageFragment)) {
-			throw new IllegalArgumentException('''Compilation unit is not in a package: «element»''')
-		}
-		val javaQualifiedName = JDTQualifiedName::create('''«packageFragment.elementName».«element.elementName»''').parent.get
-		val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
-		
+		val umlQualifiedName = element.getUmlClassQualifiedName
 		deleteClass(umlQualifiedName)
 	}
 	
-	def deleteCorrespondingAssociations(ICompilationUnit element) {
-		
+	def getUmlClassQualifiedName(ICompilationUnit compilationUnit) {
+		val packageFragment = compilationUnit.parent
+		if(!(packageFragment instanceof IPackageFragment)) {
+			throw new IllegalArgumentException('''Compilation unit is not in a package: «compilationUnit»''')
+		}
+		val javaQualifiedName = JDTQualifiedName::create('''«packageFragment.elementName».«compilationUnit.elementName»''').parent.get
+		val umlQualifiedName = UMLQualifiedName::create(javaQualifiedName)
+		return umlQualifiedName
 	}
 	
 }
