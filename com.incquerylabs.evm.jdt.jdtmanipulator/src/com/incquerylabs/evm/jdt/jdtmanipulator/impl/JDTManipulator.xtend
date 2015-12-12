@@ -121,8 +121,17 @@ class JDTManipulator implements IJDTManipulator {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 
-	override changePackageName(QualifiedName oldQualifiedName, String name) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	override updatePackage(QualifiedName oldQualifiedName, QualifiedName newQualifiedName) {
+		val genFolder = rootProject.project.getFolder(GENERATION_FOLDER)
+		val packageRoot = rootProject.getPackageFragmentRoot(genFolder)
+		val existingPackage = packageRoot.getPackageFragment(oldQualifiedName.toString)
+		if(!existingPackage.exists) {
+			error('''Package <«oldQualifiedName»> cannot be renamed, does not exist''')
+			return
+		}
+		
+		debug('''Renaming package <«existingPackage.elementName»> to <«newQualifiedName.toString»>''')
+		existingPackage.rename(newQualifiedName.toString, false, new NullProgressMonitor)
 	}
 
 	override updateClass(QualifiedName oldQualifiedName, String name) {

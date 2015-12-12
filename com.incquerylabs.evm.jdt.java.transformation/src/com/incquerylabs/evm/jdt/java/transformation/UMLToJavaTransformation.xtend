@@ -34,8 +34,7 @@ class UMLToJavaTransformation {
 
 	JDTManipulator manipulator
 	
-	boolean initialized = false
-	
+	boolean initialized = false	
 	
 	new(IJavaProject project, Model model) {
 		manipulator = new JDTManipulator(new JDTElementLocator(project))
@@ -54,7 +53,7 @@ class UMLToJavaTransformation {
 		val ruleProviders = <RuleProvider>newArrayList
 		ruleProviders += new PackageRules
 		ruleProviders += new ClassRules
-		ruleProviders += new AssociationRules
+		//ruleProviders += new AssociationRules
 		
 		ruleProviders.forEach[initialize(manipulator, elementNameRegistry)]
 		
