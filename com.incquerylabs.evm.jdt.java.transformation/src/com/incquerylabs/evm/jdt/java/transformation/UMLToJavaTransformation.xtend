@@ -3,7 +3,6 @@ package com.incquerylabs.evm.jdt.java.transformation
 import com.google.common.base.Preconditions
 import com.incquerylabs.evm.jdt.common.queries.UmlQueries
 import com.incquerylabs.evm.jdt.fqnutil.impl.JDTElementLocator
-import com.incquerylabs.evm.jdt.java.transformation.rules.AssociationRules
 import com.incquerylabs.evm.jdt.java.transformation.rules.ClassRules
 import com.incquerylabs.evm.jdt.java.transformation.rules.PackageRules
 import com.incquerylabs.evm.jdt.java.transformation.rules.RuleProvider
@@ -13,13 +12,15 @@ import org.eclipse.incquery.runtime.api.GenericPatternGroup
 import org.eclipse.incquery.runtime.api.IncQueryEngine
 import org.eclipse.incquery.runtime.emf.EMFScope
 import org.eclipse.incquery.runtime.evm.api.Scheduler.ISchedulerFactory
-import org.eclipse.incquery.runtime.evm.specific.Schedulers
+import org.eclipse.incquery.runtime.evm.specific.TransactionalSchedulers
 import org.eclipse.incquery.runtime.evm.specific.resolver.InvertedDisappearancePriorityConflictResolver
 import org.eclipse.jdt.core.IJavaProject
+import org.eclipse.papyrus.infra.core.resource.ModelSet
 import org.eclipse.uml2.uml.Element
 import org.eclipse.uml2.uml.Model
 import org.eclipse.viatra.emf.runtime.transformation.eventdriven.EventDrivenTransformation
 import org.eclipse.viatra.emf.runtime.transformation.eventdriven.ExecutionSchemaBuilder
+import org.apache.log4j.Level
 
 class UMLToJavaTransformation {
 
@@ -33,12 +34,15 @@ class UMLToJavaTransformation {
 	EventDrivenTransformation transformation
 
 	JDTManipulator manipulator
+	Model model
 	
-	boolean initialized = false	
+	boolean initialized = false
+	
 	
 	new(IJavaProject project, Model model) {
 		manipulator = new JDTManipulator(new JDTElementLocator(project))
-		engine = IncQueryEngine::on(new EMFScope(model))	
+		engine = IncQueryEngine::on(new EMFScope(model))
+		this.model = model
 	}
 	
 	
@@ -46,7 +50,8 @@ class UMLToJavaTransformation {
 		Preconditions.checkArgument(engine != null, "Engine cannot be null!")
 		if(!initialized) {
 			if(schedulerFactory == null) {
-				schedulerFactory = Schedulers.getIQEngineSchedulerFactory(engine)
+				val domain = (model.eResource.resourceSet as ModelSet).transactionalEditingDomain
+				schedulerFactory = TransactionalSchedulers::getTransactionSchedulerFactory(domain)
 			}			
 		}
 		
@@ -70,6 +75,7 @@ class UMLToJavaTransformation {
 		executionSchemaBuilder.scheduler = schedulerFactory
 		executionSchemaBuilder.conflictResolver = fixedPriorityResolver
 		val executionSchema = executionSchemaBuilder.build
+		executionSchema.logger.level = Level::TRACE
 		
 		transformationBuilder.schema = executionSchema
 		ruleProviders.forEach[addRules(transformationBuilder)]		

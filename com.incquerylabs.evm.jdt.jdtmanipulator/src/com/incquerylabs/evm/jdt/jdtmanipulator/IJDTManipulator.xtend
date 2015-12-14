@@ -17,8 +17,8 @@ interface IJDTManipulator {
 	def void deleteField(QualifiedName qualifiedName)
 	def void deleteMethod(QualifiedName qualifiedName)
 	
-	def void updatePackage(QualifiedName oldQualifiedName, QualifiedName newQualifiedName)
-	def void updateClass(QualifiedName oldQualifiedName, String name)
-	def void updateField(QualifiedName oldQualifiedName, QualifiedName type, String name)
-	def void changeMethodName(QualifiedName oldQualifiedName, String name)
+	def boolean updatePackage(QualifiedName oldQualifiedName, QualifiedName newQualifiedName)
+	def boolean updateClass(QualifiedName oldQualifiedName, String name)
+	def boolean updateField(QualifiedName oldQualifiedName, QualifiedName type, String name)
+	def boolean changeMethodName(QualifiedName oldQualifiedName, String name)
 }

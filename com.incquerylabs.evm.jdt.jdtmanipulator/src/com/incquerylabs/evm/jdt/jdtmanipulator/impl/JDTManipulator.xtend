@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.ICompilationUnit
 import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaModel
 import org.eclipse.jdt.core.IJavaProject
+import org.eclipse.jdt.core.IPackageFragment
 import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTParser
 import org.eclipse.jdt.core.dom.ASTVisitor
@@ -17,15 +18,13 @@ import org.eclipse.jdt.core.dom.CompilationUnit
 import org.eclipse.jdt.core.dom.FieldDeclaration
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import org.eclipse.jface.text.Document
-import org.eclipse.jdt.core.IPackageFragment
-import java.util.Stack
 
 class JDTManipulator implements IJDTManipulator {
 
 	extension val Logger logger = Logger.getLogger(this.class)
 
 	// TODO: move this to a common config
-	static val GENERATION_FOLDER = "src" 
+	static val GENERATION_FOLDER = "src"
 
 	IJavaProject rootProject
 	IJDTElementLocator elementLocator
@@ -38,7 +37,7 @@ class JDTManipulator implements IJDTManipulator {
 
 	override def createClass(QualifiedName qualifiedName) {
 		val clazz = elementLocator.locateClass(qualifiedName)
-		if(clazz != null) {
+		if (clazz != null) {
 			debug('''Class <«clazz.fullyQualifiedName»> already exists''')
 			return clazz
 		}
@@ -49,30 +48,31 @@ class JDTManipulator implements IJDTManipulator {
 		val package = packageRoot.createPackageFragment(packageName, false, new NullProgressMonitor)
 		val className = qualifiedName.name
 		val compilationUnitName = '''«className».java'''
-		return (package.createCompilationUnit(compilationUnitName, getClassBody(packageName, className), false, new NullProgressMonitor) => [
+		return (package.createCompilationUnit(compilationUnitName, getClassBody(packageName, className), false,
+			new NullProgressMonitor) => [
 			debug('''Created class <«className»> in package <«packageName»> in file <«compilationUnitName»>''')
 		]).types.head
 	}
-	
+
 	private def getClassBody(String packageName, String className) {
 		'''
-		«IF packageName != ""»package «packageName»;«ENDIF»
-		
-		public class «className» {
+			«IF packageName != ""»package «packageName»;«ENDIF»
 			
-		}
+			public class «className» {
+				
+			}
 		'''.toString
 	}
 
 	override def createField(QualifiedName containerName, String fieldName, QualifiedName type) {
 		val clazz = elementLocator.locateClass(containerName)
 		val field = clazz.fields.findFirst[it.elementName == fieldName]
-		if(field != null) {
+		if (field != null) {
 			debug('''Field <«field.elementName»> in <«clazz.fullyQualifiedName»> already exists''')
 			return field
 		}
 		return clazz.createField('''«type.toString» «fieldName»;''', null, false, new NullProgressMonitor) => [
-			debug('''Created field <«fieldName»> in class <«clazz.fullyQualifiedName»>''')		
+			debug('''Created field <«fieldName»> in class <«clazz.fullyQualifiedName»>''')
 		]
 	}
 
@@ -80,11 +80,11 @@ class JDTManipulator implements IJDTManipulator {
 		val genFolder = rootProject.project.getFolder(GENERATION_FOLDER)
 		val packageRoot = rootProject.getPackageFragmentRoot(genFolder)
 		val existingPackage = packageRoot.getPackageFragment(qualifiedName.toString)
-		if(existingPackage.exists) {
+		if (existingPackage.exists) {
 			debug('''Package <«existingPackage.elementName»> already exists''')
 			return existingPackage
 		}
-		
+
 		return packageRoot.createPackageFragment(qualifiedName.toString, false, new NullProgressMonitor) => [
 			debug('''Created package <«qualifiedName»>''')
 		]
@@ -98,19 +98,19 @@ class JDTManipulator implements IJDTManipulator {
 		val genFolder = rootProject.project.getFolder(GENERATION_FOLDER)
 		val packageRoot = rootProject.getPackageFragmentRoot(genFolder)
 		val existingPackage = packageRoot.getPackageFragment(qualifiedName.toString)
-		if(!existingPackage.exists) {
+		if (!existingPackage.exists) {
 			error('''Package <«qualifiedName»> cannot be deleted, does not exist''')
 			return
 		}
-		
+
 		debug('''Deleting package <«existingPackage.elementName»> ''')
-		existingPackage.deleteJavaElement		
+		existingPackage.deleteJavaElement
 	}
 
 	override deleteClass(QualifiedName qualifiedName) {
 		val clazz = elementLocator.locateClass(qualifiedName)
 		debug('''Deleting class <«clazz.fullyQualifiedName»>''')
-		clazz.compilationUnit.deleteJavaElement		
+		clazz.compilationUnit.deleteJavaElement
 	}
 
 	override deleteField(QualifiedName qualifiedName) {
@@ -126,83 +126,99 @@ class JDTManipulator implements IJDTManipulator {
 	override updatePackage(QualifiedName oldQualifiedName, QualifiedName newQualifiedName) {
 		val genFolder = rootProject.project.getFolder(GENERATION_FOLDER)
 		val packageRoot = rootProject.getPackageFragmentRoot(genFolder)
-				
-		val leafPackages = packageRoot.children.filter(IPackageFragment).filter[elementName.startsWith(oldQualifiedName.toString)].filter[!hasSubpackages] 
-		leafPackages.forEach[
+
+		val leafPackages = packageRoot.children.filter(IPackageFragment).filter [
+			elementName.startsWith(oldQualifiedName.toString)
+		].filter[!hasSubpackages]
+		return leafPackages.fold(true) [ result, it |
 			val newName = it.elementName.getNewName(oldQualifiedName.toString, newQualifiedName.toString)
+
+			val existingPackage = packageRoot.getPackageFragment(newName)
+			if (existingPackage.exists) {
+				debug('''Skipping package rename <«oldQualifiedName»>-><«newQualifiedName»> because new package already exists.''')
+				return false
+			}
+
 			debug('''Renaming package <«it.elementName»> to <«newName»>''')
-			it.rename(newName, false, new NullProgressMonitor)			
+			it.rename(newName, false, new NullProgressMonitor)
+			return result && true
 		]
 	}
-	
+
 	private def getNewName(String fullPackageName, String originalFragment, String renameFragment) {
 		val idx = fullPackageName.lastIndexOf(originalFragment) + originalFragment.length
 		val trimmedPackageName = fullPackageName.substring(idx)
-		return renameFragment + trimmedPackageName		
+		return renameFragment + trimmedPackageName
 	}
 
 	override updateClass(QualifiedName oldQualifiedName, String name) {
 		val clazz = elementLocator.locateClass(oldQualifiedName)
 		debug('''Renaming class <«clazz.fullyQualifiedName»> to <«name»>''')
 		clazz.rename(name, true, new NullProgressMonitor)
+		return true
 	}
 
 	override updateField(QualifiedName oldQualifiedName, QualifiedName type, String name) {
 		val field = elementLocator.locateFieldNode(oldQualifiedName)
-		
+
 		val astRoot = field.compilationUnit.createRecordingASTRoot
-		astRoot.accept(new ASTVisitor {
-			
-			override visit(FieldDeclaration node) {
-				val varDeclaration = node.fragments.head as VariableDeclarationFragment
-				if(varDeclaration.name.toString.equals(oldQualifiedName.name)) {
-					debug('''Updating field <«varDeclaration.name»> in class <«field.declaringType.fullyQualifiedName»> to new name <«name»>, new type <«type»>''')
-					varDeclaration.name = node.AST.newSimpleName(name)
-					node.type = node.AST.newSimpleType(type.toJDTQualifiedName(node.AST))
-				}
-				
-				return false;
+		astRoot.accept(
+			new ASTVisitor {
+
+				override visit(FieldDeclaration node) {
+					val varDeclaration = node.fragments.head as VariableDeclarationFragment
+					if (varDeclaration.name.toString.equals(
+						oldQualifiedName.
+							name)) {
+								debug('''Updating field <«varDeclaration.name»> in class <«field.declaringType.fullyQualifiedName»> to new name <«name»>, new type <«type»>''')
+								varDeclaration.name = node.AST.newSimpleName(name)
+								node.type = node.AST.newSimpleType(type.toJDTQualifiedName(node.AST))
+							}
+
+							return false;
+						}
+
+					})
+
+				astRoot.saveToCompilationUnit(field.compilationUnit)
+				return true
 			}
-			
-		})
+
+			override changeMethodName(QualifiedName oldQualifiedName, String name) {
+				throw new UnsupportedOperationException("TODO: auto-generated method stub")
+			}
+
+			private def deleteJavaElement(IJavaElement javaElement) {
+				val javaModel = javaElement.javaModel as IJavaModel
+				javaModel.delete(#[javaElement], true, new NullProgressMonitor)
+			}
+
+			private def createRecordingASTRoot(ICompilationUnit cu) {
+				val parser = ASTParser.newParser(AST.JLS8)
+				parser.source = cu
+				val astRoot = parser.createAST(new NullProgressMonitor) as CompilationUnit
+
+				astRoot.recordModifications
+
+				return astRoot
+			}
+
+			private def toJDTQualifiedName(QualifiedName qn, AST ast) {
+				qn.toList.reverse.fold(null) [ seed, it |
+					if (seed == null)
+						return ast.newSimpleName(it)
+					else
+						ast.newQualifiedName(seed, ast.newSimpleName(it))
+				]
+			}
+
+			private def saveToCompilationUnit(CompilationUnit astCompilationUnit, ICompilationUnit jmCompilationUnit) {
+				val document = new Document(jmCompilationUnit.source)
+				val edits = astCompilationUnit.rewrite(document, jmCompilationUnit.javaProject.getOptions(true))
+				edits.apply(document)
+				jmCompilationUnit.buffer.contents = document.get
+				jmCompilationUnit.save(new NullProgressMonitor, true)
+			}
+
+		}
 		
-		astRoot.saveToCompilationUnit(field.compilationUnit)
-	}
-
-	override changeMethodName(QualifiedName oldQualifiedName, String name) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
-	}
-
-	private def deleteJavaElement(IJavaElement javaElement) {
-		val javaModel = javaElement.javaModel as IJavaModel
-		javaModel.delete(#[javaElement], true, new NullProgressMonitor)
-	}
-
-	private def createRecordingASTRoot(ICompilationUnit cu) {
-		val parser = ASTParser.newParser(AST.JLS8)
-		parser.source = cu
-		val astRoot = parser.createAST(new NullProgressMonitor) as CompilationUnit
-
-		astRoot.recordModifications
-
-		return astRoot
-	}
-
-	private def toJDTQualifiedName(QualifiedName qn, AST ast) {
-		qn.toList.reverse.fold(null) [ seed, it |
-			if (seed == null)
-				return ast.newSimpleName(it)
-			else
-				ast.newQualifiedName(seed, ast.newSimpleName(it))
-		]
-	}
-
-	private def saveToCompilationUnit(CompilationUnit astCompilationUnit, ICompilationUnit jmCompilationUnit) {
-		val document = new Document(jmCompilationUnit.source)
-		val edits = astCompilationUnit.rewrite(document, jmCompilationUnit.javaProject.getOptions(true))
-		edits.apply(document)
-		jmCompilationUnit.buffer.contents = document.get
-		jmCompilationUnit.save(new NullProgressMonitor, true)
-	}
-	
-}

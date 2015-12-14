@@ -23,14 +23,16 @@ class PackageRules extends RuleProvider {
 		// only handle leaf packages, as otherwise the order they appear could be wrong in some situations
 		addRule(ruleFactory.createRule.precondition(LeafPackageQuerySpecification::instance)
 			.action(IncQueryActivationStateEnum::APPEARED) [
-				debug('''Package appeared: <«it.umlPackage.qualifiedName»>''')
+				debug('''Leaf package appeared: <«it.umlPackage.qualifiedName»>''')
 				manipulator.createPackage(it.umlPackage.qualifiedName.toJDTQN)
 			].action(IncQueryActivationStateEnum::UPDATED) [
 				val packageName = elementNameRegistry.get(it.umlPackage)
 				val qualifiedName = (it.umlPackage.namespace.qualifiedName + "::" + packageName)
-				debug('''Package updated: <«qualifiedName»>''')
-				manipulator.updatePackage(qualifiedName.toJDTQN, it.umlPackage.qualifiedName.toJDTQN)				
-			].addLifeCycle(Lifecycles::getDefault(true, true)).build, 0
+				debug('''Leaf package updated: <«qualifiedName»>''')
+				if(manipulator.updatePackage(qualifiedName.toJDTQN, it.umlPackage.qualifiedName.toJDTQN)) {
+					elementNameRegistry.put(it.umlPackage, it.umlPackage.name)
+				}				
+			].addLifeCycle(Lifecycles::getDefault(true, false)).build, 0
 		)
 		
 		addRule(ruleFactory.createRule.precondition(UmlPackageQuerySpecification::instance)
@@ -40,17 +42,21 @@ class PackageRules extends RuleProvider {
 				val packageName = elementNameRegistry.get(it.umlPackage)
 				val qualifiedName = (it.umlPackage.namespace.qualifiedName + "::" + packageName)
 				debug('''Package updated: <«qualifiedName»>''')
-				manipulator.updatePackage(qualifiedName.toJDTQN, it.umlPackage.qualifiedName.toJDTQN)				
-			].addLifeCycle(Lifecycles::getDefault(true, true)).build, 0
+				if(manipulator.updatePackage(qualifiedName.toJDTQN, it.umlPackage.qualifiedName.toJDTQN)) {
+					elementNameRegistry.put(it.umlPackage, it.umlPackage.name)
+				}
+								
+			].addLifeCycle(Lifecycles::getDefault(true, false)).build, 0
 		)
 		
 		addRule(ruleFactory.createRule.precondition(PackageInPackageQuerySpecification::instance)
 			// TODO: use proper lifecycle instead of this hack
 			.action(IncQueryActivationStateEnum::APPEARED) [] 
 			.action(IncQueryActivationStateEnum::DISAPPEARED) [
-				debug('''Package disappeared: <«it.child.name»> in <«it.parent.qualifiedName»>''')
+				debug('''Child package disappeared: <«it.child.name»> in <«it.parent.qualifiedName»>''')
 				val packageQualifiedName = it.parent.qualifiedName + "::" + it.child.name
 				manipulator.deletePackage(packageQualifiedName.toJDTQN)
+				elementNameRegistry.remove(it.child)
 			].addLifeCycle(Lifecycles::getDefault(false, true)).build, 1
 		)
 	}

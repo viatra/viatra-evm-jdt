@@ -21,14 +21,14 @@ class AssociationRules extends RuleProvider {
 	override initialize(JDTManipulator manipulator, Map<Element, String> elementNameRegistry) {
 		addRule(ruleFactory.createRule.precondition(UmlAssociationQuerySpecification::instance)
 			.action(IncQueryActivationStateEnum::APPEARED) [
-				debug('''Association appeared: <«it.association.qualifiedName»> from:<«it.srcEnd.type.qualifiedName»> to:<«it.trgEnd.type.qualifiedName»>''')
+				debug('''Association appeared: <«it.association.qualifiedName»> from:<«it.srcEnd.type.qualifiedName»> to:<«it.trgEnd.type?.qualifiedName»>''')
 				val containingClassQN = it.srcEnd.type.qualifiedName.toJDTQN
 				val fieldName = it.trgEnd.name
 				val typeQN = it.trgEnd.type.qualifiedName.toJDTQN
 				manipulator.createField(containingClassQN, fieldName, typeQN)
 				elementNameRegistry.put(it.trgEnd, it.trgEnd.name)
 			].action(IncQueryActivationStateEnum::UPDATED) [
-				debug('''Association updated: <«it.association.qualifiedName»> from:<«it.srcEnd.type.qualifiedName»> to:<«it.trgEnd.type.qualifiedName»>''')
+				debug('''Association updated: <«it.association.qualifiedName»> from:<«it.srcEnd.type.qualifiedName»> to:<«it.trgEnd.type?.qualifiedName»>''')
 				val fieldName = elementNameRegistry.get(it.trgEnd)
 				manipulator.updateField((it.srcEnd.type.qualifiedName + "::" + fieldName).toJDTQN,
 					it.trgEnd.type.qualifiedName.toJDTQN, it.trgEnd.name)
@@ -39,7 +39,7 @@ class AssociationRules extends RuleProvider {
 		addRule(
 			ruleFactory.createRule.precondition(AssociationOfClassQuerySpecification::instance)
 			.action(IncQueryActivationStateEnum.APPEARED) [
-				debug('''Association appeared: <«it.association.qualifiedName»> from:<«it.srcEnd.type.qualifiedName»> to:<«it.trgEnd.type.qualifiedName»>''')
+				debug('''Association appeared: <«it.association.qualifiedName»> from:<«it.srcEnd.type.qualifiedName»> to:<«it.trgEnd.type?.qualifiedName»>''')
 				val containingClassQN = it.srcEnd.type.qualifiedName.toJDTQN
 				val fieldName = it.trgEnd.name
 				val typeQN = it.trgEnd.type.qualifiedName.toJDTQN
@@ -47,7 +47,7 @@ class AssociationRules extends RuleProvider {
 				elementNameRegistry.put(it.trgEnd, it.trgEnd.name)
 			]
 			.action(IncQueryActivationStateEnum.DISAPPEARED) [
-				debug('''Association disappeared: <«it.association.qualifiedName»> from:<«it.srcQn»> to:<«it.trgType.qualifiedName»>''')
+				debug('''Association disappeared: <«it.association.qualifiedName»> from:<«it.srcQn»> to:<«it.trgEnd?.type.qualifiedName»>''')
 				val fieldName = it.trgEnd.name
 				val fieldQN = (it.srcQn + "::" + fieldName).toJDTQN
 				manipulator.deleteField(fieldQN)

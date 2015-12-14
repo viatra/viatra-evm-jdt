@@ -12,8 +12,6 @@ pattern umlClass(umlClass: Class) {
 	neg find stereotype(umlClass);
 	neg find templateParameterClass(umlClass);
 	neg find templateBindingClass(umlClass);
-	
-	Class.name(umlClass, _);
 }
 
 private pattern umlAssociationClass(associationClass) {
