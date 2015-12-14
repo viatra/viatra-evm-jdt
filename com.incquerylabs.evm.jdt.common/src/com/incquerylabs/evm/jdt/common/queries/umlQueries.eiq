@@ -94,11 +94,10 @@ pattern umlAssociation(association: Association, srcEnd : Property, trgEnd : Pro
 	srcEnd != trgEnd;
 }
 
-pattern associationOfClass(trgType : Type, srcType : Type, srcQn, association: Association, srcEnd : Property, trgEnd : Property) {
+pattern associationOfClass(srcType : Type, srcQn, association: Association, srcEnd : Property, trgEnd : Property) {
 	Association.memberEnd(association, srcEnd);
 	Property.type(srcEnd, srcType);
 	Association.navigableOwnedEnd(association, trgEnd);
-	Property.type(trgEnd, trgType);
-	srcType != trgType;
+	srcEnd != trgEnd;
 	Type.qualifiedName(srcType, srcQn);
 }
