@@ -1,5 +1,7 @@
 package com.incquerylabs.evm.jdt.umlmanipulator.impl
 
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
 import com.incquerylabs.evm.jdt.common.queries.UmlQueries
 import com.incquerylabs.evm.jdt.fqnutil.IUMLElementLocator
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
@@ -14,6 +16,7 @@ import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.Property
 import org.eclipse.uml2.uml.TypedElement
 import org.eclipse.uml2.uml.UMLFactory
+import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
 
 class UMLManipulator implements IUMLManipulator {
 	extension val Logger logger = Logger.getLogger(this.class)
@@ -23,6 +26,8 @@ class UMLManipulator implements IUMLManipulator {
 	static val umlQueries = UmlQueries::instance
 	val IncQueryEngine engine
 	
+	val Multimap<QualifiedName, QualifiedName> umlTypeReferences = HashMultimap::create
+	
 	new(Model umlModel, IncQueryEngine engine) {
 		this.model = umlModel
 		this.locator = new UMLElementLocator(umlModel)
@@ -31,15 +36,17 @@ class UMLManipulator implements IUMLManipulator {
 	}
 	
 	override createClass(QualifiedName fqn) {
+		val umlFqn = UMLQualifiedName::create(fqn)
 		val umlClass = createClass => [
-			name = fqn.name
+			name = umlFqn.name
 		]
-		if(fqn.parent.isPresent){
-			val parent = locator.locateElement(fqn.parent.get)
+		if(umlFqn.parent.isPresent){
+			val parent = locator.locateElement(umlFqn.parent.get)
 			if(parent != null) {
 				if(parent instanceof Package) {
 					parent.packagedElements += umlClass
-					debug('''Created UML Class: «fqn»''')
+					umlFqn.updateTypeReferences
+					debug('''Created UML Class: «umlFqn»''')
 				}
 			}
 		}
@@ -62,7 +69,9 @@ class UMLManipulator implements IUMLManipulator {
 	}
 	
 	override createAssociation(QualifiedName fqn, QualifiedName typeQualifiedName) {
-		val parentQualifiedName = fqn.parent.get
+		val parentQualifiedName = UMLQualifiedName::create(fqn.parent.get)
+		val umlTypeQualifiedName = UMLQualifiedName::create(typeQualifiedName)
+		
 		val parentClass = locator.locateElement(parentQualifiedName)
 		if(parentClass != null) {
 			if(parentClass instanceof Class) {
@@ -72,7 +81,7 @@ class UMLManipulator implements IUMLManipulator {
 				val navigableEnd = createProperty => [
 					it.name = fqn.name
 					it.association = association
-					it.type = locator.locateElement(typeQualifiedName) as Class
+					it.type = locator.locateElement(umlTypeQualifiedName) as Class
 				]
 				val oppositeEnd = createProperty => [
 					it.name = '''«fqn.name»_opposite'''
@@ -83,6 +92,10 @@ class UMLManipulator implements IUMLManipulator {
 				association.ownedEnds += oppositeEnd
 				association.navigableOwnedEnds += navigableEnd
 				parentClass.package.packagedElements += association
+				
+				
+				val associationEndQualifiedName = UMLQualifiedName::create('''«parentQualifiedName»_«fqn.name»::«fqn.name»''')
+				addTypeReference(umlTypeQualifiedName, associationEndQualifiedName)
 			}
 		}
 	}
@@ -126,8 +139,30 @@ class UMLManipulator implements IUMLManipulator {
 		val matcher = umlQueries.associationOfClass.getMatcher(engine)
 		val associations = matcher.getAllValuesOfassociation(null, umlClass.qualifiedName, null, null)
 		associations.forEach[association | 
-			association.memberEnds.forEach[destroy]
+			association.memberEnds.forEach[ memberEnd|
+				val endQuelaifiedName = UMLQualifiedName::create(memberEnd.qualifiedName)
+				removeTypeReference(endQuelaifiedName)
+				memberEnd.destroy
+			]
 			association.destroy
 		]
+	}
+	
+	private def void updateTypeReferences(QualifiedName typeFqn) {
+		val referers = umlTypeReferences.get(typeFqn)
+		referers.forEach[ refererFqn |
+			this.updateType(refererFqn, typeFqn)
+		]
+	}
+	
+	private def void addTypeReference(QualifiedName typeFqn, QualifiedName refererFqn) {
+		umlTypeReferences.put(typeFqn, refererFqn)
+	}
+	
+	private def void removeTypeReference(QualifiedName refererFqn) {
+		val entry = umlTypeReferences.entries.findFirst[
+			value == refererFqn
+		]
+		umlTypeReferences.remove(entry.key, entry.value)
 	}
 }

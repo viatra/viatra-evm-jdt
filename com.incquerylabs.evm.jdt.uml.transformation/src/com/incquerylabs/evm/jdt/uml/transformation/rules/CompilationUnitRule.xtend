@@ -21,11 +21,13 @@ import org.eclipse.jdt.core.IPackageFragment
 class CompilationUnitRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
 	extension val IUMLManipulator umlManipulator
+	val TypeVisitor typeVisitor
 	
 	
 	new(JDTEventSourceSpecification eventSourceSpecification, ActivationLifeCycle activationLifeCycle, IJavaProject project, IUMLManipulator umlManipulator) {
 		super(eventSourceSpecification, activationLifeCycle, project)
 		this.umlManipulator = umlManipulator
+		this.typeVisitor = new TypeVisitor(umlManipulator)
 		this.filter = new CompilationUnitFilter(this.filter)
 		this.logger.level = Level.DEBUG
 	}
@@ -66,7 +68,6 @@ class CompilationUnitRule extends JDTRule {
 			if(ast == null) {
 				throw new IllegalArgumentException('''AST was null, compilation unit is not transformed: «element»''')
 			}
-			val typeVisitor = new TypeVisitor(umlManipulator)
 			ast.accept(typeVisitor)
 		}
 		

@@ -31,8 +31,8 @@ class TypeVisitor extends ASTVisitor {
 		val containingType = node.parent as TypeDeclaration
 		val List<VariableDeclarationFragment> fragments = node.fragments
 		fragments.forEach[ fragment |
-			val fqn = JDTQualifiedName::create('''«containingType.resolveBinding.qualifiedName».«fragment.name.fullyQualifiedName»''')
-			manipulator.createAssociation(fqn, typeFqn)
+			val javaFieldFqn = JDTQualifiedName::create('''«containingType.resolveBinding.qualifiedName».«fragment.name.fullyQualifiedName»''')
+			manipulator.createAssociation(javaFieldFqn, typeFqn)
 		]
 		
 		super.visit(node)
