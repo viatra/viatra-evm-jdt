@@ -64,4 +64,8 @@ abstract class QualifiedName implements Iterable<String> {
 		return false
 	}
 	
+	override hashCode() {
+		this.toString.hashCode
+	}
+	
 }
