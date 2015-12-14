@@ -6,7 +6,7 @@
       <menuContribution
             locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
          <command
-               commandId="com.incquerylabs.evm.jdt.ui.starttransform.java2uml"
+               commandId="com.incquerylabs.evm.jdt.ui.starttransform.jdtlogging"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -28,13 +28,26 @@
                style="push">
          </command>
       </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
+         <command
+               commandId="com.incquerylabs.evm.jdt.ui.starttransform.jdtlogging"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <adapt
+                     type="java.lang.Object">
+               </adapt>
+            </visibleWhen>
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
       <command
             defaultHandler="com.incquerylabs.evm.jdt.ui.JavaProjectHandler"
-            id="com.incquerylabs.evm.jdt.ui.starttransform.java2uml"
-            name="Start Java to UML transformation">
+            id="com.incquerylabs.evm.jdt.ui.starttransform.jdtlogging"
+            name="Start JDT notification logging">
       </command>
       <command
             defaultHandler="com.incquerylabs.evm.jdt.ui.UMLModelHandler"
