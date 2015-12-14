@@ -124,7 +124,7 @@ class UMLManipulator implements IUMLManipulator {
 
 	private def deleteAssociationsOfClass(Class umlClass) {
 		val matcher = umlQueries.associationOfClass.getMatcher(engine)
-		val associations = matcher.getAllValuesOfassociation(null, null, umlClass.qualifiedName, null, null)
+		val associations = matcher.getAllValuesOfassociation(null, umlClass.qualifiedName, null, null)
 		associations.forEach[association | 
 			association.memberEnds.forEach[destroy]
 			association.destroy
