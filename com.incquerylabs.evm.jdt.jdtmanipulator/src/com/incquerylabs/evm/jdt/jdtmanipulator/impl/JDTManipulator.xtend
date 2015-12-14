@@ -17,6 +17,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit
 import org.eclipse.jdt.core.dom.FieldDeclaration
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import org.eclipse.jface.text.Document
+import org.eclipse.jdt.core.IPackageFragment
+import java.util.Stack
 
 class JDTManipulator implements IJDTManipulator {
 
@@ -124,14 +126,19 @@ class JDTManipulator implements IJDTManipulator {
 	override updatePackage(QualifiedName oldQualifiedName, QualifiedName newQualifiedName) {
 		val genFolder = rootProject.project.getFolder(GENERATION_FOLDER)
 		val packageRoot = rootProject.getPackageFragmentRoot(genFolder)
-		val existingPackage = packageRoot.getPackageFragment(oldQualifiedName.toString)
-		if(!existingPackage.exists) {
-			error('''Package <«oldQualifiedName»> cannot be renamed, does not exist''')
-			return
-		}
-		
-		debug('''Renaming package <«existingPackage.elementName»> to <«newQualifiedName.toString»>''')
-		existingPackage.rename(newQualifiedName.toString, false, new NullProgressMonitor)
+				
+		val leafPackages = packageRoot.children.filter(IPackageFragment).filter[elementName.startsWith(oldQualifiedName.toString)].filter[!hasSubpackages] 
+		leafPackages.forEach[
+			val newName = it.elementName.getNewName(oldQualifiedName.toString, newQualifiedName.toString)
+			debug('''Renaming package <«it.elementName»> to <«newName»>''')
+			it.rename(newName, false, new NullProgressMonitor)			
+		]
+	}
+	
+	private def getNewName(String fullPackageName, String originalFragment, String renameFragment) {
+		val idx = fullPackageName.lastIndexOf(originalFragment) + originalFragment.length
+		val trimmedPackageName = fullPackageName.substring(idx)
+		return renameFragment + trimmedPackageName		
 	}
 
 	override updateClass(QualifiedName oldQualifiedName, String name) {
