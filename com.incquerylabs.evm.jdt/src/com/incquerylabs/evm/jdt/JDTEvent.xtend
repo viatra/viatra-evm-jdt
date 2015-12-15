@@ -4,14 +4,14 @@ import org.eclipse.incquery.runtime.evm.api.event.Event
 import org.eclipse.incquery.runtime.evm.api.event.EventType
 
 class JDTEvent implements Event<JDTEventAtom> {
-	JDTEventType type
+	EventType type
 	JDTEventAtom atom
 
 	/** 
 	 * @param type
 	 * @param atom
 	 */
-	new(JDTEventType type, JDTEventAtom atom) {
+	new(EventType type, JDTEventAtom atom) {
 		this.type = type
 		this.atom = atom
 	}

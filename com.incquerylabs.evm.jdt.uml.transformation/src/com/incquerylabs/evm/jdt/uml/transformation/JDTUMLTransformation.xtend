@@ -5,7 +5,10 @@ import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
 import com.incquerylabs.evm.jdt.JDTRealm
 import com.incquerylabs.evm.jdt.JDTRule
 import com.incquerylabs.evm.jdt.common.queries.UmlQueries
+import com.incquerylabs.evm.jdt.transactions.JDTTransactionalLifecycle
 import com.incquerylabs.evm.jdt.uml.transformation.rules.CompilationUnitRule
+import com.incquerylabs.evm.jdt.uml.transformation.rules.PackageRule
+import com.incquerylabs.evm.jdt.uml.transformation.rules.TransactionalCompilationUnitRule
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import com.incquerylabs.evm.jdt.umlmanipulator.impl.TransactionalManipulator
 import com.incquerylabs.evm.jdt.umlmanipulator.impl.UMLManipulator
@@ -23,7 +26,7 @@ import org.eclipse.incquery.runtime.evm.specific.Schedulers
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.papyrus.infra.core.resource.ModelSet
 import org.eclipse.uml2.uml.Model
-import com.incquerylabs.evm.jdt.uml.transformation.rules.PackageRule
+import com.incquerylabs.evm.jdt.transactions.JDTTransactionalEventSourceSpecification
 
 class JDTUMLTransformation {
 	extension val Logger logger = Logger.getLogger(this.class)
@@ -61,12 +64,23 @@ class JDTUMLTransformation {
 			umlManipulator = new TransactionalManipulator(umlManipulator, modelSet.transactionalEditingDomain)
 		}
 		
+		// Initialize transactional rules
+		val transactionalLifeCycle = new JDTTransactionalLifecycle
+		val JDTTransactionalEventSourceSpecification transactionalSourceSpec = new JDTTransactionalEventSourceSpecification
+		val transactionalCompilationUnitRule = new TransactionalCompilationUnitRule(transactionalSourceSpec, transactionalLifeCycle, project, umlManipulator)
+		addRule(transactionalCompilationUnitRule)
+		
+		
+		
+		
+		
+		
 		// Initialize and add rules
 		val ActivationLifeCycle lifeCycle = new JDTActivationLifeCycle
 		val JDTEventSourceSpecification sourceSpec = new JDTEventSourceSpecification
-
-		val compilationUnitRule = new CompilationUnitRule(sourceSpec, lifeCycle, project, umlManipulator)
-		addRule(compilationUnitRule)
+//
+//		val compilationUnitRule = new CompilationUnitRule(sourceSpec, lifeCycle, project, umlManipulator)
+//		addRule(compilationUnitRule)
 		val packageRule = new PackageRule(sourceSpec, lifeCycle, project, umlManipulator)
 		addRule(packageRule)
 		

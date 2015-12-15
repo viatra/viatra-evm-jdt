@@ -5,6 +5,8 @@ import org.eclipse.incquery.runtime.evm.api.event.Event
 import org.eclipse.incquery.runtime.evm.api.event.EventFilter
 import org.eclipse.incquery.runtime.evm.api.event.EventHandler
 import org.eclipse.incquery.runtime.evm.api.event.EventSource
+import org.eclipse.incquery.runtime.evm.api.event.EventType
+import org.eclipse.jdt.core.IJavaElementDelta
 
 class JDTEventHandler implements EventHandler<JDTEventAtom>{
 	
@@ -19,7 +21,7 @@ class JDTEventHandler implements EventHandler<JDTEventAtom>{
 	}
 	
 	override void handleEvent(Event<JDTEventAtom> event) {
-		val type=event.getEventType() as JDTEventType 
+		val type=event.getEventType() as EventType 
 		val eventAtom=event.getEventAtom()
 		if(filter.isProcessable(eventAtom)){
 			val activation = getOrCreateActivation(eventAtom)
@@ -43,7 +45,9 @@ class JDTEventHandler implements EventHandler<JDTEventAtom>{
 		if(activation == null){
 			return instance.createActivation(eventAtom)
 		} else {
-			activation.atom.delta = eventAtom.delta
+			if(eventAtom.delta.flags.bitwiseAnd(IJavaElementDelta::F_AST_AFFECTED) != 0){
+				activation.atom.delta = eventAtom.delta
+			}
 		}
 		return activation
 	}
