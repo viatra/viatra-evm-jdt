@@ -68,6 +68,24 @@ class TransactionalManipulator implements IUMLManipulator {
 		domain.commandStack.execute(command)
 	}
 	
+	override createPackage(QualifiedName fqn) {
+		val command = new RecordingCommand(domain) {
+			override protected doExecute() {
+				manipulator.createPackage(fqn)
+			}
+		}
+		domain.commandStack.execute(command)
+	}
+	
+	override deletePackage(QualifiedName fqn) {
+		val command = new RecordingCommand(domain) {
+			override protected doExecute() {
+				manipulator.deletePackage(fqn)
+			}
+		}
+		domain.commandStack.execute(command)
+	}
+	
 	override save() {
 		val command = new RecordingCommand(domain) {
 			override protected doExecute() {

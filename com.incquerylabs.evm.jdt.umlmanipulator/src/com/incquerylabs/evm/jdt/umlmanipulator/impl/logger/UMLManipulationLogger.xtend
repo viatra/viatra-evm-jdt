@@ -37,6 +37,14 @@ class UMLManipulationLogger implements IUMLManipulator {
 		debug('''Updated type of «fqn» to «typeQualifiedName»''')
 	}
 	
+	override createPackage(QualifiedName fqn) {
+		debug('''Created UML package «fqn»''')
+	}
+	
+	override deletePackage(QualifiedName fqn) {
+		debug('''Deleted UML package «fqn»''')
+	}
+	
 	override save() {
 		debug('''Saved UML resource''')
 	}

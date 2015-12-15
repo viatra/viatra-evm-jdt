@@ -23,6 +23,7 @@ import org.eclipse.incquery.runtime.evm.specific.Schedulers
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.papyrus.infra.core.resource.ModelSet
 import org.eclipse.uml2.uml.Model
+import com.incquerylabs.evm.jdt.uml.transformation.rules.PackageRule
 
 class JDTUMLTransformation {
 	extension val Logger logger = Logger.getLogger(this.class)
@@ -66,6 +67,8 @@ class JDTUMLTransformation {
 
 		val compilationUnitRule = new CompilationUnitRule(sourceSpec, lifeCycle, project, umlManipulator)
 		addRule(compilationUnitRule)
+		val packageRule = new PackageRule(sourceSpec, lifeCycle, project, umlManipulator)
+		addRule(packageRule)
 		
 		// Add scheduler for EVM
 		addTimedScheduler(100)

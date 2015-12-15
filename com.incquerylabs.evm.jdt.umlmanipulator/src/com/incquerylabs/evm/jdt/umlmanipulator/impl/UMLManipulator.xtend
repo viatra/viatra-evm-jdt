@@ -46,7 +46,7 @@ class UMLManipulator implements IUMLManipulator {
 				if(parent instanceof Package) {
 					parent.packagedElements += umlClass
 					umlFqn.updateTypeReferences
-					debug('''Created UML Class: «umlFqn»''')
+					debug('''Created class «umlFqn»''')
 				}
 			}
 		}
@@ -56,7 +56,7 @@ class UMLManipulator implements IUMLManipulator {
 		val umlElement = locator.locateElement(fqn)
 		if(umlElement != null) {
 			umlElement.name = fqn.name
-			debug('''Updated UML Element name: «fqn»''')
+			debug('''Updated name of «fqn»''')
 		}
 	}
 	
@@ -64,7 +64,7 @@ class UMLManipulator implements IUMLManipulator {
 		val umlClass = locator.locateElement(fqn)
 		if(umlClass != null) {
 			umlClass.destroy
-			debug('''Deleted UML Class: «fqn»''')
+			debug('''Deleted class «fqn»''')
 		}
 	}
 	
@@ -93,7 +93,7 @@ class UMLManipulator implements IUMLManipulator {
 				association.navigableOwnedEnds += navigableEnd
 				parentClass.package.packagedElements += association
 				
-				
+				debug('''Created association «fqn» with type «typeQualifiedName»''')
 				val associationEndQualifiedName = UMLQualifiedName::create('''«parentQualifiedName»_«fqn.name»::«fqn.name»''')
 				addTypeReference(umlTypeQualifiedName, associationEndQualifiedName)
 			}
@@ -105,6 +105,7 @@ class UMLManipulator implements IUMLManipulator {
 		if(typedElement instanceof TypedElement) {
 			val type = locator.locateElement(typeQualifiedName) as Class
 			typedElement.type = type
+			trace('''Updated type of «fqn» to «typeQualifiedName»''')
 		}
 	}
 	
@@ -115,6 +116,7 @@ class UMLManipulator implements IUMLManipulator {
 			if(association != null) {
 				association.memberEnds.forEach[destroy]
 				association.destroy
+				debug('''Deleted association «fqn»''')
 			}
 		}
 	}
@@ -125,14 +127,43 @@ class UMLManipulator implements IUMLManipulator {
 			if(umlClass instanceof Class){
 				umlClass.deleteAssociationsOfClass
 				umlClass.destroy
-				debug('''Deleted UML Class: «fqn»''')
+				debug('''Deleted class «fqn»''')
+			}
+		}
+	}
+	
+	override createPackage(QualifiedName fqn) {
+		if(!fqn.parent.isPresent) {
+			throw new IllegalArgumentException("Cannot create root package")
+		}
+		val parentFqn = fqn.parent.get
+		
+		val packageFragment = umlFactory.createPackage() => [
+			name = fqn.name
+		]
+		val parentPackage =  locator.locateElement(parentFqn)
+		if(parentPackage instanceof Package) {
+			parentPackage.packagedElements += packageFragment
+			debug('''Created package «fqn»''')
+		} else {
+			throw new IllegalArgumentException("Package must be in another package")
+		}
+		
+	}
+	
+	override deletePackage(QualifiedName fqn) {
+		val packageFragment = locator.locateElement(fqn)
+		if(packageFragment != null) {
+			if(packageFragment instanceof Package){
+				packageFragment.destroy
+				debug('''Deleted class «fqn»''')
 			}
 		}
 	}
 	
 	override save() {
 		model.eResource.save(null)
-		trace('''Saved UML resource''')
+		debug('''Saved UML resource''')
 	}
 
 	private def deleteAssociationsOfClass(Class umlClass) {
@@ -156,6 +187,7 @@ class UMLManipulator implements IUMLManipulator {
 	}
 	
 	private def void addTypeReference(QualifiedName typeFqn, QualifiedName refererFqn) {
+		trace('''Added type reference mapping for «refererFqn» with type «typeFqn»''')
 		umlTypeReferences.put(typeFqn, refererFqn)
 	}
 	
@@ -164,5 +196,7 @@ class UMLManipulator implements IUMLManipulator {
 			value == refererFqn
 		]
 		umlTypeReferences.remove(entry.key, entry.value)
+		trace('''Removed type reference mapping for «refererFqn» with type «entry.key»''')
 	}
+	
 }
