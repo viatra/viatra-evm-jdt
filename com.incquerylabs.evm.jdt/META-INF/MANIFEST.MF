@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: com.incquerylabs.evm.jdt,
  com.incquerylabs.evm.jdt.job,
+ com.incquerylabs.evm.jdt.transactions,
  com.incquerylabs.evm.jdt.util
 Require-Bundle: org.eclipse.incquery.runtime.evm;bundle-version="1.0.1",
  org.eclipse.jdt.core;bundle-version="3.11.1",
@@ -13,4 +14,5 @@ Require-Bundle: org.eclipse.incquery.runtime.evm;bundle-version="1.0.1",
  org.apache.log4j;bundle-version="1.2.15",
  org.eclipse.xtext.xbase.lib,
  org.eclipse.xtend.lib,
- org.eclipse.xtend.lib.macro
+ org.eclipse.xtend.lib.macro,
+ org.eclipse.core.runtime;bundle-version="3.11.1"
