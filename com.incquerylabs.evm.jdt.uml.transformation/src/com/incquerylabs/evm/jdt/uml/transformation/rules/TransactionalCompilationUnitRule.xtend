@@ -17,6 +17,9 @@ import org.eclipse.jdt.core.ICompilationUnit
 import org.eclipse.jdt.core.IJavaElementDelta
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IPackageFragment
+import org.eclipse.jdt.core.dom.AST
+import org.eclipse.jdt.core.dom.ASTNode
+import org.eclipse.jdt.core.dom.ASTParser
 
 class TransactionalCompilationUnitRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
@@ -36,7 +39,7 @@ class TransactionalCompilationUnitRule extends JDTRule {
 			debug('''Compilation unit is deleted: «activation.atom.element»''')
 			try {
 				val compilationUnit = activation.atom.element as ICompilationUnit
-				compilationUnit.deleteCorrespondingClass
+				compilationUnit.deleteCorrespondingElements
 			} catch (IllegalArgumentException e) {
 				error('''Error during updating compilation unit''', e)
 			}
@@ -56,14 +59,13 @@ class TransactionalCompilationUnitRule extends JDTRule {
 	def transform(JDTEventAtom atom) {
 		val element = atom.element as ICompilationUnit
 		var delta = atom.delta
-		var ast = delta.compilationUnitAST
-		if(delta.flags.bitwiseAnd(IJavaElementDelta.F_AST_AFFECTED) != 0) {
-			element.deleteCorrespondingElements
-			if(ast == null) {
-				throw new IllegalArgumentException('''AST was null, compilation unit is not transformed: «element»''')
-			}
-			ast.accept(typeVisitor)
+		
+		val ast = delta.ast
+		if(ast == null) {
+			throw new IllegalStateException('''AST was null, compilation unit is not transformed: «element»''')
 		}
+		element.deleteCorrespondingElements
+		ast.accept(typeVisitor)
 		
 		return
 	}
@@ -88,4 +90,23 @@ class TransactionalCompilationUnitRule extends JDTRule {
 		return umlQualifiedName
 	}
 	
+	private def getAst(IJavaElementDelta delta) {
+		val element = delta.element
+		if(element instanceof ICompilationUnit) {
+			val ast = delta.compilationUnitAST
+			if(ast != null) {
+				return ast
+			}
+			return element.parse
+		}
+	}
+	
+	private def ASTNode parse(ICompilationUnit compilationUnit) {
+		val parser = ASTParser.newParser(AST.JLS8)
+		parser.kind = ASTParser.K_COMPILATION_UNIT
+		parser.source = compilationUnit
+		parser.resolveBindings = true
+		debug('''Manually parsed AST of «compilationUnit.elementName»''')
+		return parser.createAST(null)
+	}
 }

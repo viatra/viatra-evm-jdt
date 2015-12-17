@@ -16,8 +16,11 @@ class TypeVisitor extends ASTVisitor {
 	}
 	
 	override visit(TypeDeclaration node) {
-		val fqn = JDTQualifiedName::create(node.resolveBinding.qualifiedName)
-		manipulator.createClass(fqn)
+		val binding = node.resolveBinding
+		if(binding != null) {
+			val fqn = JDTQualifiedName::create(binding.qualifiedName)
+			manipulator.createClass(fqn)
+		}
 		
 		
 		super.visit(node)
@@ -26,14 +29,20 @@ class TypeVisitor extends ASTVisitor {
 	
 	override visit(FieldDeclaration node) {
 		val type = node.type
-		val typeFqn = JDTQualifiedName::create(type.resolveBinding.qualifiedName)
+		val binding = type.resolveBinding
 		
 		val containingType = node.parent as TypeDeclaration
-		val List<VariableDeclarationFragment> fragments = node.fragments
-		fragments.forEach[ fragment |
-			val javaFieldFqn = JDTQualifiedName::create('''«containingType.resolveBinding.qualifiedName».«fragment.name.fullyQualifiedName»''')
-			manipulator.createAssociation(javaFieldFqn, typeFqn)
-		]
+		val parentBinding = containingType.resolveBinding
+		
+		if(binding != null && parentBinding != null) {
+			val typeFqn = JDTQualifiedName::create(binding.qualifiedName)
+			
+			val List<VariableDeclarationFragment> fragments = node.fragments
+			fragments.forEach[ fragment |
+				val javaFieldFqn = JDTQualifiedName::create('''«parentBinding.qualifiedName».«fragment.name.fullyQualifiedName»''')
+				manipulator.createAssociation(javaFieldFqn, typeFqn)
+			]
+		}
 		
 		super.visit(node)
 		return true

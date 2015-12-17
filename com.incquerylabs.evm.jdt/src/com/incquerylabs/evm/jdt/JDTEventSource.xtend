@@ -8,11 +8,12 @@ import org.eclipse.incquery.runtime.evm.api.event.EventSourceSpecification
 import org.eclipse.jdt.core.IJavaElementDelta
 
 import static extension com.incquerylabs.evm.jdt.util.JDTEventTypeDecoder.toEventType
+import org.eclipse.incquery.runtime.evm.api.event.EventHandler
 
 class JDTEventSource implements EventSource<JDTEventAtom> {
 	JDTEventSourceSpecification spec
 	JDTRealm realm
-	Set<JDTEventHandler> handlers = Sets::newHashSet()
+	Set<EventHandler<JDTEventAtom>> handlers = Sets::newHashSet()
 	
 	new(JDTEventSourceSpecification spec, JDTRealm realm) {
 		this.spec = spec
@@ -40,7 +41,11 @@ class JDTEventSource implements EventSource<JDTEventAtom> {
 		]
 	}
 
-	def void addHandler(JDTEventHandler handler) {
+	def void addHandler(EventHandler<JDTEventAtom> handler) {
 		handlers.add(handler)
+	}
+	
+	def getHandlers() {
+		return handlers
 	}
 }
