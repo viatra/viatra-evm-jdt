@@ -17,6 +17,7 @@ import org.eclipse.uml2.uml.Property
 import org.eclipse.uml2.uml.TypedElement
 import org.eclipse.uml2.uml.UMLFactory
 import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
+import org.eclipse.uml2.uml.Type
 
 class UMLManipulator implements IUMLManipulator {
 	extension val Logger logger = Logger.getLogger(this.class)
@@ -81,7 +82,7 @@ class UMLManipulator implements IUMLManipulator {
 				val navigableEnd = createProperty => [
 					it.name = fqn.name
 					it.association = association
-					it.type = locator.locateElement(umlTypeQualifiedName) as Class
+					it.type = locator.locateElement(umlTypeQualifiedName) as Type
 				]
 				val oppositeEnd = createProperty => [
 					it.name = '''«fqn.name»_opposite'''
