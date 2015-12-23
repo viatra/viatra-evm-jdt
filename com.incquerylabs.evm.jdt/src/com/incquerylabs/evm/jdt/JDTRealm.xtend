@@ -13,15 +13,23 @@ import org.eclipse.jdt.core.IJavaElementDelta
 class JDTRealm implements EventRealm {
 	Set<JDTEventSource> sources = Sets.newHashSet()
 	extension val Logger logger = Logger.getLogger(this.class)
-
+	
+	private static JDTRealm instance = null
 	/** 
 	 */
-	new() {
+	protected new() {
 		logger.level = Level.DEBUG
 		JavaCore::addElementChangedListener(([ ElementChangedEvent event |
 			val delta = event.delta
 			notifySources(delta)
 		] as IElementChangedListener))
+	}
+	
+	static def JDTRealm getInstance() {
+		if(instance == null) {
+			instance = new JDTRealm
+		}
+		return instance
 	}
 	
 	private def notifySources(IJavaElementDelta delta) {

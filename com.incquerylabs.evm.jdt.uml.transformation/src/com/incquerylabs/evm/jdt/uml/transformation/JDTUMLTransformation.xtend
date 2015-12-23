@@ -40,7 +40,7 @@ class JDTUMLTransformation {
 	IncQueryEngine engine
 	
 	new() {
-		this.jdtRealm = new JDTRealm
+		this.jdtRealm = JDTRealm::instance
 		this.executor = new Executor(jdtRealm)
 		this.ruleEngine = RuleEngine.create(executor.ruleBase);
 		this.umlManipulator = new UMLManipulationLogger
