@@ -1,5 +1,9 @@
 package com.incquerylabs.evm.jdt
 
+import com.incquerylabs.evm.jdt.fqnutil.JDTInternalQualifiedName
+import java.lang.reflect.Field
+import java.util.List
+import java.util.Map
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.core.runtime.NullProgressMonitor
@@ -9,12 +13,8 @@ import org.eclipse.jdt.core.compiler.CompilationParticipant
 import org.eclipse.jdt.internal.core.JavaModelManager
 import org.eclipse.jdt.internal.core.builder.ReferenceCollection
 import org.eclipse.jdt.internal.core.builder.State
-import java.lang.reflect.Field
 import org.eclipse.jdt.internal.core.builder.StringSet
-import java.util.List
-import java.util.Map
-import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
-import com.incquerylabs.evm.jdt.fqnutil.JDTInternalQualifiedName
+import org.eclipse.core.runtime.Path
 
 class BuildNotifierCompilationParticipant extends CompilationParticipant {
 	extension val Logger logger = Logger.getLogger(this.class)
@@ -39,6 +39,8 @@ class BuildNotifierCompilationParticipant extends CompilationParticipant {
 			debug('''Structurally changed types are «FOR type:changedTypes SEPARATOR ", "»«type»«ENDFOR»''')
 			val affectedFiles = lastState.getAffectedCompilationUnitsInProject
 			debug('''Affected files are «FOR file : affectedFiles SEPARATOR ", "»«file»«ENDFOR»''')
+			val compilationUnits = affectedFiles.map[fqn | project.findElement(new Path(fqn.toString))]
+			debug('''Affected compilation units are «FOR cu : compilationUnits SEPARATOR ", "»«cu»«ENDFOR»''')
 		}
 		
 		debug('''Build of «project.elementName» has finished''')
@@ -84,7 +86,11 @@ class BuildNotifierCompilationParticipant extends CompilationParticipant {
 				val fqn = JDTInternalQualifiedName::create(nameString)
 				referenceStorage.qualifiedNameReferences.contains(fqn)
 			]
-		].keySet
+		].keySet.map[
+			val fullPath = JDTInternalQualifiedName::create(it)
+			val pathWithoutSrcSegment = fullPath.iterator.toList.reverse.tail.join('/')
+			JDTInternalQualifiedName::create(pathWithoutSrcSegment)
+		]
 		return affectedCompilationUnits
 	}
 	
