@@ -6,9 +6,9 @@ class JDTInternalQualifiedName extends QualifiedName {
 	static def QualifiedName create(String qualifiedName) {
 		val lastIndexOfSeparator = qualifiedName.lastIndexOf(JDT_INTERNAL_SEPARATOR)
 		if(lastIndexOfSeparator == -1) {
-			return new JDTQualifiedName(qualifiedName, null) 
+			return new JDTInternalQualifiedName(qualifiedName, null) 
 		} else {
-			return new JDTQualifiedName(qualifiedName.substring(lastIndexOfSeparator + JDT_INTERNAL_SEPARATOR.length), create(qualifiedName.substring(0, lastIndexOfSeparator)))
+			return new JDTInternalQualifiedName(qualifiedName.substring(lastIndexOfSeparator + JDT_INTERNAL_SEPARATOR.length), create(qualifiedName.substring(0, lastIndexOfSeparator)))
 		}
 	}
 	
