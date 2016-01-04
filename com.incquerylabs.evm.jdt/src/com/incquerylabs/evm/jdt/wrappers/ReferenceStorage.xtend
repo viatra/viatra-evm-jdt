@@ -1,4 +1,4 @@
-package com.incquerylabs.evm.jdt
+package com.incquerylabs.evm.jdt.wrappers
 
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import java.util.Set
