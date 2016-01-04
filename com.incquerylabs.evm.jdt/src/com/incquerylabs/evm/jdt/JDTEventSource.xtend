@@ -9,6 +9,8 @@ import org.eclipse.jdt.core.IJavaElementDelta
 
 import static extension com.incquerylabs.evm.jdt.util.JDTEventTypeDecoder.toEventType
 import org.eclipse.incquery.runtime.evm.api.event.EventHandler
+import org.eclipse.jdt.core.IJavaElement
+import com.incquerylabs.evm.jdt.transactions.JDTTransactionalEventType
 
 class JDTEventSource implements EventSource<JDTEventAtom> {
 	JDTEventSourceSpecification spec
@@ -35,9 +37,19 @@ class JDTEventSource implements EventSource<JDTEventAtom> {
 	def void createEvent(IJavaElementDelta delta) {
 		val eventAtom = new JDTEventAtom(delta)
 		val JDTEvent event = new JDTEvent(delta.kind.toEventType, eventAtom)
-		handlers.forEach[handleEvent(event)]
+		handlers.forEach[
+			handleEvent(event)
+		]
 		delta.affectedChildren.forEach[affectedChildren |
 			createEvent(affectedChildren)
+		]
+	}
+
+	def void createReferenceRefreshEvent(IJavaElement javaElement) {
+		val eventAtom = new JDTEventAtom(javaElement)
+		val JDTEvent event = new JDTEvent(JDTTransactionalEventType::UPDATE_DEPENDENCY, eventAtom)
+		handlers.forEach[
+			handleEvent(event)
 		]
 	}
 

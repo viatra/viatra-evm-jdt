@@ -7,6 +7,7 @@ interface IUMLManipulator {
 	def void updateName(QualifiedName fqn)
 	def void deleteClass(QualifiedName fqn)
 	def void deleteClassAndReferences(QualifiedName fqn)
+	def void deleteReferencesOfClass(QualifiedName fqn)
 	def void createAssociation(QualifiedName fqn, QualifiedName typeQualifiedName)
 	def void deleteAssociation(QualifiedName fqn)
 	def void createPackage(QualifiedName fqn)

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="jdtBuildNotifierParticipant"
+         name="jdtBuildNotifierParticipantName"
+         point="org.eclipse.jdt.core.compilationParticipant">
+      <compilationParticipant
+            class="com.incquerylabs.evm.jdt.BuildNotifierCompilationParticipant"
+            id="com.incquerylabs.evm.jdt.jdtBuildNotifierParticipant"
+            modifiesEnvironment="false"
+            requiredSourceLevel="1.8">
+      </compilationParticipant>
+   </extension>
+
+</plugin>

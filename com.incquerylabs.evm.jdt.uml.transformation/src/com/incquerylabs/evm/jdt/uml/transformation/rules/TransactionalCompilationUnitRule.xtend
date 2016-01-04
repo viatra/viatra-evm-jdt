@@ -20,16 +20,20 @@ import org.eclipse.jdt.core.IPackageFragment
 import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTNode
 import org.eclipse.jdt.core.dom.ASTParser
+import org.eclipse.jdt.core.IJavaElement
+import com.incquerylabs.evm.jdt.uml.transformation.rules.visitors.CrossReferenceUpdateVisitor
 
 class TransactionalCompilationUnitRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
 	extension val IUMLManipulator umlManipulator
 	val TypeVisitor typeVisitor
+	val CrossReferenceUpdateVisitor crossReferenceUpdateVisitor
 	
 	new(JDTEventSourceSpecification eventSourceSpecification, ActivationLifeCycle activationLifeCycle, IJavaProject project, IUMLManipulator umlManipulator) {
 		super(eventSourceSpecification, activationLifeCycle, project)
 		this.umlManipulator = umlManipulator
 		this.typeVisitor = new TypeVisitor(umlManipulator)
+		this.crossReferenceUpdateVisitor = new CrossReferenceUpdateVisitor(umlManipulator)
 		this.filter = new CompilationUnitFilter(this.filter)
 		this.logger.level = Level.DEBUG
 	}
@@ -54,19 +58,41 @@ class TransactionalCompilationUnitRule extends JDTRule {
 				error('''Error during updating compilation unit''', e)
 			}
 		])
+		
+		jobs.add(JDTJobFactory.createJob(JDTTransactionalActivationState.DEPENDENCY_UPDATED)[activation, context |
+			val atom = activation.atom
+			debug('''Cross references are updated in compilation unit: «activation.atom.element»''')
+			try{
+				atom.updateCrossReferences
+			} catch (IllegalArgumentException e) {
+				error('''Error during updating compilation unit cross references''', e)
+			}
+		])
 	}
 	
 	def transform(JDTEventAtom atom) {
 		val element = atom.element as ICompilationUnit
-		var delta = atom.delta
-		
-		val ast = delta.ast
-		if(ast == null) {
-			throw new IllegalStateException('''AST was null, compilation unit is not transformed: «element»''')
+		val optionalDelta = atom.delta
+		if(!optionalDelta.present) {
+			debug('''Delta was not present in the event atom, compilation unit is not transformed: «element»''')
+			return
 		}
+		val ast = optionalDelta.map[ delta |
+			delta.ast
+		].orElseThrow[
+			new IllegalStateException('''AST was null, compilation unit is not transformed: «element»''')
+		]
 		element.deleteCorrespondingElements
 		ast.accept(typeVisitor)
 		
+		return
+	}
+	
+	def updateCrossReferences(JDTEventAtom atom) {
+		val element = atom.element as ICompilationUnit
+		val ast = element.ast
+		element.deleteReferencesOfClass
+		ast.accept(crossReferenceUpdateVisitor)
 		return
 	}
 	
@@ -78,6 +104,11 @@ class TransactionalCompilationUnitRule extends JDTRule {
 	def deleteCorrespondingClass(ICompilationUnit element) {
 		val umlQualifiedName = element.getUmlClassQualifiedName
 		deleteClass(umlQualifiedName)
+	}
+	
+	def deleteReferencesOfClass(ICompilationUnit element) {
+		val umlQualifiedName = element.getUmlClassQualifiedName
+		deleteReferencesOfClass(umlQualifiedName)
 	}
 	
 	def getUmlClassQualifiedName(ICompilationUnit compilationUnit) {
@@ -92,11 +123,15 @@ class TransactionalCompilationUnitRule extends JDTRule {
 	
 	private def getAst(IJavaElementDelta delta) {
 		val element = delta.element
+		val ast = delta.compilationUnitAST
+		if(ast != null) {
+			return ast
+		}
+		return element.ast
+	}
+	
+	private def getAst(IJavaElement element) {
 		if(element instanceof ICompilationUnit) {
-			val ast = delta.compilationUnitAST
-			if(ast != null) {
-				return ast
-			}
 			return element.parse
 		}
 	}

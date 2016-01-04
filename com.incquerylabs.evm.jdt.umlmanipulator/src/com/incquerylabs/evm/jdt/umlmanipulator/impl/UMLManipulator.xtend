@@ -1,10 +1,9 @@
 package com.incquerylabs.evm.jdt.umlmanipulator.impl
 
-import com.google.common.collect.HashMultimap
-import com.google.common.collect.Multimap
 import com.incquerylabs.evm.jdt.common.queries.UmlQueries
 import com.incquerylabs.evm.jdt.fqnutil.IUMLElementLocator
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
+import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.impl.UMLElementLocator
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import org.apache.log4j.Level
@@ -14,9 +13,9 @@ import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.Model
 import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.Property
+import org.eclipse.uml2.uml.Type
 import org.eclipse.uml2.uml.TypedElement
 import org.eclipse.uml2.uml.UMLFactory
-import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
 
 class UMLManipulator implements IUMLManipulator {
 	extension val Logger logger = Logger.getLogger(this.class)
@@ -26,7 +25,6 @@ class UMLManipulator implements IUMLManipulator {
 	static val umlQueries = UmlQueries::instance
 	val IncQueryEngine engine
 	
-	val Multimap<QualifiedName, QualifiedName> umlTypeReferences = HashMultimap::create
 	
 	new(Model umlModel, IncQueryEngine engine) {
 		this.model = umlModel
@@ -45,7 +43,6 @@ class UMLManipulator implements IUMLManipulator {
 			if(parent != null) {
 				if(parent instanceof Package) {
 					parent.packagedElements += umlClass
-					umlFqn.updateTypeReferences
 					debug('''Created class «umlFqn»''')
 				}
 			}
@@ -81,7 +78,7 @@ class UMLManipulator implements IUMLManipulator {
 				val navigableEnd = createProperty => [
 					it.name = fqn.name
 					it.association = association
-					it.type = locator.locateElement(umlTypeQualifiedName) as Class
+					it.type = locator.locateElement(umlTypeQualifiedName) as Type
 				]
 				val oppositeEnd = createProperty => [
 					it.name = '''«fqn.name»_opposite'''
@@ -94,8 +91,6 @@ class UMLManipulator implements IUMLManipulator {
 				parentClass.package.packagedElements += association
 				
 				debug('''Created association «fqn» with type «typeQualifiedName»''')
-				val associationEndQualifiedName = UMLQualifiedName::create('''«parentQualifiedName»_«fqn.name»::«fqn.name»''')
-				addTypeReference(umlTypeQualifiedName, associationEndQualifiedName)
 			}
 		}
 	}
@@ -128,6 +123,16 @@ class UMLManipulator implements IUMLManipulator {
 				umlClass.deleteAssociationsOfClass
 				umlClass.destroy
 				debug('''Deleted class «fqn»''')
+			}
+		}
+	}
+	
+	override deleteReferencesOfClass(QualifiedName fqn) {
+		val umlClass = locator.locateElement(fqn)
+		if(umlClass != null) {
+			if(umlClass instanceof Class){
+				umlClass.deleteAssociationsOfClass
+				debug('''Deleted references of class «fqn»''')
 			}
 		}
 	}
@@ -171,32 +176,11 @@ class UMLManipulator implements IUMLManipulator {
 		val associations = matcher.getAllValuesOfassociation(null, umlClass.qualifiedName, null, null)
 		associations.forEach[association | 
 			association.memberEnds.forEach[ memberEnd|
-				val endQuelaifiedName = UMLQualifiedName::create(memberEnd.qualifiedName)
-				removeTypeReference(endQuelaifiedName)
 				memberEnd.destroy
 			]
 			association.destroy
 		]
 	}
 	
-	private def void updateTypeReferences(QualifiedName typeFqn) {
-		val referers = umlTypeReferences.get(typeFqn)
-		referers.forEach[ refererFqn |
-			this.updateType(refererFqn, typeFqn)
-		]
-	}
-	
-	private def void addTypeReference(QualifiedName typeFqn, QualifiedName refererFqn) {
-		trace('''Added type reference mapping for «refererFqn» with type «typeFqn»''')
-		umlTypeReferences.put(typeFqn, refererFqn)
-	}
-	
-	private def void removeTypeReference(QualifiedName refererFqn) {
-		val entry = umlTypeReferences.entries.findFirst[
-			value == refererFqn
-		]
-		umlTypeReferences.remove(entry.key, entry.value)
-		trace('''Removed type reference mapping for «refererFqn» with type «entry.key»''')
-	}
 	
 }
