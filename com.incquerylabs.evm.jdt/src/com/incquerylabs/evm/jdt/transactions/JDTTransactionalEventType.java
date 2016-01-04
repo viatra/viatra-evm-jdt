@@ -6,5 +6,6 @@ public enum JDTTransactionalEventType implements EventType {
 	CREATE,
 	DELETE,
 	MODIFY,
-	COMMIT
+	COMMIT,
+	UPDATE_DEPENDENCY
 }

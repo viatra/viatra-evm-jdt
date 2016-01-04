@@ -9,6 +9,7 @@ import org.eclipse.jdt.core.ElementChangedEvent
 import org.eclipse.jdt.core.IElementChangedListener
 import org.eclipse.jdt.core.JavaCore
 import org.eclipse.jdt.core.IJavaElementDelta
+import org.eclipse.jdt.core.IJavaElement
 
 class JDTRealm implements EventRealm {
 	Set<JDTEventSource> sources = Sets.newHashSet()
@@ -30,6 +31,12 @@ class JDTRealm implements EventRealm {
 			instance = new JDTRealm
 		}
 		return instance
+	}
+	
+	def notifySources(IJavaElement javaElement) {
+		sources.forEach[
+			createReferenceRefreshEvent(javaElement)
+		]
 	}
 	
 	private def notifySources(IJavaElementDelta delta) {

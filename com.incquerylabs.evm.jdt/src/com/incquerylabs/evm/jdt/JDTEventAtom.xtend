@@ -3,16 +3,22 @@ package com.incquerylabs.evm.jdt
 import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaElementDelta
 import org.eclipse.xtend.lib.annotations.Accessors
+import java.util.Optional
 
 class JDTEventAtom {
 	@Accessors
 	val IJavaElement element
 	@Accessors
-	IJavaElementDelta delta
+	Optional<? extends IJavaElementDelta> delta
 	
 	new(IJavaElementDelta delta) {
-		this.delta = delta
+		this.delta = Optional::of(delta)
 		this.element = delta.element
+	}
+	
+	new(IJavaElement javaElement) {
+		this.delta = Optional::empty
+		this.element = javaElement
 	}
 	
 	override equals(Object obj) {

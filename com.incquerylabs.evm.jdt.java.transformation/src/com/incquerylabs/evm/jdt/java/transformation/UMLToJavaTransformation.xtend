@@ -52,37 +52,37 @@ class UMLToJavaTransformation {
 			if(schedulerFactory == null) {
 				val domain = (model.eResource.resourceSet as ModelSet).transactionalEditingDomain
 				schedulerFactory = TransactionalSchedulers::getTransactionSchedulerFactory(domain)
-			}			
+			}
+			
+			val ruleProviders = <RuleProvider>newArrayList
+			ruleProviders += new PackageRules
+			ruleProviders += new ClassRules
+			//ruleProviders += new AssociationRules
+			
+			ruleProviders.forEach[initialize(manipulator, elementNameRegistry)]
+			
+			val queries = GenericPatternGroup::of(umlQueries)
+			queries.prepare(engine)
+			
+			val transformationBuilder = EventDrivenTransformation::forEngine(engine)
+			
+			val fixedPriorityResolver = new InvertedDisappearancePriorityConflictResolver
+			ruleProviders.forEach[registerRules(fixedPriorityResolver)]
+			
+			val executionSchemaBuilder = new ExecutionSchemaBuilder
+			executionSchemaBuilder.engine = engine
+			executionSchemaBuilder.scheduler = schedulerFactory
+			executionSchemaBuilder.conflictResolver = fixedPriorityResolver
+			val executionSchema = executionSchemaBuilder.build
+			executionSchema.logger.level = Level::TRACE
+			
+			transformationBuilder.schema = executionSchema
+			ruleProviders.forEach[addRules(transformationBuilder)]
+			transformation = transformationBuilder.build
+			
+			
+			initialized = true
 		}
-		
-		val ruleProviders = <RuleProvider>newArrayList
-		ruleProviders += new PackageRules
-		ruleProviders += new ClassRules
-		//ruleProviders += new AssociationRules
-		
-		ruleProviders.forEach[initialize(manipulator, elementNameRegistry)]
-		
-		val queries = GenericPatternGroup::of(umlQueries)
-		queries.prepare(engine)
-		
-		val transformationBuilder = EventDrivenTransformation::forEngine(engine)
-		
-		val fixedPriorityResolver = new InvertedDisappearancePriorityConflictResolver
-		ruleProviders.forEach[registerRules(fixedPriorityResolver)]
-				
-		val executionSchemaBuilder = new ExecutionSchemaBuilder
-		executionSchemaBuilder.engine = engine
-		executionSchemaBuilder.scheduler = schedulerFactory
-		executionSchemaBuilder.conflictResolver = fixedPriorityResolver
-		val executionSchema = executionSchemaBuilder.build
-		executionSchema.logger.level = Level::TRACE
-		
-		transformationBuilder.schema = executionSchema
-		ruleProviders.forEach[addRules(transformationBuilder)]		
-		transformation = transformationBuilder.build
-		
-		
-		initialized = true
 	}
 	
 	def execute() {

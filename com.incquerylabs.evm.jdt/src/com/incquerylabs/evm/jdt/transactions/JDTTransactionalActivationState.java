@@ -6,6 +6,7 @@ public enum JDTTransactionalActivationState implements ActivationState {
 	INACTIVE,
 	MODIFIED,
 	COMMITTED,
+	DEPENDENCY_UPDATED,
 	DELETED,
 	FIRED;
 

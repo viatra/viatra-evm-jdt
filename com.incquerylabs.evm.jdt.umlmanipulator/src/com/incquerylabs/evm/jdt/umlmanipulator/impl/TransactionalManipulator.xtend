@@ -104,4 +104,13 @@ class TransactionalManipulator implements IUMLManipulator {
 		domain.commandStack.execute(command)
 	}
 	
+	override deleteReferencesOfClass(QualifiedName fqn) {
+		val command = new RecordingCommand(domain) {
+			override protected doExecute() {
+				manipulator.deleteReferencesOfClass(fqn)
+			}
+		}
+		domain.commandStack.execute(command)
+	}
+	
 }

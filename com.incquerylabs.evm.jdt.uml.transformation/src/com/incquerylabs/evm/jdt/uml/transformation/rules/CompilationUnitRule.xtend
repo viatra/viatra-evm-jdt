@@ -61,7 +61,12 @@ class CompilationUnitRule extends JDTRule {
 	
 	def transform(JDTEventAtom atom) {
 		val element = atom.element as ICompilationUnit
-		var delta = atom.delta
+		val optionalDelta = atom.delta
+		if(!optionalDelta.present){
+			debug('''Delta was not present in the event atom, compilation unit is not transformed: «element»''')
+			return
+		}
+		val delta = optionalDelta.get
 		var ast = delta.compilationUnitAST
 		if(delta.flags.bitwiseAnd(IJavaElementDelta.F_AST_AFFECTED) != 0) {
 			element.deleteCorrespondingElements
