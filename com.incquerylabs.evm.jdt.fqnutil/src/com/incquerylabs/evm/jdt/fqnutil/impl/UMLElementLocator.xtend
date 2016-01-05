@@ -34,6 +34,7 @@ class UMLElementLocator implements IUMLElementLocator {
 	}
 	
 	def <T extends NamedElement>locateElement(QualifiedName qualifiedName, Class<T> clazz){
+		// TODO this is extremely inefficient! use EIQ instead
 		umlModel.allOwnedElements.filter(clazz).findFirst[element|
 			UMLQualifiedName.create(element.qualifiedName) == qualifiedName
 		]
@@ -49,6 +50,7 @@ class UMLElementLocator implements IUMLElementLocator {
 		if(modelQualifiedName == umlQualifiedName) {
 			return umlModel
 		} else {
+			// TODO this is extremely inefficient! use EIQ instead
 			umlModel.allOwnedElements.filter(NamedElement).findFirst[element|
 				UMLQualifiedName.create(element.qualifiedName) == umlQualifiedName
 			]

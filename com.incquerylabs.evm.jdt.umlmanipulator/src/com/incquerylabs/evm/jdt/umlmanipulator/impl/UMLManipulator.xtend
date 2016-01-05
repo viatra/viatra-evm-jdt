@@ -161,7 +161,7 @@ class UMLManipulator implements IUMLManipulator {
 		if(packageFragment != null) {
 			if(packageFragment instanceof Package){
 				packageFragment.destroy
-				debug('''Deleted class «fqn»''')
+				debug('''Deleted package «fqn»''')
 			}
 		}
 	}
