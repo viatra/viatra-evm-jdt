@@ -79,7 +79,24 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	}
 	
 	override ensureClass(QualifiedName qualifiedName) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+		val existingClass = qualifiedName.findClass
+		if(existingClass.present){
+			return existingClass.get
+		}
+		
+		val umlClass = createClass => [
+			name = qualifiedName.name
+		]
+		if(qualifiedName.parent.isPresent){
+			throw new IllegalArgumentException("Cannot create root class")
+		}
+		
+		val parent = qualifiedName.parent.get.findPackage
+		if(parent.present) {
+			parent.get.packagedElements += umlClass
+			debug('''Created class «qualifiedName»''')
+		}
+		return umlClass
 	}
 	
 	override removeClass(Class clss) {
