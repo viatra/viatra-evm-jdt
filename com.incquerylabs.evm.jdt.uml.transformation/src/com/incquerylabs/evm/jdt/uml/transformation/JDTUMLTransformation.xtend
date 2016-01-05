@@ -88,4 +88,10 @@ class JDTUMLTransformation {
 		ruleEngine.addRule(rule.ruleSpecification, rule.filter)
 	}
 	
+	def disableSynchronization() {
+	}
+	
+	def enableSynchronization() {
+	}
+	
 }

@@ -35,19 +35,25 @@ class ClassRules extends RuleProvider {
 			.action(IncQueryActivationStateEnum::APPEARED)[
 				debug('''Class in package appeared: <«it.umlClass.qualifiedName»>''')
 				val qualifiedName = it.umlClass.qualifiedName.toJDTQN
-				manipulator.createClass(qualifiedName)
+				if(synchronizationEnabled){
+					manipulator.createClass(qualifiedName)
+				}
 				elementNameRegistry.put(it.umlClass, it.umlClass.name)
 			]
 			.action(IncQueryActivationStateEnum::UPDATED) [
 				val clazzName = elementNameRegistry.get(it.umlClass)
 				val qualifiedName = (it.umlClass.package.qualifiedName + "::" + clazzName)
 				debug('''Class in model updated: <«qualifiedName»>''')
-				manipulator.updateClass(qualifiedName.toJDTQN, it.umlClass.name)
+				if(synchronizationEnabled){
+					manipulator.updateClass(qualifiedName.toJDTQN, it.umlClass.name)
+				}
 				elementNameRegistry.put(it.umlClass, it.umlClass.name)
 			].action(IncQueryActivationStateEnum::DISAPPEARED) [
 				val qualifiedName = (it.model.qualifiedName + "::" + it.umlClass.name).toJDTQN
 				debug('''Class in model disappeared: <«qualifiedName»>''')
-				manipulator.deleteClass(qualifiedName)
+				if(synchronizationEnabled){
+					manipulator.deleteClass(qualifiedName)
+				}
 				elementNameRegistry.remove(it.umlClass.name)
 			].addLifeCycle(Lifecycles::getDefault(true, true)).build, 3
 		)
@@ -57,19 +63,25 @@ class ClassRules extends RuleProvider {
 			.action(IncQueryActivationStateEnum::APPEARED)[
 				debug('''Class in package appeared: <«it.umlClass.qualifiedName»>''')
 				val qualifiedName = it.umlClass.qualifiedName.toJDTQN
-				manipulator.createClass(qualifiedName)
+				if(synchronizationEnabled){
+					manipulator.createClass(qualifiedName)
+				}
 				elementNameRegistry.put(it.umlClass, it.umlClass.name)
 			]
 			.action(IncQueryActivationStateEnum::UPDATED) [
 				val clazzName = elementNameRegistry.get(it.umlClass)
 				val qualifiedName = (it.umlClass.package.qualifiedName + "::" + clazzName)
 				debug('''Class in package updated: <«qualifiedName»>''')
-				manipulator.updateClass(qualifiedName.toJDTQN, it.umlClass.name)
+				if(synchronizationEnabled){
+					manipulator.updateClass(qualifiedName.toJDTQN, it.umlClass.name)
+				}
 				elementNameRegistry.put(it.umlClass, it.umlClass.name)
 			].action(IncQueryActivationStateEnum::DISAPPEARED) [
 				debug('''Class in package disappeared: <«it.umlClass.qualifiedName»>''')
 				val qualifiedName = (it.umlPackage.qualifiedName + "::" + it.umlClass.name).toJDTQN
-				manipulator.deleteClass(qualifiedName)
+				if(synchronizationEnabled){
+					manipulator.deleteClass(qualifiedName)
+				}
 				elementNameRegistry.remove(it.umlClass.name)
 			].addLifeCycle(Lifecycles::getDefault(true, true)).build, 3
 		)

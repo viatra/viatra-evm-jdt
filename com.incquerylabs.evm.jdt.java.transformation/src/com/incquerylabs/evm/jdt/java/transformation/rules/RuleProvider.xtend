@@ -8,11 +8,15 @@ import org.eclipse.viatra.emf.runtime.rules.eventdriven.EventDrivenTransformatio
 import org.eclipse.viatra.emf.runtime.rules.eventdriven.EventDrivenTransformationRuleFactory
 import org.eclipse.viatra.emf.runtime.transformation.eventdriven.EventDrivenTransformation.EventDrivenTransformationBuilder
 import org.eclipse.xtend.lib.annotations.Data
+import org.eclipse.xtend.lib.annotations.Accessors
 
 abstract class RuleProvider {
 	
 	val rules = <PrioritizedRule>newArrayList
 	protected val ruleFactory = new EventDrivenTransformationRuleFactory
+	
+	@Accessors
+	protected boolean synchronizationEnabled = false
 	
 	abstract def void initialize(JDTManipulator manipulator, Map<Element, String> elementNameRegistry)
 	
