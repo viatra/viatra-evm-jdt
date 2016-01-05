@@ -34,9 +34,10 @@ class UMLElementLocator implements IUMLElementLocator {
 	}
 	
 	def <T extends NamedElement>locateElement(QualifiedName qualifiedName, Class<T> clazz){
+		val prefixedUmlQualifiedName = qualifiedName.toModelNamePrefixedQualifiedName
 		// TODO this is extremely inefficient! use EIQ instead
 		umlModel.allOwnedElements.filter(clazz).findFirst[element|
-			UMLQualifiedName.create(element.qualifiedName) == qualifiedName
+			UMLQualifiedName.create(element.qualifiedName) == prefixedUmlQualifiedName
 		]
 	}
 	
@@ -45,16 +46,21 @@ class UMLElementLocator implements IUMLElementLocator {
 	}
 	
 	override locateElement(QualifiedName qualifiedName) {
-		val umlQualifiedName = UMLQualifiedName::create(qualifiedName)
+		val prefixedUmlQualifiedName = qualifiedName.toModelNamePrefixedQualifiedName
 		val modelQualifiedName = UMLQualifiedName::create(umlModel.qualifiedName)
-		if(modelQualifiedName == umlQualifiedName) {
+		if(modelQualifiedName == prefixedUmlQualifiedName) {
 			return umlModel
 		} else {
 			// TODO this is extremely inefficient! use EIQ instead
 			umlModel.allOwnedElements.filter(NamedElement).findFirst[element|
-				UMLQualifiedName.create(element.qualifiedName) == umlQualifiedName
+				UMLQualifiedName.create(element.qualifiedName) == prefixedUmlQualifiedName
 			]
 		}
 	}
 	
+	private def toModelNamePrefixedQualifiedName(QualifiedName qualifiedName) {
+		val umlQualifiedName = UMLQualifiedName::create(qualifiedName)
+		val correctedUmlQualifiedName = UMLQualifiedName.create('''«umlModel.qualifiedName»::«umlQualifiedName»''')
+		return correctedUmlQualifiedName
+	}
 }
