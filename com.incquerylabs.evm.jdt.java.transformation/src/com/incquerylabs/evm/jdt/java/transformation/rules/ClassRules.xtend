@@ -11,7 +11,6 @@ import org.eclipse.incquery.runtime.evm.specific.event.IncQueryActivationStateEn
 import org.eclipse.uml2.uml.Element
 
 import static extension com.incquerylabs.evm.jdt.java.transformation.util.QualifiedNameUtil.*
-import com.incquerylabs.evm.jdt.common.queries.util.UmlClassQuerySpecification
 
 class ClassRules extends RuleProvider {
 
@@ -79,7 +78,7 @@ class ClassRules extends RuleProvider {
 			].action(IncQueryActivationStateEnum::DISAPPEARED) [
 				debug('''Class in package disappeared: <«it.umlClass.qualifiedName»>''')
 				val qualifiedName = (it.umlPackage.qualifiedName + "::" + it.umlClass.name).toJDTQN
-				if(synchronizationEnabled){
+				if(synchronizationEnabled && it.umlPackage.eContainer != null){
 					manipulator.deleteClass(qualifiedName)
 				}
 				elementNameRegistry.remove(it.umlClass.name)
