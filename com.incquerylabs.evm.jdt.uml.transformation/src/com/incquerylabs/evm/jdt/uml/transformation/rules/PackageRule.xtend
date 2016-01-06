@@ -9,6 +9,7 @@ import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
+import org.eclipse.incquery.runtime.evm.specific.Jobs
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IPackageFragment
 import com.incquerylabs.evm.jdt.job.JDTJobFactory
@@ -26,15 +27,15 @@ class PackageRule extends JDTRule {
 	}
 	
 	override initialize() {
-		jobs.add(createJob(JDTActivationState.APPEARED)[activation, context |
+		jobs.add(Jobs.newEnableJob(createJob(JDTActivationState.APPEARED)[activation, context |
 			val atom = activation.atom
 			val packageFragment = atom.element as IPackageFragment
 			val fqn = JDTQualifiedName::create(packageFragment.elementName)
 			ensurePackage(fqn)
 			debug('''Package appeared: «atom.element»''')
-		])
+		]))
 		
-		jobs.add(createJob(JDTActivationState.DISAPPEARED)[activation, context |
+		jobs.add(Jobs.newEnableJob(createJob(JDTActivationState.DISAPPEARED)[activation, context |
 			try {
 				val packageFragment = activation.atom.element as IPackageFragment
 				val fqn = JDTQualifiedName::create(packageFragment.elementName)
@@ -46,12 +47,12 @@ class PackageRule extends JDTRule {
 			} catch (IllegalArgumentException e) {
 				error('''Error during updating package''', e)
 			}
-		])
+		]))
 		
-		jobs.add(createJob(JDTActivationState.UPDATED)[activation, context |
+		jobs.add(Jobs.newEnableJob(createJob(JDTActivationState.UPDATED)[activation, context |
 			val atom = activation.atom
 			debug('''Package updated: «atom.element»''')
-		])
+		]))
 	}
 	
 }

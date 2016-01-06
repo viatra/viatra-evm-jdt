@@ -21,6 +21,7 @@ import org.eclipse.uml2.uml.Model
 import org.eclipse.viatra.emf.runtime.transformation.eventdriven.EventDrivenTransformation
 import org.eclipse.viatra.emf.runtime.transformation.eventdriven.ExecutionSchemaBuilder
 import org.apache.log4j.Level
+import java.util.List
 
 class UMLToJavaTransformation {
 
@@ -37,7 +38,7 @@ class UMLToJavaTransformation {
 	Model model
 	
 	boolean initialized = false
-	
+	val List<RuleProvider> ruleProviders = newArrayList
 	
 	new(IJavaProject project, Model model) {
 		manipulator = new JDTManipulator(new JDTElementLocator(project))
@@ -54,7 +55,6 @@ class UMLToJavaTransformation {
 				schedulerFactory = TransactionalSchedulers::getTransactionSchedulerFactory(domain)
 			}
 			
-			val ruleProviders = <RuleProvider>newArrayList
 			ruleProviders += new PackageRules
 			ruleProviders += new ClassRules
 			//ruleProviders += new AssociationRules
@@ -74,7 +74,7 @@ class UMLToJavaTransformation {
 			executionSchemaBuilder.scheduler = schedulerFactory
 			executionSchemaBuilder.conflictResolver = fixedPriorityResolver
 			val executionSchema = executionSchemaBuilder.build
-			executionSchema.logger.level = Level::TRACE
+			//executionSchema.logger.level = Level::TRACE
 			
 			transformationBuilder.schema = executionSchema
 			ruleProviders.forEach[addRules(transformationBuilder)]
@@ -87,6 +87,14 @@ class UMLToJavaTransformation {
 	
 	def execute() {
 		transformation.executionSchema.startUnscheduledExecution
+	}
+	
+	def disableSynchronization() {
+		ruleProviders.forEach[synchronizationEnabled = false]
+	}
+	
+	def enableSynchronization() {
+		ruleProviders.forEach[synchronizationEnabled = true]
 	}
 	
 }

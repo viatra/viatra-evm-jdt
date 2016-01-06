@@ -24,6 +24,8 @@ import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTNode
 import org.eclipse.jdt.core.dom.ASTParser
 import org.eclipse.uml2.uml.Class
+import org.eclipse.incquery.runtime.evm.specific.job.EnableJob
+import org.eclipse.incquery.runtime.evm.specific.Jobs
 
 class TransactionalCompilationUnitRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
@@ -41,7 +43,7 @@ class TransactionalCompilationUnitRule extends JDTRule {
 	}
 	
 	override initialize() {
-		jobs.add(createJob(JDTTransactionalActivationState.DELETED)[activation, context |
+		jobs.add(Jobs.newEnableJob(createJob(JDTTransactionalActivationState.DELETED)[activation, context |
 			debug('''Compilation unit is deleted: «activation.atom.element»''')
 			try {
 				val compilationUnit = activation.atom.element as ICompilationUnit
@@ -49,9 +51,9 @@ class TransactionalCompilationUnitRule extends JDTRule {
 			} catch (IllegalArgumentException e) {
 				error('''Error during updating compilation unit''', e)
 			}
-		])
+		]))
 		
-		jobs.add(createJob(JDTTransactionalActivationState.COMMITTED)[activation, context |
+		jobs.add(Jobs.newEnableJob(createJob(JDTTransactionalActivationState.COMMITTED)[activation, context |
 			val atom = activation.atom
 			debug('''Compilation unit is modified: «activation.atom.element»''')
 			try{
@@ -59,9 +61,9 @@ class TransactionalCompilationUnitRule extends JDTRule {
 			} catch (IllegalArgumentException e) {
 				error('''Error during updating compilation unit''', e)
 			}
-		])
+		]))
 		
-		jobs.add(createJob(JDTTransactionalActivationState.DEPENDENCY_UPDATED)[activation, context |
+		jobs.add(Jobs.newEnableJob(createJob(JDTTransactionalActivationState.DEPENDENCY_UPDATED)[activation, context |
 			val atom = activation.atom
 			debug('''Cross references are updated in compilation unit: «activation.atom.element»''')
 			try{
@@ -69,7 +71,7 @@ class TransactionalCompilationUnitRule extends JDTRule {
 			} catch (IllegalArgumentException e) {
 				error('''Error during updating compilation unit cross references''', e)
 			}
-		])
+		]))
 	}
 	
 	def transform(JDTEventAtom atom) {

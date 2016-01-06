@@ -24,14 +24,17 @@ class PackageRules extends RuleProvider {
 		addRule(ruleFactory.createRule.precondition(LeafPackageQuerySpecification::instance)
 			.action(IncQueryActivationStateEnum::APPEARED) [
 				debug('''Leaf package appeared: <«it.umlPackage.qualifiedName»>''')
-				manipulator.createPackage(it.umlPackage.qualifiedName.toJDTQN)
+				if(synchronizationEnabled){
+					manipulator.createPackage(it.umlPackage.qualifiedName.toJDTQN)
+				}
 			].action(IncQueryActivationStateEnum::UPDATED) [
 				val packageName = elementNameRegistry.get(it.umlPackage)
 				val qualifiedName = (it.umlPackage.namespace.qualifiedName + "::" + packageName)
 				debug('''Leaf package updated: <«qualifiedName»>''')
-				if(manipulator.updatePackage(qualifiedName.toJDTQN, it.umlPackage.qualifiedName.toJDTQN)) {
-					elementNameRegistry.put(it.umlPackage, it.umlPackage.name)
-				}				
+				if(synchronizationEnabled){
+					manipulator.updatePackage(qualifiedName.toJDTQN, it.umlPackage.qualifiedName.toJDTQN)
+				}
+				elementNameRegistry.put(it.umlPackage, it.umlPackage.name)
 			].addLifeCycle(Lifecycles::getDefault(true, false)).build, 0
 		)
 		
@@ -42,10 +45,10 @@ class PackageRules extends RuleProvider {
 				val packageName = elementNameRegistry.get(it.umlPackage)
 				val qualifiedName = (it.umlPackage.namespace.qualifiedName + "::" + packageName)
 				debug('''Package updated: <«qualifiedName»>''')
-				if(manipulator.updatePackage(qualifiedName.toJDTQN, it.umlPackage.qualifiedName.toJDTQN)) {
-					elementNameRegistry.put(it.umlPackage, it.umlPackage.name)
+				if(synchronizationEnabled) {
+					manipulator.updatePackage(qualifiedName.toJDTQN, it.umlPackage.qualifiedName.toJDTQN)
 				}
-								
+				elementNameRegistry.put(it.umlPackage, it.umlPackage.name)
 			].addLifeCycle(Lifecycles::getDefault(true, false)).build, 0
 		)
 		
@@ -55,7 +58,9 @@ class PackageRules extends RuleProvider {
 			.action(IncQueryActivationStateEnum::DISAPPEARED) [
 				debug('''Child package disappeared: <«it.child.name»> in <«it.parent.qualifiedName»>''')
 				val packageQualifiedName = it.parent.qualifiedName + "::" + it.child.name
-				manipulator.deletePackage(packageQualifiedName.toJDTQN)
+				if(synchronizationEnabled){
+					manipulator.deletePackage(packageQualifiedName.toJDTQN)
+				}
 				elementNameRegistry.remove(it.child)
 			].addLifeCycle(Lifecycles::getDefault(false, true)).build, 1
 		)

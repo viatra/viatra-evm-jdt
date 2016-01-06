@@ -25,13 +25,17 @@ class AssociationRules extends RuleProvider {
 				val containingClassQN = it.srcEnd.type.qualifiedName.toJDTQN
 				val fieldName = it.trgEnd.name
 				val typeQN = it.trgEnd.type.qualifiedName.toJDTQN
-				manipulator.createField(containingClassQN, fieldName, typeQN)
+				if(synchronizationEnabled){
+					manipulator.createField(containingClassQN, fieldName, typeQN)
+				}
 				elementNameRegistry.put(it.trgEnd, it.trgEnd.name)
 			].action(IncQueryActivationStateEnum::UPDATED) [
 				debug('''Association updated: <«it.association.qualifiedName»> from:<«it.srcEnd.type.qualifiedName»> to:<«it.trgEnd.type?.qualifiedName»>''')
 				val fieldName = elementNameRegistry.get(it.trgEnd)
-				manipulator.updateField((it.srcEnd.type.qualifiedName + "::" + fieldName).toJDTQN,
-					it.trgEnd.type.qualifiedName.toJDTQN, it.trgEnd.name)
+				if(synchronizationEnabled){
+					manipulator.updateField((it.srcEnd.type.qualifiedName + "::" + fieldName).toJDTQN,
+						it.trgEnd.type.qualifiedName.toJDTQN, it.trgEnd.name)
+				}
 				elementNameRegistry.put(it.trgEnd, it.trgEnd.name)
 			].addLifeCycle(Lifecycles::getDefault(true, false)).build, 4
 		)
@@ -43,14 +47,18 @@ class AssociationRules extends RuleProvider {
 				val containingClassQN = it.srcEnd.type.qualifiedName.toJDTQN
 				val fieldName = it.trgEnd.name
 				val typeQN = it.trgEnd.type.qualifiedName.toJDTQN
-				manipulator.createField(containingClassQN, fieldName, typeQN)
+				if(synchronizationEnabled){
+					manipulator.createField(containingClassQN, fieldName, typeQN)
+				}
 				elementNameRegistry.put(it.trgEnd, it.trgEnd.name)
 			]
 			.action(IncQueryActivationStateEnum.DISAPPEARED) [
 				debug('''Association disappeared: <«it.association.qualifiedName»> from:<«it.srcQn»> to:<«it.trgEnd?.type.qualifiedName»>''')
 				val fieldName = it.trgEnd.name
 				val fieldQN = (it.srcQn + "::" + fieldName).toJDTQN
-				manipulator.deleteField(fieldQN)
+				if(synchronizationEnabled){
+					manipulator.deleteField(fieldQN)
+				}
 				elementNameRegistry.remove(it.trgEnd.name)
 			].addLifeCycle(Lifecycles::getDefault(false, true)).build, 5)
 	}

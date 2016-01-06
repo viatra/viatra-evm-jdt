@@ -1,20 +1,22 @@
 package com.incquerylabs.evm.jdt.ui
 
+import com.incquerylabs.evm.jdt.java.transformation.UMLToJavaTransformation
 import com.incquerylabs.evm.jdt.uml.transformation.JDTUMLTransformation
-import org.eclipse.core.commands.AbstractHandler
+import java.util.Map
 import org.eclipse.core.commands.ExecutionEvent
 import org.eclipse.core.commands.ExecutionException
+import org.eclipse.core.resources.IProject
 import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.IAdaptable
 import org.eclipse.jdt.core.JavaCore
-import org.eclipse.jface.dialogs.MessageDialog
 import org.eclipse.jface.viewers.ISelection
 import org.eclipse.jface.viewers.IStructuredSelection
-import org.eclipse.swt.widgets.Shell
 import org.eclipse.ui.handlers.HandlerUtil
 import org.eclipse.uml2.uml.Model
 
-class SynchronisationModelHandler  extends AbstractHandler {
+class SynchronisationModelHandler extends UMLModelHandler {
+	
+	protected static Map<Model, BidirectionalSynchronization> runningSynchronizations = newHashMap
 	
 	override execute(ExecutionEvent event) throws ExecutionException {
 		var selection = HandlerUtil.getCurrentSelection(event);
@@ -31,10 +33,9 @@ class SynchronisationModelHandler  extends AbstractHandler {
 		val project = root.getProject(projectName)
 		
 		if(project != null && project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
-			val javaProject = JavaCore.create(project);
-			System::out.println('''Working on project «javaProject.elementName»'''.toString)
-			val JDTUMLTransformation umlTransformation = new JDTUMLTransformation()
-			umlTransformation.start(javaProject, model)
+			
+			project.startTransformation(model)
+			
 		} else {
 			reportError(shell, null, "Invalid target",
 				'''The transformation can only be started on Java projects'''
@@ -58,7 +59,22 @@ class SynchronisationModelHandler  extends AbstractHandler {
 		}
 	}
 	
-	def reportError(Shell shell, Throwable exception, String message, String details) {
-		MessageDialog.openError(shell, message, details)
+	override protected startTransformation(IProject project, Model model) {
+		val javaProject = JavaCore.create(project);
+		val umlTransformation = new JDTUMLTransformation()
+		val transformation = new UMLToJavaTransformation(javaProject, model)
+		val synch = new BidirectionalSynchronization(umlTransformation, transformation)
+		
+		synch.allowJava2UML
+		
+		println('''Starting Java2UML Transformation «javaProject.elementName»'''.toString)
+		umlTransformation.start(javaProject, model)
+		
+		println('''Starting UML2Java Transformation «javaProject.elementName»'''.toString)
+		transformation.initialize()
+		transformation.execute
+		
+		runningSynchronizations.put(model, synch)
 	}
+	
 }

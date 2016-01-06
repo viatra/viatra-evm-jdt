@@ -8,11 +8,13 @@ import org.eclipse.incquery.runtime.evm.api.RuleSpecification
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.incquery.runtime.evm.api.event.EventFilter
 import com.incquerylabs.evm.jdt.job.JDTJobFactory
+import org.eclipse.xtend.lib.annotations.Accessors
 
 abstract class JDTRule {
 	protected val JDTEventSourceSpecification eventSourceSpecification
 	protected val ActivationLifeCycle activationLifeCycle
 	protected extension val JDTJobFactory jobFactory
+	@Accessors
 	protected val Set<Job<JDTEventAtom>> jobs = new HashSet
 	protected RuleSpecification<JDTEventAtom> ruleSpecification
 	protected EventFilter<JDTEventAtom> filter
@@ -36,10 +38,12 @@ abstract class JDTRule {
 	def EventFilter<JDTEventAtom> getFilter() {
 		return filter
 	}
+	
 	def RuleSpecification<JDTEventAtom> getRuleSpecification() {
 		if(ruleSpecification == null) {
 			ruleSpecification = new RuleSpecification(eventSourceSpecification, activationLifeCycle, jobs)
 		}
 		return ruleSpecification
 	}
+	
 }
