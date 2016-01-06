@@ -11,6 +11,10 @@ import static extension com.incquerylabs.evm.jdt.util.JDTEventTypeDecoder.toEven
 import org.eclipse.incquery.runtime.evm.api.event.EventHandler
 import org.eclipse.jdt.core.IJavaElement
 import com.incquerylabs.evm.jdt.transactions.JDTTransactionalEventType
+import org.eclipse.jdt.core.JavaCore
+import org.eclipse.incquery.runtime.evm.api.event.EventFilter
+import org.eclipse.jdt.core.IJavaProject
+import org.eclipse.jdt.core.IPackageFragmentRoot
 
 class JDTEventSource implements EventSource<JDTEventAtom> {
 	JDTEventSourceSpecification spec
@@ -54,7 +58,36 @@ class JDTEventSource implements EventSource<JDTEventAtom> {
 	}
 
 	def void addHandler(EventHandler<JDTEventAtom> handler) {
+		// send events to handler for existing activations
+		val filter = handler.eventFilter
+		val project = getJavaProject(filter)
+		val pckgfr = project.packageFragments.filter[kind == IPackageFragmentRoot.K_SOURCE].toList
+		
+		pckgfr.forEach[
+			handler.sendExistingEvents(it)
+			compilationUnits.forEach[
+				handler.sendExistingEvents(it)
+			]
+		]
+		
 		handlers.add(handler)
+	}
+	
+	def sendExistingEvents(EventHandler<JDTEventAtom> handler, IJavaElement element) {
+		val eventAtom = new JDTEventAtom(element)
+		val JDTEvent createEvent = new JDTEvent(JDTTransactionalEventType::CREATE, eventAtom)
+		handler.handleEvent(createEvent)
+		val JDTEvent commitEvent = new JDTEvent(JDTTransactionalEventType::COMMIT, eventAtom)
+		handler.handleEvent(commitEvent)
+	}
+	
+	def IJavaProject getJavaProject(EventFilter<? super JDTEventAtom> filter) {
+		if(filter instanceof JDTEventFilter){
+			return filter.project
+		} else if(filter instanceof CompositeEventFilter){
+			return getJavaProject(filter.innerFilter)
+		}
+		return null
 	}
 	
 	def getHandlers() {

@@ -28,4 +28,8 @@ class JDTEventAtom {
 		return false
 	}
 	
+	override toString() {
+		element.toString() + " : " + delta.toString()
+	}
+	
 }

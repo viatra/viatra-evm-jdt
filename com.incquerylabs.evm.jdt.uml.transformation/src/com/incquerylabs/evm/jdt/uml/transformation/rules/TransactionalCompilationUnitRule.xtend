@@ -75,15 +75,18 @@ class TransactionalCompilationUnitRule extends JDTRule {
 	def transform(JDTEventAtom atom) {
 		val element = atom.element as ICompilationUnit
 		val optionalDelta = atom.delta
+		var ASTNode ast
 		if(!optionalDelta.present) {
-			debug('''Delta was not present in the event atom, compilation unit is not transformed: «element»''')
-			return
+			debug('''Delta was not present in the event atom: «element»''')
+			ast = element.ast
+		} else {
+			ast = optionalDelta.map[ delta |
+				delta.ast
+			].orElseThrow[
+				new IllegalStateException('''AST was null, compilation unit is not transformed: «element»''')
+			]
 		}
-		val ast = optionalDelta.map[ delta |
-			delta.ast
-		].orElseThrow[
-			new IllegalStateException('''AST was null, compilation unit is not transformed: «element»''')
-		]
+		
 		element.deleteCorrespondingElements
 		ast.accept(typeVisitor)
 		
