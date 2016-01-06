@@ -1,22 +1,22 @@
 package com.incquerylabs.evm.jdt.ui
 
+import com.incquerylabs.evm.jdt.java.transformation.UMLToJavaTransformation
 import com.incquerylabs.evm.jdt.uml.transformation.JDTUMLTransformation
-import org.eclipse.core.commands.AbstractHandler
+import java.util.Map
 import org.eclipse.core.commands.ExecutionEvent
 import org.eclipse.core.commands.ExecutionException
+import org.eclipse.core.resources.IProject
 import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.IAdaptable
 import org.eclipse.jdt.core.JavaCore
-import org.eclipse.jface.dialogs.MessageDialog
 import org.eclipse.jface.viewers.ISelection
 import org.eclipse.jface.viewers.IStructuredSelection
-import org.eclipse.swt.widgets.Shell
 import org.eclipse.ui.handlers.HandlerUtil
 import org.eclipse.uml2.uml.Model
-import org.eclipse.jdt.core.IJavaProject
-import com.incquerylabs.evm.jdt.java.transformation.UMLToJavaTransformation
 
-class SynchronisationModelHandler  extends AbstractHandler {
+class SynchronisationModelHandler extends UMLModelHandler {
+	
+	protected static Map<Model, BidirectionalSynchronization> runningSynchronizations = newHashMap
 	
 	override execute(ExecutionEvent event) throws ExecutionException {
 		var selection = HandlerUtil.getCurrentSelection(event);
@@ -33,10 +33,8 @@ class SynchronisationModelHandler  extends AbstractHandler {
 		val project = root.getProject(projectName)
 		
 		if(project != null && project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
-			val javaProject = JavaCore.create(project);
 			
-			javaProject.startTransformation(model)
-			
+			project.startTransformation(model)
 			
 		} else {
 			reportError(shell, null, "Invalid target",
@@ -61,24 +59,22 @@ class SynchronisationModelHandler  extends AbstractHandler {
 		}
 	}
 	
-	def private void startTransformation(IJavaProject project, Model model) {
+	override protected startTransformation(IProject project, Model model) {
+		val javaProject = JavaCore.create(project);
 		val umlTransformation = new JDTUMLTransformation()
-		val transformation = new UMLToJavaTransformation(project, model)
+		val transformation = new UMLToJavaTransformation(javaProject, model)
 		val synch = new BidirectionalSynchronization(umlTransformation, transformation)
 		
 		synch.allowJava2UML
 		
-		System::out.println('''Starting Java2UML Transformation «project.elementName»'''.toString)
-		umlTransformation.start(project, model)
+		println('''Starting Java2UML Transformation «javaProject.elementName»'''.toString)
+		umlTransformation.start(javaProject, model)
 		
-		System::out.println('''Starting UML2Java Transformation «project.elementName»'''.toString)
+		println('''Starting UML2Java Transformation «javaProject.elementName»'''.toString)
 		transformation.initialize()
 		transformation.execute
 		
-		synch.allowBoth
+		runningSynchronizations.put(model, synch)
 	}
 	
-	def reportError(Shell shell, Throwable exception, String message, String details) {
-		MessageDialog.openError(shell, message, details)
-	}
 }

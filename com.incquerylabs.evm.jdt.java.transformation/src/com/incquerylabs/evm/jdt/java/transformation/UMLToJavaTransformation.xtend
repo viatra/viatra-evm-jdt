@@ -74,7 +74,7 @@ class UMLToJavaTransformation {
 			executionSchemaBuilder.scheduler = schedulerFactory
 			executionSchemaBuilder.conflictResolver = fixedPriorityResolver
 			val executionSchema = executionSchemaBuilder.build
-			executionSchema.logger.level = Level::TRACE
+			//executionSchema.logger.level = Level::TRACE
 			
 			transformationBuilder.schema = executionSchema
 			ruleProviders.forEach[addRules(transformationBuilder)]

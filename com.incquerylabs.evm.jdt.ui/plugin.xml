@@ -27,6 +27,10 @@
                commandId="com.incquerylabs.evm.jdt.ui.uml2java"
                style="push">
          </command>
+         <command
+               commandId="com.incquerylabs.evm.jdt.ui.syncdir"
+               style="push">
+         </command>
       </menuContribution>
       <menuContribution
             locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
@@ -50,7 +54,7 @@
             name="Start JDT notification logging">
       </command>
       <command
-            defaultHandler="com.incquerylabs.evm.jdt.ui.UMLModelHandler"
+            defaultHandler="com.incquerylabs.evm.jdt.ui.UMLToJavaSynchronizationHandler"
             id="com.incquerylabs.evm.jdt.ui.uml2java"
             name="Start UML to Java transformation">
       </command>
@@ -58,6 +62,11 @@
             defaultHandler="com.incquerylabs.evm.jdt.ui.SynchronisationModelHandler"
             id="com.incquerylabs.evm.jdt.ui.modelcodesync"
             name="Start code synchronisation">
+      </command>
+      <command
+            defaultHandler="com.incquerylabs.evm.jdt.ui.SynchronizationDirectionHandler"
+            id="com.incquerylabs.evm.jdt.ui.syncdir"
+            name="Change synchronization direction">
       </command>
    </extension>
    <extension

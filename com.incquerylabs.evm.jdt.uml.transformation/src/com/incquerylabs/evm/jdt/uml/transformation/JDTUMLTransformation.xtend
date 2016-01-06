@@ -94,4 +94,8 @@ class JDTUMLTransformation {
 	def enableSynchronization() {
 	}
 	
+	def isEnabled(){
+		return true
+	}
+	
 }
