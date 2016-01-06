@@ -95,6 +95,12 @@
          </with>
       </definition>
    </extension>
+   <extension
+         point="org.eclipse.papyrus.infra.core.model">
+      <modelSetSnippet
+            classname="com.incquerylabs.evm.jdt.ui.CleanupModelSetSnippet">
+      </modelSetSnippet>
+   </extension>
 
 
 </plugin>

@@ -74,6 +74,8 @@ class SynchronisationModelHandler extends UMLModelHandler {
 		transformation.initialize()
 		transformation.execute
 		
+		
+		
 		runningSynchronizations.put(model, synch)
 	}
 	
