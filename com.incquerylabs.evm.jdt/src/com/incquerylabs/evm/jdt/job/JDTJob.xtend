@@ -15,7 +15,7 @@ abstract class JDTJob extends Job<JDTEventAtom> {
 	}
 	
 	override protected handleError(Activation<? extends JDTEventAtom> activation, Exception exception, Context context) {
-		error('''Unhandled error in JDTJob.''')
+		error('''Unhandled error in JDTJob.''', exception)
 	}
 	
 }

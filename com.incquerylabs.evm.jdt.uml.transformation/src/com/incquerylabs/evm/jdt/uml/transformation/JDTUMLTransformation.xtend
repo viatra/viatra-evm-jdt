@@ -26,6 +26,8 @@ import org.eclipse.incquery.runtime.evm.specific.Schedulers
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.papyrus.infra.core.resource.ModelSet
 import org.eclipse.uml2.uml.Model
+import java.util.Set
+import org.eclipse.incquery.runtime.evm.specific.job.EnableJob
 
 class JDTUMLTransformation {
 	extension val Logger logger = Logger.getLogger(this.class)
@@ -37,6 +39,8 @@ class JDTUMLTransformation {
 	Executor executor
 	Scheduler scheduler
 
+	Set<JDTRule> rules = newHashSet
+
 	IncQueryEngine engine
 	
 	new() {
@@ -47,7 +51,7 @@ class JDTUMLTransformation {
 	}
 
 	def void start(IJavaProject project, Model model) {
-		ruleEngine.logger.level = Level.INFO
+		ruleEngine.logger.level = Level.DEBUG
 		logger.level = Level.DEBUG
 		debug('''Started Java to UML transformation.''')
 		
@@ -75,6 +79,8 @@ class JDTUMLTransformation {
 		val packageRule = new PackageRule(sourceSpec, lifeCycle, project, umlManipulator)
 		addRule(packageRule)
 		
+		enableSynchronization
+		
 		// Add scheduler for EVM
 		addTimedScheduler(100)
 	}
@@ -85,17 +91,28 @@ class JDTUMLTransformation {
 	}
 	
 	def addRule(JDTRule rule) {
+		rules.add(rule)
 		ruleEngine.addRule(rule.ruleSpecification, rule.filter)
 	}
 	
 	def disableSynchronization() {
+		rules.forEach[
+			jobs.forEach[job |
+				if(job instanceof EnableJob){
+					job.enabled = false
+				}
+			]
+		]
 	}
 	
 	def enableSynchronization() {
-	}
-	
-	def isEnabled(){
-		return true
+		rules.forEach[
+			jobs.forEach[job |
+				if(job instanceof EnableJob){
+					job.enabled = true
+				}
+			]
+		]
 	}
 	
 }
