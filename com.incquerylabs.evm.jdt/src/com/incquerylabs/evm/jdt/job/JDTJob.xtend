@@ -14,6 +14,12 @@ abstract class JDTJob extends Job<JDTEventAtom> {
 		super(activationState)
 	}
 	
+	override protected execute(Activation<? extends JDTEventAtom> activation, Context context) {
+		run(activation, context)
+	}
+	
+	def abstract protected void run(Activation<? extends JDTEventAtom> activation, Context context)
+	
 	override protected handleError(Activation<? extends JDTEventAtom> activation, Exception exception, Context context) {
 		error('''Unhandled error in JDTJob.''', exception)
 	}

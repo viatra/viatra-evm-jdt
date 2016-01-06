@@ -1,7 +1,7 @@
 package com.incquerylabs.evm.jdt.uml.transformation.rules.visitors
 
 import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
-import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
+import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import java.util.List
 import org.eclipse.jdt.core.dom.ASTVisitor
 import org.eclipse.jdt.core.dom.FieldDeclaration
@@ -9,10 +9,10 @@ import org.eclipse.jdt.core.dom.TypeDeclaration
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 
 class CrossReferenceUpdateVisitor extends ASTVisitor {
-	val IUMLManipulator manipulator
+	extension val UMLModelAccess umlModelAccess
 	
-	new(IUMLManipulator manipulator) {
-		this.manipulator = manipulator
+	new(UMLModelAccess umlModelAccess) {
+		this.umlModelAccess = umlModelAccess
 	}
 	
 	override visit(FieldDeclaration node) {
@@ -28,7 +28,16 @@ class CrossReferenceUpdateVisitor extends ASTVisitor {
 			val List<VariableDeclarationFragment> fragments = node.fragments
 			fragments.forEach[ fragment |
 				val javaFieldFqn = JDTQualifiedName::create('''«parentBinding.qualifiedName».«fragment.name.fullyQualifiedName»''')
-				manipulator.createAssociation(javaFieldFqn, typeFqn)
+				val association = ensureAssociation(javaFieldFqn)
+				val umlType = findClass(typeFqn)
+				umlType.ifPresent[
+					val targetEnd = association.memberEnds.filter[ targetEnd | 
+						!association.ownedEnds.contains(targetEnd) ||
+						association.navigableOwnedEnds.contains(targetEnd)
+					].head
+					
+					targetEnd.type = it
+				]
 			]
 		}
 		

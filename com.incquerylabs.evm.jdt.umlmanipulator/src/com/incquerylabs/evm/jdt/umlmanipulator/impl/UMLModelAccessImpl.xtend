@@ -5,6 +5,7 @@ import com.incquerylabs.evm.jdt.fqnutil.IUMLElementLocator
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.impl.UMLElementLocator
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
+import java.util.Optional
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.incquery.runtime.api.IncQueryEngine
@@ -14,7 +15,6 @@ import org.eclipse.uml2.uml.Model
 import org.eclipse.uml2.uml.Operation
 import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.UMLFactory
-import java.util.Optional
 
 class UMLModelAccessImpl implements UMLModelAccess {
 	
@@ -40,25 +40,24 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	
 	override ensurePackage(QualifiedName qualifiedName) {
 		val existingPackage = qualifiedName.findPackage
-		if(existingPackage.present){
-			return existingPackage.get
-		}
 		
-		if(!qualifiedName.parent.isPresent) {
-			throw new IllegalArgumentException("Cannot create root package")
-		}
-		val parentFqn = qualifiedName.parent.get
+		return existingPackage.orElseGet[
+			createPackage(qualifiedName)
+		]
+	}
+	
+	private def createPackage(QualifiedName qualifiedName) {
+		val parentFqn = qualifiedName.parent
+		val parentPackage = parentFqn.map[
+			ensurePackage
+		].orElseGet[locator.UMLModel]
 		
 		val packageFragment = umlFactory.createPackage() => [
 			name = qualifiedName.name
 		]
-		val parentPackage =  parentFqn.findPackage
-		if(parentPackage.present) {
-			parentPackage.get.packagedElements += packageFragment
-			debug('''Created package «qualifiedName»''')
-		} else {
-			throw new IllegalArgumentException("Package must be in another package")
-		}
+		
+		parentPackage.packagedElements += packageFragment
+		debug('''Created package «qualifiedName»''')
 		packageFragment
 	}
 	
@@ -80,22 +79,25 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	
 	override ensureClass(QualifiedName qualifiedName) {
 		val existingClass = qualifiedName.findClass
-		if(existingClass.present){
-			return existingClass.get
-		}
+		
+		return existingClass.orElseGet[
+			createClass(qualifiedName)
+		]
+	}
+	
+	private def createClass(QualifiedName qualifiedName) {
+		val parentFqn = qualifiedName.parent
+		
+		val parent = parentFqn.map[
+			ensurePackage
+		].orElseGet[locator.UMLModel]
 		
 		val umlClass = createClass => [
 			name = qualifiedName.name
 		]
-		if(qualifiedName.parent.isPresent){
-			throw new IllegalArgumentException("Cannot create root class")
-		}
 		
-		val parent = qualifiedName.parent.get.findPackage
-		if(parent.present) {
-			parent.get.packagedElements += umlClass
-			debug('''Created class «qualifiedName»''')
-		}
+		parent.packagedElements += umlClass
+		debug('''Created class «qualifiedName»''')
 		return umlClass
 	}
 	
@@ -116,7 +118,41 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	}
 	
 	override ensureAssociation(QualifiedName qualifiedName) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+		val existingAssociation = qualifiedName.findAssociation
+		
+		return existingAssociation.orElseGet[
+			createAssociation(qualifiedName)
+		]
+	}
+	
+	private def createAssociation(QualifiedName qualifiedName) {
+		val parentFqn = qualifiedName.parent
+		val parent = parentFqn.flatMap[
+			findClass
+		]
+		
+		val umlAssociation = parent.map[ parentClass |
+			val association = createAssociation => [
+				it.name = '''«parentClass.name»_«qualifiedName.name»'''
+			]
+			val navigableEnd = createProperty => [
+				it.name = qualifiedName.name
+				it.association = association
+			]
+			val oppositeEnd = createProperty => [
+				it.name = '''«qualifiedName.name»_opposite'''
+				it.association = association
+				it.type = parentClass
+			]
+			parentClass.ownedAttributes += navigableEnd
+			association.ownedEnds += oppositeEnd
+			parentClass.package.packagedElements += association
+			
+			debug('''Created association «qualifiedName»''')
+			association
+		]
+		
+		return umlAssociation.orElseThrow[new RuntimeException('''Was not able to create UML association: «qualifiedName»''')]
 	}
 	
 	override removeAssociation(Association association) {

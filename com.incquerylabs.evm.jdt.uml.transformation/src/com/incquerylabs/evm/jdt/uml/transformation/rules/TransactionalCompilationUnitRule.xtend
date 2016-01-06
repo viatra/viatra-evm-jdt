@@ -8,50 +8,52 @@ import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
 import com.incquerylabs.evm.jdt.job.JDTJobFactory
 import com.incquerylabs.evm.jdt.transactions.JDTTransactionalActivationState
 import com.incquerylabs.evm.jdt.uml.transformation.rules.filters.CompilationUnitFilter
+import com.incquerylabs.evm.jdt.uml.transformation.rules.visitors.CrossReferenceUpdateVisitor
 import com.incquerylabs.evm.jdt.uml.transformation.rules.visitors.TypeVisitor
-import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
+import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
+import java.util.Optional
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
 import org.eclipse.jdt.core.ICompilationUnit
+import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaElementDelta
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IPackageFragment
 import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTNode
 import org.eclipse.jdt.core.dom.ASTParser
-import org.eclipse.jdt.core.IJavaElement
-import com.incquerylabs.evm.jdt.uml.transformation.rules.visitors.CrossReferenceUpdateVisitor
+import org.eclipse.uml2.uml.Class
 import org.eclipse.incquery.runtime.evm.specific.job.EnableJob
 import org.eclipse.incquery.runtime.evm.specific.Jobs
 
 class TransactionalCompilationUnitRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
-	extension val IUMLManipulator umlManipulator
+	extension val UMLModelAccess umlModelAccess
 	val TypeVisitor typeVisitor
 	val CrossReferenceUpdateVisitor crossReferenceUpdateVisitor
 	
-	new(JDTEventSourceSpecification eventSourceSpecification, ActivationLifeCycle activationLifeCycle, IJavaProject project, IUMLManipulator umlManipulator) {
-		super(eventSourceSpecification, activationLifeCycle, project)
-		this.umlManipulator = umlManipulator
-		this.typeVisitor = new TypeVisitor(umlManipulator)
-		this.crossReferenceUpdateVisitor = new CrossReferenceUpdateVisitor(umlManipulator)
+	new(JDTEventSourceSpecification eventSourceSpecification, ActivationLifeCycle activationLifeCycle, IJavaProject project, UMLModelAccess umlModelAccess, JDTJobFactory jobFactory) {
+		super(eventSourceSpecification, activationLifeCycle, project, jobFactory)
+		this.umlModelAccess = umlModelAccess
+		this.typeVisitor = new TypeVisitor(umlModelAccess)
+		this.crossReferenceUpdateVisitor = new CrossReferenceUpdateVisitor(umlModelAccess)
 		this.filter = new CompilationUnitFilter(this.filter)
 		this.logger.level = Level.DEBUG
 	}
 	
 	override initialize() {
-		jobs.add(Jobs.newEnableJob(JDTJobFactory.createJob(JDTTransactionalActivationState.DELETED)[activation, context |
+		jobs.add(Jobs.newEnableJob(createJob(JDTTransactionalActivationState.DELETED)[activation, context |
 			debug('''Compilation unit is deleted: «activation.atom.element»''')
 			try {
 				val compilationUnit = activation.atom.element as ICompilationUnit
-				compilationUnit.deleteCorrespondingElements
+				compilationUnit.deleteCorrespondingClass
 			} catch (IllegalArgumentException e) {
 				error('''Error during updating compilation unit''', e)
 			}
 		]))
 		
-		jobs.add(Jobs.newEnableJob(JDTJobFactory.createJob(JDTTransactionalActivationState.COMMITTED)[activation, context |
+		jobs.add(Jobs.newEnableJob(createJob(JDTTransactionalActivationState.COMMITTED)[activation, context |
 			val atom = activation.atom
 			debug('''Compilation unit is modified: «activation.atom.element»''')
 			try{
@@ -61,7 +63,7 @@ class TransactionalCompilationUnitRule extends JDTRule {
 			}
 		]))
 		
-		jobs.add(Jobs.newEnableJob(JDTJobFactory.createJob(JDTTransactionalActivationState.DEPENDENCY_UPDATED)[activation, context |
+		jobs.add(Jobs.newEnableJob(createJob(JDTTransactionalActivationState.DEPENDENCY_UPDATED)[activation, context |
 			val atom = activation.atom
 			debug('''Cross references are updated in compilation unit: «activation.atom.element»''')
 			try{
@@ -84,33 +86,52 @@ class TransactionalCompilationUnitRule extends JDTRule {
 		].orElseThrow[
 			new IllegalStateException('''AST was null, compilation unit is not transformed: «element»''')
 		]
-		element.deleteCorrespondingElements
+		typeVisitor.clearVisitedElements
 		ast.accept(typeVisitor)
 		
+		val visitedElements = typeVisitor.visitedElements
+		val visitedClasses = visitedElements.filter(Class)
+		val associationsOfVisitedClasses = visitedClasses.map[
+			getAssociationsOf(it)
+		].flatten
+		val associationsToRemove = associationsOfVisitedClasses.filter[
+			!visitedElements.contains(it)
+		]
+		associationsToRemove.forEach[
+			removeAssociation
+		]
+		
 		return
+	}
+	
+	def deleteCorrespondingClass(ICompilationUnit element) {
+		val umlQualifiedName = element.getUmlClassQualifiedName
+		val umlClass = findClass(umlQualifiedName)
+		umlClass.ifPresent[
+			val associations = getAssociationsOf(it)
+			associations.forEach[
+				removeAssociation
+			]
+		]
+		
+		umlClass.ifPresent[
+			removeClass
+		]
+	}
+	
+	private def getAssociationsOf(Class umlClass) {
+		val associations = umlClass.ownedAttributes.map[ attribute |
+			Optional::ofNullable(attribute.association)
+		].filter[isPresent].map[get]
+		
+		return associations
 	}
 	
 	def updateCrossReferences(JDTEventAtom atom) {
 		val element = atom.element as ICompilationUnit
 		val ast = element.ast
-		element.deleteReferencesOfClass
 		ast.accept(crossReferenceUpdateVisitor)
 		return
-	}
-	
-	def deleteCorrespondingElements(ICompilationUnit element) {
-		val umlQualifiedName = element.getUmlClassQualifiedName
-		deleteClassAndReferences(umlQualifiedName)
-	}
-	
-	def deleteCorrespondingClass(ICompilationUnit element) {
-		val umlQualifiedName = element.getUmlClassQualifiedName
-		deleteClass(umlQualifiedName)
-	}
-	
-	def deleteReferencesOfClass(ICompilationUnit element) {
-		val umlQualifiedName = element.getUmlClassQualifiedName
-		deleteReferencesOfClass(umlQualifiedName)
 	}
 	
 	def getUmlClassQualifiedName(ICompilationUnit compilationUnit) {
