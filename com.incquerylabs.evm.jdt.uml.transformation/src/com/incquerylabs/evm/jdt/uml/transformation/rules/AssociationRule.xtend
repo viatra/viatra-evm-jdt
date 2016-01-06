@@ -5,20 +5,19 @@ import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
 import com.incquerylabs.evm.jdt.JDTRule
 import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
-import com.incquerylabs.evm.jdt.job.JDTJobFactory
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
+import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
 import org.eclipse.jdt.core.IField
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IType
-import org.eclipse.jdt.core.dom.ASTParser
 import org.eclipse.jdt.core.dom.AST
-import org.eclipse.core.runtime.NullProgressMonitor
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment
+import org.eclipse.jdt.core.dom.ASTParser
 import org.eclipse.jdt.core.dom.ASTVisitor
 import org.eclipse.jdt.core.dom.FieldDeclaration
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 
 class AssociationRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
@@ -36,7 +35,7 @@ class AssociationRule extends JDTRule {
 	}
 	
 	override initialize() {
-		jobs.add(JDTJobFactory.createJob(JDTActivationState.APPEARED)[activation, context |
+		jobs.add(createJob(JDTActivationState.APPEARED)[activation, context |
 			val javaField = activation.atom.element
 			if(javaField instanceof IField) {
 				val parentClass = javaField.parent
@@ -71,7 +70,7 @@ class AssociationRule extends JDTRule {
 			}
 		])
 		
-		jobs.add(JDTJobFactory.createJob(JDTActivationState.DISAPPEARED)[activation, context |
+		jobs.add(createJob(JDTActivationState.DISAPPEARED)[activation, context |
 			val javaField = activation.atom.element
 			if(javaField instanceof IField) {
 				val parentClass = javaField.declaringType
@@ -83,7 +82,7 @@ class AssociationRule extends JDTRule {
 			}
 		])
 		
-		jobs.add(JDTJobFactory.createJob(JDTActivationState.UPDATED)[activation, context |
+		jobs.add(createJob(JDTActivationState.UPDATED)[activation, context |
 			val javaField = activation.atom.element
 			if(javaField instanceof IField) {
 				val parentClass = javaField.declaringType
