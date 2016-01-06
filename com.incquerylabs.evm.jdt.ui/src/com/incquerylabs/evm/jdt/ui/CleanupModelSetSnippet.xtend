@@ -7,6 +7,8 @@ import org.eclipse.uml2.uml.resource.UMLResource
 
 class CleanupModelSetSnippet implements IModelSetSnippet {
 	
+	extension RunningSynchronizationManager manager = RunningSynchronizationManager.INSTANCE
+	
 	override start(ModelSet modelSet) {
 	}
 
@@ -15,7 +17,7 @@ class CleanupModelSetSnippet implements IModelSetSnippet {
 		val umlResources = modelSet.resources.filter(UMLResource)
 		val umlResource = umlResources.findFirst[URI.trimFileExtension.equals(modelSet.URIWithoutExtension)]
 		val umlRoot = umlResource.contents.filter(Model).head
-		val synch = SynchronisationModelHandler.runningSynchronizations.remove(umlRoot)
+		val synch = cleanupSynchronization(umlRoot)
 		if(synch != null) {
 			synch.allowJava2UML
 		}

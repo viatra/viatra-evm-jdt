@@ -65,6 +65,7 @@
          </command>
          <command
                commandId="com.incquerylabs.evm.jdt.ui.syncdir"
+               label="Switch to Java2UML"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -80,6 +81,37 @@
                      <test
                            forcePluginActivation="true"
                            property="com.incquerylabs.evm.jdt.ui.isumlmodel">
+                     </test>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.incquerylabs.evm.jdt.ui.isUML2Java">
+                     </test>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.incquerylabs.evm.jdt.ui.syncdir"
+               label="Switch to UML2Java"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.core.runtime.IAdaptable">
+                     </instanceof>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.incquerylabs.evm.jdt.ui.isumlmodel">
+                     </test>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.incquerylabs.evm.jdt.ui.isJava2UML">
                      </test>
                   </iterate>
                </with>
@@ -116,11 +148,30 @@
             defaultHandler="com.incquerylabs.evm.jdt.ui.SynchronisationModelHandler"
             id="com.incquerylabs.evm.jdt.ui.modelcodesync"
             name="Start code synchronisation">
+         <commandParameter
+               id="com.incquerylabs.evm.jdt.ui.commandParameter1"
+               name="name"
+               optional="true">
+         </commandParameter>
       </command>
       <command
             defaultHandler="com.incquerylabs.evm.jdt.ui.SynchronizationDirectionHandler"
             id="com.incquerylabs.evm.jdt.ui.syncdir"
             name="Change synchronization direction">
+         <state
+               id="org.eclipse.ui.commands.toggleState">
+            <class
+                  class="org.eclipse.ui.handlers.RegistryToggleState">
+               <parameter
+                     name="default"
+                     value="false">
+               </parameter>
+               <parameter
+                     name="persisted"
+                     value="false">
+               </parameter>
+            </class>
+         </state>
       </command>
    </extension>
    <extension
@@ -129,7 +180,7 @@
             class="com.incquerylabs.evm.jdt.ui.SelectionAdapterTester"
             id="com.incquerylabs.evm.jdt.ui.adaptertester"
             namespace="com.incquerylabs.evm.jdt.ui"
-            properties="isumlmodel"
+            properties="isumlmodel,isJava2UML,isUML2Java"
             type="org.eclipse.core.runtime.IAdaptable">
       </propertyTester>
    </extension>
