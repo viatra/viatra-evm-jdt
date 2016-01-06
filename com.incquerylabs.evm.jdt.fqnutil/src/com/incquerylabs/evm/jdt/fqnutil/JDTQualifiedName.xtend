@@ -27,4 +27,10 @@ class JDTQualifiedName extends QualifiedName {
 		JDT_SEPARATOR
 	}
 	
+	override dropRoot() {
+		this.toList.reverse.tail.fold(null)[parent, name|
+			new JDTQualifiedName(name, parent)
+		]
+	}
+	
 }

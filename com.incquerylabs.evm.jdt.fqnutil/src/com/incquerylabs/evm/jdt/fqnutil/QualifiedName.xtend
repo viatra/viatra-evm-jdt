@@ -57,6 +57,8 @@ abstract class QualifiedName implements Iterable<String> {
 		
 	}
 	
+	def QualifiedName dropRoot()
+	
 	override equals(Object obj) {
 		if(obj instanceof QualifiedName) {
 			return this.toString.equals(obj.toString)

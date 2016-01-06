@@ -28,4 +28,10 @@ class JDTInternalQualifiedName extends QualifiedName {
 	override getSeparator() {
 		JDT_INTERNAL_SEPARATOR
 	}
+	
+	override dropRoot() {
+		this.toList.reverse.tail.fold(null)[parent, name|
+			new JDTInternalQualifiedName(name, parent)
+		]
+	}
 }

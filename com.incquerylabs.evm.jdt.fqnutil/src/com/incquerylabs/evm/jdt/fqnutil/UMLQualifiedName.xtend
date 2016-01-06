@@ -27,4 +27,10 @@ class UMLQualifiedName extends QualifiedName {
 		UML_SEPARATOR
 	}
 	
+	override dropRoot() {
+		this.toList.reverseView.tail.fold(null)[parent, name|
+			new UMLQualifiedName(name, parent)
+		]
+	}
+	
 }

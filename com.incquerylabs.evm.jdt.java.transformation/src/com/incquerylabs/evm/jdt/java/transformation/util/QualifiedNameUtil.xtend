@@ -6,7 +6,8 @@ import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
 class QualifiedNameUtil {
 
 	static def toJDTQN(String umlQNString) {
-		JDTQualifiedName::create(UMLQualifiedName::create(umlQNString))
+		val umlQualifiedName = UMLQualifiedName::create(umlQNString).dropRoot
+		return JDTQualifiedName::create(umlQualifiedName)
 	}
 	
 }
