@@ -12,6 +12,7 @@ class UMLToJavaSynchronizationHandler extends UMLModelHandler {
 		println('''Working on project «javaProject.elementName»'''.toString)
 		val transformation = new UMLToJavaTransformation(javaProject, model)
 		transformation.initialize()
+		transformation.enableSynchronization
 		transformation.execute
 	}
 	
