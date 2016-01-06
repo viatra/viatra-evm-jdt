@@ -10,9 +10,9 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <adapt
-                     type="java.lang.Object">
-               </adapt>
+               <reference
+                     definitionId="com.incquerylabs.evm.jdt.ui.javaproject">
+               </reference>
             </visibleWhen>
          </command>
       </menuContribution>
@@ -39,9 +39,9 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <adapt
-                     type="java.lang.Object">
-               </adapt>
+               <reference
+                     definitionId="com.incquerylabs.evm.jdt.ui.javaproject">
+               </reference>
             </visibleWhen>
          </command>
       </menuContribution>
@@ -91,6 +91,30 @@
                      forcePluginActivation="true"
                      property="com.incquerylabs.evm.jdt.ui.isumlmodel">
                </test>
+            </iterate>
+         </with>
+      </definition>
+      <definition
+            id="com.incquerylabs.evm.jdt.ui.javaproject">
+         <with
+               variable="selection">
+            <count
+                  value="1">
+            </count>
+            <iterate>
+               <or>
+                  <adapt
+                        type="org.eclipse.jdt.core.IJavaProject">
+                  </adapt>
+                  <and>
+                     <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.eclipse.jdt.core.javanature">
+                     </test></and>
+               </or>
             </iterate>
          </with>
       </definition>
