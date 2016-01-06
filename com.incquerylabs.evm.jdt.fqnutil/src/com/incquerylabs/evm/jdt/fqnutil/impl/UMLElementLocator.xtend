@@ -2,12 +2,13 @@ package com.incquerylabs.evm.jdt.fqnutil.impl
 
 import com.incquerylabs.evm.jdt.fqnutil.IUMLElementLocator
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
-import org.eclipse.uml2.uml.Model
-import org.eclipse.uml2.uml.Package
-import org.eclipse.uml2.uml.Operation
-import org.eclipse.uml2.uml.Association
 import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
+import org.eclipse.uml2.uml.Class
+import org.eclipse.uml2.uml.Model
 import org.eclipse.uml2.uml.NamedElement
+import org.eclipse.uml2.uml.Operation
+import org.eclipse.uml2.uml.Package
+import org.eclipse.uml2.uml.Property
 
 class UMLElementLocator implements IUMLElementLocator {
 	
@@ -22,18 +23,19 @@ class UMLElementLocator implements IUMLElementLocator {
 	}
 	
 	override locateClass(QualifiedName qualifiedName) {
-		locateElement(qualifiedName, org.eclipse.uml2.uml.Class)
+		locateElement(qualifiedName, Class)
 	}
 	
 	override locateAssociation(QualifiedName qualifiedName) {
-		locateElement(qualifiedName, Association)
+		val attribute = locateElement(qualifiedName, Property)
+		return attribute?.association
 	}
 	
 	override locateOperation(QualifiedName qualifiedName) {
 		locateElement(qualifiedName, Operation)
 	}
 	
-	def <T extends NamedElement>locateElement(QualifiedName qualifiedName, Class<T> clazz){
+	def <T extends NamedElement>locateElement(QualifiedName qualifiedName, java.lang.Class<T> clazz){
 		val prefixedUmlQualifiedName = qualifiedName.toModelNamePrefixedQualifiedName
 		// TODO this is extremely inefficient! use EIQ instead
 		umlModel.allOwnedElements.filter(clazz).findFirst[element|

@@ -1,25 +1,32 @@
 package com.incquerylabs.evm.jdt.uml.transformation.rules.visitors
 
 import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
-import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
+import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import java.util.List
+import java.util.Set
 import org.eclipse.jdt.core.dom.ASTVisitor
 import org.eclipse.jdt.core.dom.FieldDeclaration
 import org.eclipse.jdt.core.dom.TypeDeclaration
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment
+import org.eclipse.uml2.uml.Element
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class TypeVisitor extends ASTVisitor {
-	val IUMLManipulator manipulator
+	extension val UMLModelAccess umlModelAccess
 	
-	new(IUMLManipulator manipulator) {
-		this.manipulator = manipulator
+	@Accessors(PUBLIC_GETTER)
+	val Set<Element> visitedElements = newHashSet
+	
+	new(UMLModelAccess umlModelAccess) {
+		this.umlModelAccess = umlModelAccess
 	}
 	
 	override visit(TypeDeclaration node) {
 		val binding = node.resolveBinding
 		if(binding != null) {
 			val fqn = JDTQualifiedName::create(binding.qualifiedName)
-			manipulator.createClass(fqn)
+			val umlClass = ensureClass(fqn)
+			visitedElements.add(umlClass)
 		}
 		
 		
@@ -33,19 +40,33 @@ class TypeVisitor extends ASTVisitor {
 		
 		val containingType = node.parent as TypeDeclaration
 		val parentBinding = containingType.resolveBinding
-		
-		if(binding != null && parentBinding != null) {
-			val typeFqn = JDTQualifiedName::create(binding.qualifiedName)
-			
-			val List<VariableDeclarationFragment> fragments = node.fragments
-			fragments.forEach[ fragment |
-				val javaFieldFqn = JDTQualifiedName::create('''«parentBinding.qualifiedName».«fragment.name.fullyQualifiedName»''')
-				manipulator.createAssociation(javaFieldFqn, typeFqn)
+		if(parentBinding != null) {
+			val List<VariableDeclarationFragment> variables = node.fragments
+			variables.forEach[ variable |
+				val javaFieldFqn = JDTQualifiedName::create('''«parentBinding.qualifiedName».«variable.name.fullyQualifiedName»''')
+				val association = ensureAssociation(javaFieldFqn)
+				visitedElements.add(association)
+				
+				if(binding != null) {
+					val typeFqn = JDTQualifiedName::create(binding.qualifiedName)
+					val associationType = findClass(typeFqn)
+					associationType.ifPresent[
+						val targetEnd = association.memberEnds.filter[ targetEnd | 
+							!association.ownedEnds.contains(targetEnd) ||
+							association.navigableOwnedEnds.contains(targetEnd)
+						].head
+						targetEnd.type = it
+					]
+				}
 			]
 		}
 		
 		super.visit(node)
 		return true
+	}
+	
+	def void clearVisitedElements() {
+		visitedElements.clear
 	}
 	
 }

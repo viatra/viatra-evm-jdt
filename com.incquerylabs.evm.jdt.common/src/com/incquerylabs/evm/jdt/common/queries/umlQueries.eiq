@@ -87,15 +87,27 @@ private pattern profile(it) {
 pattern umlAssociation(association: Association, srcEnd : Property, trgEnd : Property) {
 	Association.memberEnd(association, srcEnd);
 	Property.type(srcEnd, _);
-	Association.navigableOwnedEnd(association, trgEnd);
+	find associationTargetEnd(association, trgEnd);
 	Property.type(trgEnd, _);
 	srcEnd != trgEnd;
+}
+
+
+private pattern associationTargetEnd(association: Association, trgEnd: Property) {
+	Association.navigableOwnedEnd(association, trgEnd);
+} or {
+	Association.memberEnd(association, trgEnd);
+	neg find associationOwnedEnd(association, trgEnd);
+}
+
+private pattern associationOwnedEnd(association: Association, ownedEnd: Property) {
+	Association.ownedEnd(association, ownedEnd);
 }
 
 pattern associationOfClass(srcType : Type, srcQn, association: Association, srcEnd : Property, trgEnd : Property) {
 	Association.memberEnd(association, srcEnd);
 	Property.type(srcEnd, srcType);
-	Association.navigableOwnedEnd(association, trgEnd);
+	find associationTargetEnd(association, trgEnd);
 	srcEnd != trgEnd;
 	Type.qualifiedName(srcType, srcQn);
 }

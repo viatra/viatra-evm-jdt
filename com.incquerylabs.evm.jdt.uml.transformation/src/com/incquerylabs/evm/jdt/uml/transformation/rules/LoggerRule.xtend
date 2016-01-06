@@ -3,7 +3,6 @@ package com.incquerylabs.evm.jdt.uml.transformation.rules
 import com.incquerylabs.evm.jdt.JDTActivationState
 import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
 import com.incquerylabs.evm.jdt.JDTRule
-import com.incquerylabs.evm.jdt.job.JDTJobFactory
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
@@ -18,13 +17,13 @@ class LoggerRule extends JDTRule {
 	}
 	
 	override initialize() {
-		jobs.add(JDTJobFactory.createJob(JDTActivationState.APPEARED)[activation, context |
+		jobs.add(createJob(JDTActivationState.APPEARED)[activation, context |
 			debug('''Element appeared: «activation.atom.element»''')
 		])
-		jobs.add(JDTJobFactory.createJob(JDTActivationState.DISAPPEARED)[activation, context |
+		jobs.add(createJob(JDTActivationState.DISAPPEARED)[activation, context |
 			debug('''Element disappeared: «activation.atom.element»''')
 		])
-		jobs.add(JDTJobFactory.createJob(JDTActivationState.UPDATED)[activation, context |
+		jobs.add(createJob(JDTActivationState.UPDATED)[activation, context |
 			debug('''Element is updated: «activation.atom.element»''')
 		])
 	}

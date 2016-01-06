@@ -5,6 +5,7 @@ import com.incquerylabs.evm.jdt.fqnutil.IUMLElementLocator
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.impl.UMLElementLocator
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
+import java.util.Optional
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.incquery.runtime.api.IncQueryEngine
@@ -14,7 +15,6 @@ import org.eclipse.uml2.uml.Model
 import org.eclipse.uml2.uml.Operation
 import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.UMLFactory
-import java.util.Optional
 
 class UMLModelAccessImpl implements UMLModelAccess {
 	
@@ -41,16 +41,16 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	override ensurePackage(QualifiedName qualifiedName) {
 		val existingPackage = qualifiedName.findPackage
 		
-		return existingPackage.orElse(
+		return existingPackage.orElseGet[
 			createPackage(qualifiedName)
-		)
+		]
 	}
 	
 	private def createPackage(QualifiedName qualifiedName) {
 		val parentFqn = qualifiedName.parent
-		val parentPackage = parentFqn.flatMap[
-			findPackage
-		].orElse(locator.UMLModel)
+		val parentPackage = parentFqn.map[
+			ensurePackage
+		].orElseGet[locator.UMLModel]
 		
 		val packageFragment = umlFactory.createPackage() => [
 			name = qualifiedName.name
@@ -80,17 +80,17 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	override ensureClass(QualifiedName qualifiedName) {
 		val existingClass = qualifiedName.findClass
 		
-		return existingClass.orElse(
+		return existingClass.orElseGet[
 			createClass(qualifiedName)
-		)
+		]
 	}
 	
 	private def createClass(QualifiedName qualifiedName) {
 		val parentFqn = qualifiedName.parent
 		
-		val parent = parentFqn.flatMap[
-			findPackage
-		].orElse(locator.UMLModel)
+		val parent = parentFqn.map[
+			ensurePackage
+		].orElseGet[locator.UMLModel]
 		
 		val umlClass = createClass => [
 			name = qualifiedName.name
@@ -120,7 +120,9 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	override ensureAssociation(QualifiedName qualifiedName) {
 		val existingAssociation = qualifiedName.findAssociation
 		
-		return existingAssociation.orElse(createAssociation(qualifiedName))
+		return existingAssociation.orElseGet[
+			createAssociation(qualifiedName)
+		]
 	}
 	
 	private def createAssociation(QualifiedName qualifiedName) {
@@ -142,9 +144,8 @@ class UMLModelAccessImpl implements UMLModelAccess {
 				it.association = association
 				it.type = parentClass
 			]
-			association.ownedEnds += navigableEnd
+			parentClass.ownedAttributes += navigableEnd
 			association.ownedEnds += oppositeEnd
-			association.navigableOwnedEnds += navigableEnd
 			parentClass.package.packagedElements += association
 			
 			debug('''Created association «qualifiedName»''')

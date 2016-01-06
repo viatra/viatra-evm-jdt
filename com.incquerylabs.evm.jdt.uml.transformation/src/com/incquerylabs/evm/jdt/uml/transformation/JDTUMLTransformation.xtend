@@ -5,16 +5,17 @@ import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
 import com.incquerylabs.evm.jdt.JDTRealm
 import com.incquerylabs.evm.jdt.JDTRule
 import com.incquerylabs.evm.jdt.common.queries.UmlQueries
+import com.incquerylabs.evm.jdt.job.JDTJobFactory
+import com.incquerylabs.evm.jdt.job.JDTTransactionalJobFactory
 import com.incquerylabs.evm.jdt.transactions.JDTTransactionalEventSourceSpecification
 import com.incquerylabs.evm.jdt.transactions.JDTTransactionalLifecycle
 import com.incquerylabs.evm.jdt.uml.transformation.rules.PackageRule
 import com.incquerylabs.evm.jdt.uml.transformation.rules.TransactionalCompilationUnitRule
-import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
-import com.incquerylabs.evm.jdt.umlmanipulator.impl.TransactionalManipulator
-import com.incquerylabs.evm.jdt.umlmanipulator.impl.UMLManipulator
-import com.incquerylabs.evm.jdt.umlmanipulator.impl.logger.UMLManipulationLogger
+import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
+import com.incquerylabs.evm.jdt.umlmanipulator.impl.UMLModelAccessImpl
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
+import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.incquery.runtime.api.GenericPatternGroup
 import org.eclipse.incquery.runtime.api.IncQueryEngine
 import org.eclipse.incquery.runtime.emf.EMFScope
@@ -33,7 +34,7 @@ class JDTUMLTransformation {
 	
 	val JDTRealm jdtRealm
 	val RuleEngine ruleEngine
-	IUMLManipulator umlManipulator
+	UMLModelAccess umlModelAccess
 	Executor executor
 	Scheduler scheduler
 
@@ -43,7 +44,6 @@ class JDTUMLTransformation {
 		this.jdtRealm = JDTRealm::instance
 		this.executor = new Executor(jdtRealm)
 		this.ruleEngine = RuleEngine.create(executor.ruleBase);
-		this.umlManipulator = new UMLManipulationLogger
 	}
 
 	def void start(IJavaProject project, Model model) {
@@ -57,26 +57,31 @@ class JDTUMLTransformation {
 		queries.prepare(engine)
 		
 		// Initialize the UMLManipulator
-		umlManipulator = new UMLManipulator(model, engine)
+		umlModelAccess = new UMLModelAccessImpl(model, engine)
 		val modelSet = model.eResource.resourceSet
-		if(modelSet instanceof ModelSet) {
-			umlManipulator = new TransactionalManipulator(umlManipulator, modelSet.transactionalEditingDomain)
-		}
 		
 		// Initialize and add transactional rules
 		val transactionalLifeCycle = new JDTTransactionalLifecycle
 		val JDTTransactionalEventSourceSpecification transactionalSourceSpec = new JDTTransactionalEventSourceSpecification
-		val transactionalCompilationUnitRule = new TransactionalCompilationUnitRule(transactionalSourceSpec, transactionalLifeCycle, project, umlManipulator)
+		val jobFactory = createJobFactory(modelSet)
+		val transactionalCompilationUnitRule = new TransactionalCompilationUnitRule(transactionalSourceSpec, transactionalLifeCycle, project, umlModelAccess, jobFactory)
 		addRule(transactionalCompilationUnitRule)
 		
 		// Initialize and add other rules
 		val ActivationLifeCycle lifeCycle = new JDTActivationLifeCycle
 		val JDTEventSourceSpecification sourceSpec = new JDTEventSourceSpecification
-		val packageRule = new PackageRule(sourceSpec, lifeCycle, project, umlManipulator)
+		val packageRule = new PackageRule(sourceSpec, lifeCycle, project, umlModelAccess, jobFactory)
 		addRule(packageRule)
 		
 		// Add scheduler for EVM
 		addTimedScheduler(100)
+	}
+	
+	private def JDTJobFactory createJobFactory(ResourceSet resourceSet) {
+		if(resourceSet instanceof ModelSet) {
+			return new JDTTransactionalJobFactory(resourceSet.transactionalEditingDomain)
+		}
+		return new JDTJobFactory
 	}
 	
 	def addTimedScheduler(long interval) {
