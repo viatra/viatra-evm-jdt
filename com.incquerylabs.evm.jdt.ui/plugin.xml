@@ -10,9 +10,9 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <adapt
-                     type="java.lang.Object">
-               </adapt>
+               <reference
+                     definitionId="com.incquerylabs.evm.jdt.ui.javaproject">
+               </reference>
             </visibleWhen>
          </command>
       </menuContribution>
@@ -22,14 +22,100 @@
          <command
                commandId="com.incquerylabs.evm.jdt.ui.modelcodesync"
                style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.core.runtime.IAdaptable">
+                     </instanceof>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.incquerylabs.evm.jdt.ui.isumlmodel">
+                     </test>
+                  </iterate>
+               </with>
+            </visibleWhen>
          </command>
          <command
                commandId="com.incquerylabs.evm.jdt.ui.uml2java"
                style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.core.runtime.IAdaptable">
+                     </instanceof>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.incquerylabs.evm.jdt.ui.isumlmodel">
+                     </test>
+                  </iterate>
+               </with>
+            </visibleWhen>
          </command>
          <command
                commandId="com.incquerylabs.evm.jdt.ui.syncdir"
+               label="Switch to Java2UML"
                style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.core.runtime.IAdaptable">
+                     </instanceof>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.incquerylabs.evm.jdt.ui.isumlmodel">
+                     </test>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.incquerylabs.evm.jdt.ui.isUML2Java">
+                     </test>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.incquerylabs.evm.jdt.ui.syncdir"
+               label="Switch to UML2Java"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.core.runtime.IAdaptable">
+                     </instanceof>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.incquerylabs.evm.jdt.ui.isumlmodel">
+                     </test>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.incquerylabs.evm.jdt.ui.isJava2UML">
+                     </test>
+                  </iterate>
+               </with>
+            </visibleWhen>
          </command>
       </menuContribution>
       <menuContribution
@@ -39,10 +125,19 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <adapt
-                     type="java.lang.Object">
-               </adapt>
+               <reference
+                     definitionId="com.incquerylabs.evm.jdt.ui.javaproject">
+               </reference>
             </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.papyrus.views.modelexplorer.modelexplorer">
+         <command
+               commandId="com.incquerylabs.evm.jdt.ui.resetall"
+               icon="IMG_ELCL_STOP"
+               style="push">
          </command>
       </menuContribution>
    </extension>
@@ -62,11 +157,34 @@
             defaultHandler="com.incquerylabs.evm.jdt.ui.SynchronisationModelHandler"
             id="com.incquerylabs.evm.jdt.ui.modelcodesync"
             name="Start code synchronisation">
+         <commandParameter
+               id="com.incquerylabs.evm.jdt.ui.commandParameter1"
+               name="name"
+               optional="true">
+         </commandParameter>
       </command>
       <command
             defaultHandler="com.incquerylabs.evm.jdt.ui.SynchronizationDirectionHandler"
             id="com.incquerylabs.evm.jdt.ui.syncdir"
             name="Change synchronization direction">
+         <state
+               id="org.eclipse.ui.commands.toggleState">
+            <class
+                  class="org.eclipse.ui.handlers.RegistryToggleState">
+               <parameter
+                     name="default"
+                     value="false">
+               </parameter>
+               <parameter
+                     name="persisted"
+                     value="false">
+               </parameter>
+            </class>
+         </state>
+      </command>
+      <command
+            id="com.incquerylabs.evm.jdt.ui.resetall"
+            name="Reset All Synchronizations">
       </command>
    </extension>
    <extension
@@ -75,7 +193,7 @@
             class="com.incquerylabs.evm.jdt.ui.SelectionAdapterTester"
             id="com.incquerylabs.evm.jdt.ui.adaptertester"
             namespace="com.incquerylabs.evm.jdt.ui"
-            properties="isumlmodel"
+            properties="isumlmodel,isJava2UML,isUML2Java,isSynchronizing"
             type="org.eclipse.core.runtime.IAdaptable">
       </propertyTester>
    </extension>
@@ -94,12 +212,61 @@
             </iterate>
          </with>
       </definition>
+      <definition
+            id="com.incquerylabs.evm.jdt.ui.javaproject">
+         <with
+               variable="selection">
+            <count
+                  value="1">
+            </count>
+            <iterate>
+               <or>
+                  <adapt
+                        type="org.eclipse.jdt.core.IJavaProject">
+                  </adapt>
+                  <and>
+                     <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                     </instanceof>
+                     <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.eclipse.jdt.core.javanature">
+                     </test></and>
+               </or>
+            </iterate>
+         </with>
+      </definition>
    </extension>
    <extension
          point="org.eclipse.papyrus.infra.core.model">
       <modelSetSnippet
             classname="com.incquerylabs.evm.jdt.ui.CleanupModelSetSnippet">
       </modelSetSnippet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.incquerylabs.evm.jdt.ui.ResetAllSynchronizationHandler"
+            commandId="com.incquerylabs.evm.jdt.ui.resetall">
+         <enabledWhen>
+            <with
+                  variable="com.incquerylabs.evm.jdt.ui.anySynchronizationRunning">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </enabledWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.services">
+      <sourceProvider
+            provider="com.incquerylabs.evm.jdt.ui.manager.SynchronizationManagerFactory">
+         <variable
+               name="com.incquerylabs.evm.jdt.ui.anySynchronizationRunning"
+               priorityLevel="workbench">
+         </variable>
+      </sourceProvider>
    </extension>
 
 

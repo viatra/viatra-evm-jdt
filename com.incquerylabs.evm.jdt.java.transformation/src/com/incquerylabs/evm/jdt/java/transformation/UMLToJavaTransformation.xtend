@@ -9,7 +9,6 @@ import com.incquerylabs.evm.jdt.java.transformation.rules.RuleProvider
 import com.incquerylabs.evm.jdt.jdtmanipulator.impl.JDTManipulator
 import java.util.Map
 import org.eclipse.incquery.runtime.api.GenericPatternGroup
-import org.eclipse.incquery.runtime.api.IncQueryEngine
 import org.eclipse.incquery.runtime.emf.EMFScope
 import org.eclipse.incquery.runtime.evm.api.Scheduler.ISchedulerFactory
 import org.eclipse.incquery.runtime.evm.specific.TransactionalSchedulers
@@ -22,6 +21,7 @@ import org.eclipse.viatra.emf.runtime.transformation.eventdriven.EventDrivenTran
 import org.eclipse.viatra.emf.runtime.transformation.eventdriven.ExecutionSchemaBuilder
 import org.apache.log4j.Level
 import java.util.List
+import org.eclipse.incquery.runtime.api.AdvancedIncQueryEngine
 
 class UMLToJavaTransformation {
 
@@ -30,7 +30,7 @@ class UMLToJavaTransformation {
 	// TODO: this is a temporary solution
 	Map<Element, String> elementNameRegistry = newHashMap
 	
-	IncQueryEngine engine
+	AdvancedIncQueryEngine engine
 	ISchedulerFactory schedulerFactory
 	EventDrivenTransformation transformation
 
@@ -42,7 +42,7 @@ class UMLToJavaTransformation {
 	
 	new(IJavaProject project, Model model) {
 		manipulator = new JDTManipulator(new JDTElementLocator(project))
-		engine = IncQueryEngine::on(new EMFScope(model))
+		engine = AdvancedIncQueryEngine::createUnmanagedEngine(new EMFScope(model))
 		this.model = model
 	}
 	
@@ -97,4 +97,8 @@ class UMLToJavaTransformation {
 		ruleProviders.forEach[synchronizationEnabled = true]
 	}
 	
+	def dispose() {
+	    transformation.executionSchema.dispose
+	    engine.dispose
+	}
 }

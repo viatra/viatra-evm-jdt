@@ -2,7 +2,6 @@ package com.incquerylabs.evm.jdt.ui
 
 import com.incquerylabs.evm.jdt.java.transformation.UMLToJavaTransformation
 import com.incquerylabs.evm.jdt.uml.transformation.JDTUMLTransformation
-import java.util.Map
 import org.eclipse.core.commands.ExecutionEvent
 import org.eclipse.core.commands.ExecutionException
 import org.eclipse.core.resources.IProject
@@ -13,10 +12,11 @@ import org.eclipse.jface.viewers.ISelection
 import org.eclipse.jface.viewers.IStructuredSelection
 import org.eclipse.ui.handlers.HandlerUtil
 import org.eclipse.uml2.uml.Model
+import com.incquerylabs.evm.jdt.ui.manager.RunningSynchronizationManager
 
 class SynchronisationModelHandler extends UMLModelHandler {
 	
-	protected static Map<Model, BidirectionalSynchronization> runningSynchronizations = newHashMap
+	extension RunningSynchronizationManager manager = RunningSynchronizationManager.INSTANCE
 	
 	override execute(ExecutionEvent event) throws ExecutionException {
 		var selection = HandlerUtil.getCurrentSelection(event);
@@ -74,9 +74,7 @@ class SynchronisationModelHandler extends UMLModelHandler {
 		transformation.initialize()
 		transformation.execute
 		
-		
-		
-		runningSynchronizations.put(model, synch)
+		synchronizationStarted(model, synch)
 	}
 	
 }
