@@ -55,11 +55,6 @@ class JavaProjectHandler extends AbstractHandler {
 		}
 	}
 
-//	def private void startJDTNotificationLogging(IJavaProject project) {
-//		val JDTUMLTransformation umlTransformation = new JDTUMLTransformation()
-//		umlTransformation.startLogging(project)
-//	}
-
 	def private void startJDTNotificationLogging(IJavaProject project) {
 		logger.level = Level.DEBUG
 		JavaCore::addElementChangedListener(([ ElementChangedEvent event |
@@ -67,7 +62,6 @@ class JavaProjectHandler extends AbstractHandler {
 		] as IElementChangedListener))
 	}
 
-	
 	def reportError(Shell shell, Throwable exception, String message, String details) {
 		MessageDialog.openError(shell, message, details)
 	}

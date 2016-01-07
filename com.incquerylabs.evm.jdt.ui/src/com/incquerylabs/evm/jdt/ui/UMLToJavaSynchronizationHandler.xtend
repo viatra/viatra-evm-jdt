@@ -4,6 +4,7 @@ import com.incquerylabs.evm.jdt.java.transformation.UMLToJavaTransformation
 import org.eclipse.core.resources.IProject
 import org.eclipse.jdt.core.JavaCore
 import org.eclipse.uml2.uml.Model
+import com.incquerylabs.evm.jdt.ui.manager.RunningSynchronizationManager
 
 class UMLToJavaSynchronizationHandler extends UMLModelHandler {
 	
@@ -14,6 +15,8 @@ class UMLToJavaSynchronizationHandler extends UMLModelHandler {
 		transformation.initialize()
 		transformation.enableSynchronization
 		transformation.execute
+		val synch = new BidirectionalSynchronization(null, transformation)
+		RunningSynchronizationManager.INSTANCE.synchronizationStarted(model, synch)
 	}
 	
 }

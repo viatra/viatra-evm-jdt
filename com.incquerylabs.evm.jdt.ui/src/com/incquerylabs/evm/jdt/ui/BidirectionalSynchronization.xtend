@@ -19,21 +19,21 @@ class BidirectionalSynchronization {
 
 	def allowJava2UML(){
 		println("Allow Java2UML")
-		uml2javaTransformation.disableSynchronization
-		java2umlTransformation.enableSynchronization
+		uml2javaTransformation?.disableSynchronization
+		java2umlTransformation?.enableSynchronization
 		dir = UMLJavaSynchronizationDirection.JAVA2UML
 	}
 	
 	def allowUML2Java(){
 		println("Allow UML2Java")
-		java2umlTransformation.disableSynchronization
-		uml2javaTransformation.enableSynchronization
+		java2umlTransformation?.disableSynchronization
+		uml2javaTransformation?.enableSynchronization
 		dir = UMLJavaSynchronizationDirection.UML2JAVA
 	}
 	
 	def dispose() {
-	    java2umlTransformation.dispose
-	    uml2javaTransformation.dispose
+	    java2umlTransformation?.dispose
+	    uml2javaTransformation?.dispose
 	    dir = UMLJavaSynchronizationDirection.NEITHER
 	}
 }
