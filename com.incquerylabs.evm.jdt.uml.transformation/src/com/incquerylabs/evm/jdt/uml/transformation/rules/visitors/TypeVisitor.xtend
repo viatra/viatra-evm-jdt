@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.ParameterDirectionKind
+import com.google.common.collect.ImmutableList
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -98,10 +99,16 @@ class TypeVisitor extends ASTVisitor {
 	override visit(MethodDeclaration node) {
 		val containingType = node.parent as TypeDeclaration
 		val parentBinding = containingType.resolveBinding
-		if(parentBinding != null){
-			val javaMethodFqn = JDTQualifiedName::create('''«parentBinding.qualifiedName».«node.name.fullyQualifiedName»''')
+		if(parentBinding != null) {
+			val parentClassName = parentBinding.qualifiedName
+			val javaMethodFqn = JDTQualifiedName::create('''«parentClassName».«node.name.fullyQualifiedName»''')
 			val umlOperation = ensureOperation(javaMethodFqn)
-			umlOperation.ownedParameters.clear
+			ImmutableList::copyOf(umlOperation.ownedParameters).forEach[
+				destroy
+			]
+			ImmutableList::copyOf(umlOperation.methods).forEach[
+				destroy
+			]
 			val returnTypeBinding = node.returnType2?.resolveBinding
 			if(returnTypeBinding != null) {
 				val typeFqn = JDTQualifiedName::create(returnTypeBinding.qualifiedName)
@@ -110,6 +117,19 @@ class TypeVisitor extends ASTVisitor {
 					type = ensureClass(typeFqn)
 				]
 			}
+			val body = node.body
+			if(body != null) {
+				val behavior = umlFactory.createOpaqueBehavior => [
+					name = '''«umlOperation.name»__body'''
+					languages += "Java"
+					bodies += body.toString
+				]
+				val parentClassQualifiedName = JDTQualifiedName::create(parentClassName)
+				val parentClass = ensureClass(parentClassQualifiedName)
+				parentClass.ownedBehaviors += behavior
+				umlOperation.methods += behavior
+			}
+			
 			visitedElements.add(umlOperation)
 		}
 		
