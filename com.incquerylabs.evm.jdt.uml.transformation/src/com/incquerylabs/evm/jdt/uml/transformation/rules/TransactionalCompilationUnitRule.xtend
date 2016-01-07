@@ -26,6 +26,7 @@ import org.eclipse.jdt.core.dom.ASTParser
 import org.eclipse.uml2.uml.Class
 import org.eclipse.incquery.runtime.evm.specific.job.EnableJob
 import org.eclipse.incquery.runtime.evm.specific.Jobs
+import org.eclipse.uml2.uml.Operation
 
 class TransactionalCompilationUnitRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
@@ -93,11 +94,20 @@ class TransactionalCompilationUnitRule extends JDTRule {
 		
 		val visitedElements = typeVisitor.visitedElements
 		val visitedClasses = visitedElements.filter(Class)
+		val operationsOfVisitedClasses = visitedClasses.map[
+			ownedOperations
+		].flatten
 		val associationsOfVisitedClasses = visitedClasses.map[
 			getAssociationsOf(it)
 		].flatten
+		val operationsToRemove = operationsOfVisitedClasses.filter[
+			!visitedElements.contains(it)
+		]
 		val associationsToRemove = associationsOfVisitedClasses.filter[
 			!visitedElements.contains(it)
+		]
+		operationsToRemove.forEach[
+			removeOperation
 		]
 		associationsToRemove.forEach[
 			removeAssociation

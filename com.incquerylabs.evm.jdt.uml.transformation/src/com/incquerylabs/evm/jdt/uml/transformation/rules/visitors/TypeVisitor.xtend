@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import org.eclipse.uml2.uml.Element
 import org.eclipse.xtend.lib.annotations.Accessors
+import org.eclipse.jdt.core.dom.MethodDeclaration
 
 class TypeVisitor extends ASTVisitor {
 	extension val UMLModelAccess umlModelAccess
@@ -59,6 +60,19 @@ class TypeVisitor extends ASTVisitor {
 					]
 				}
 			]
+		}
+		
+		super.visit(node)
+		return true
+	}
+	
+	override visit(MethodDeclaration node) {
+		val containingType = node.parent as TypeDeclaration
+		val parentBinding = containingType.resolveBinding
+		if(parentBinding != null){
+			val javaMethodFqn = JDTQualifiedName::create('''«parentBinding.qualifiedName».«node.name.fullyQualifiedName»''')
+			val umlOperation = ensureOperation(javaMethodFqn)
+			visitedElements.add(umlOperation)
 		}
 		
 		super.visit(node)
