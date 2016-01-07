@@ -11,8 +11,11 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import org.eclipse.uml2.uml.Element
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.jdt.core.dom.MethodDeclaration
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration
+import org.eclipse.uml2.uml.UMLFactory
 
 class TypeVisitor extends ASTVisitor {
+	val UMLFactory umlFactory = UMLFactory::eINSTANCE
 	extension val UMLModelAccess umlModelAccess
 	
 	@Accessors(PUBLIC_GETTER)
@@ -50,16 +53,41 @@ class TypeVisitor extends ASTVisitor {
 				
 				if(binding != null) {
 					val typeFqn = JDTQualifiedName::create(binding.qualifiedName)
-					val associationType = findClass(typeFqn)
-					associationType.ifPresent[
-						val targetEnd = association.memberEnds.filter[ targetEnd | 
-							!association.ownedEnds.contains(targetEnd) ||
-							association.navigableOwnedEnds.contains(targetEnd)
-						].head
-						targetEnd.type = it
-					]
+					val associationType = ensureClass(typeFqn)
+					val targetEnd = association.memberEnds.filter[ targetEnd | 
+						!association.ownedEnds.contains(targetEnd) ||
+						association.navigableOwnedEnds.contains(targetEnd)
+					].head
+					targetEnd.type = associationType
 				}
 			]
+		}
+		
+		super.visit(node)
+		return true
+	}
+	
+	override visit(SingleVariableDeclaration node) {
+		val containingMethod = node.parent
+		
+		if(containingMethod instanceof MethodDeclaration) {
+			val methodName = containingMethod.name
+			val containingClass = containingMethod.parent as TypeDeclaration
+			val classBinding = containingClass?.resolveBinding
+			if(classBinding != null) {
+				val parentQualifiedName = JDTQualifiedName::create('''«classBinding.qualifiedName».«methodName»''')
+				val umlOperation = ensureOperation(parentQualifiedName)
+				val umlParameter = umlFactory.createParameter => [
+					name = node.name.fullyQualifiedName
+				]
+				val parameterBinding = node.resolveBinding
+				if(parameterBinding != null) {
+					val typeFqn = JDTQualifiedName::create(parameterBinding.type.qualifiedName)
+					val umlType = ensureClass(typeFqn)
+					umlParameter.type = umlType
+				}
+				umlOperation.ownedParameters += umlParameter
+			}
 		}
 		
 		super.visit(node)
@@ -72,6 +100,7 @@ class TypeVisitor extends ASTVisitor {
 		if(parentBinding != null){
 			val javaMethodFqn = JDTQualifiedName::create('''«parentBinding.qualifiedName».«node.name.fullyQualifiedName»''')
 			val umlOperation = ensureOperation(javaMethodFqn)
+			umlOperation.ownedParameters.clear
 			visitedElements.add(umlOperation)
 		}
 		
