@@ -22,14 +22,13 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	extension val UMLFactory umlFactory = UMLFactory.eINSTANCE
 	val Model model
 	val IUMLElementLocator locator
-	static val umlQueries = UmlQueries::instance
 	val IncQueryEngine engine
 	
 	
 	new(Model umlModel, IncQueryEngine engine) {
 		this.model = umlModel
-		this.locator = new UMLElementLocator(umlModel)
 		this.engine = engine
+		this.locator = new UMLElementLocator(umlModel, engine)
 		logger.level = Level.DEBUG
 	}
 	

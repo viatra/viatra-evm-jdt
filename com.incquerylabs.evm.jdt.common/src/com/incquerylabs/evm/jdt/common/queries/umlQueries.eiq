@@ -14,6 +14,10 @@ pattern umlClass(umlClass: Class) {
 	neg find templateBindingClass(umlClass);
 }
 
+pattern qualifiedNamedElement(element: NamedElement, qualifiedName) {
+	NamedElement.qualifiedName(element, qualifiedName);
+}
+
 private pattern umlAssociationClass(associationClass) {
 	AssociationClass(associationClass);
 }

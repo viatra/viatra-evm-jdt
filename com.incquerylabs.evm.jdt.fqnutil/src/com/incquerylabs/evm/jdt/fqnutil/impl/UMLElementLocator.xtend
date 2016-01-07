@@ -9,13 +9,18 @@ import org.eclipse.uml2.uml.NamedElement
 import org.eclipse.uml2.uml.Operation
 import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.Property
+import com.incquerylabs.evm.jdt.common.queries.UmlQueries
+import org.eclipse.incquery.runtime.api.IncQueryEngine
 
 class UMLElementLocator implements IUMLElementLocator {
+	extension val UmlQueries umlQueries = UmlQueries::instance
+	val IncQueryEngine engine
 	
 	val Model umlModel
 	
-	new(Model umlModel) {
+	new(Model umlModel, IncQueryEngine engine) {
 		this.umlModel = umlModel
+		this.engine = engine
 	}
 	
 	override locatePackage(QualifiedName qualifiedName) {
@@ -37,10 +42,8 @@ class UMLElementLocator implements IUMLElementLocator {
 	
 	def <T extends NamedElement>locateElement(QualifiedName qualifiedName, java.lang.Class<T> clazz){
 		val prefixedUmlQualifiedName = qualifiedName.toModelNamePrefixedQualifiedName
-		// TODO this is extremely inefficient! use EIQ instead
-		umlModel.allOwnedElements.filter(clazz).findFirst[element|
-			UMLQualifiedName.create(element.qualifiedName) == prefixedUmlQualifiedName
-		]
+		val results = engine.qualifiedNamedElement.getAllValuesOfelement(prefixedUmlQualifiedName.toString)
+		return results.filter(clazz).head
 	}
 	
 	override getUMLModel() {
@@ -53,10 +56,8 @@ class UMLElementLocator implements IUMLElementLocator {
 		if(modelQualifiedName == prefixedUmlQualifiedName) {
 			return umlModel
 		} else {
-			// TODO this is extremely inefficient! use EIQ instead
-			umlModel.allOwnedElements.filter(NamedElement).findFirst[element|
-				UMLQualifiedName.create(element.qualifiedName) == prefixedUmlQualifiedName
-			]
+			val results = engine.qualifiedNamedElement.getAllValuesOfelement(prefixedUmlQualifiedName.toString)
+			return results.head
 		}
 	}
 	

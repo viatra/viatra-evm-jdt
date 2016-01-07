@@ -28,8 +28,8 @@ class UMLManipulator implements IUMLManipulator {
 	
 	new(Model umlModel, IncQueryEngine engine) {
 		this.model = umlModel
-		this.locator = new UMLElementLocator(umlModel)
 		this.engine = engine
+		this.locator = new UMLElementLocator(umlModel, engine)
 		logger.level = Level.DEBUG
 	}
 	
