@@ -172,7 +172,30 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	}
 	
 	override ensureOperation(QualifiedName qualifiedName) {
-		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+		val existingOperation = qualifiedName.findOperation
+		
+		return existingOperation.orElseGet[
+			createOperation(qualifiedName)
+		]
+	}
+	
+	private def createOperation(QualifiedName qualifiedName) {
+		val parentFqn = qualifiedName.parent
+		val parent = parentFqn.flatMap[
+			findClass
+		]
+		
+		val umlOperation = parent.map[ parentClass |
+			val operation = createOperation => [
+				it.name = '''«qualifiedName.name»'''
+			]
+			parentClass.ownedOperations += operation
+			
+			debug('''Created operation «qualifiedName»''')
+			operation
+		]
+		
+		return umlOperation.orElseThrow[new RuntimeException('''Was not able to create UML operation: «qualifiedName»''')]
 	}
 	
 	override removeOperation(Operation operation) {
