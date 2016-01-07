@@ -8,13 +8,16 @@ import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import java.util.Optional
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
+import org.eclipse.emf.common.util.URI
 import org.eclipse.incquery.runtime.api.IncQueryEngine
 import org.eclipse.uml2.uml.Association
 import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.Model
 import org.eclipse.uml2.uml.Operation
 import org.eclipse.uml2.uml.Package
+import org.eclipse.uml2.uml.PrimitiveType
 import org.eclipse.uml2.uml.UMLFactory
+import org.eclipse.uml2.uml.resource.UMLResource
 
 class UMLModelAccessImpl implements UMLModelAccess {
 	
@@ -74,6 +77,29 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	override findClass(QualifiedName qualifiedName) {
 		val clsFragment = locator.locateClass(qualifiedName)
 		return Optional.ofNullable(clsFragment)
+	}
+	
+	override findPrimitiveType(QualifiedName qualifiedName) {
+		val javaPrimitiveTypesUri = UMLResource.JAVA_PRIMITIVE_TYPES_LIBRARY_URI
+		val umlPrimitiveTypesUri = UMLResource.UML_PRIMITIVE_TYPES_LIBRARY_URI
+		
+		val javaPrimitiveTypesResource = model.eResource.resourceSet.getResource(URI.createURI(javaPrimitiveTypesUri), true)
+		val umlPrimitiveTypesResource = model.eResource.resourceSet.getResource(URI.createURI(umlPrimitiveTypesUri), true)
+		
+		val fqn = qualifiedName.toString
+		
+		if(fqn.equals("java.lang.String")){
+			val stringType = umlPrimitiveTypesResource.allContents.filter(PrimitiveType).findFirst[
+				name.equals("String")
+			]
+			return Optional.ofNullable(stringType)
+		}
+		
+		val javaPrimitiveType = javaPrimitiveTypesResource.allContents.filter(PrimitiveType).findFirst[
+			name.equals(qualifiedName.name)
+		]
+		return Optional.ofNullable(javaPrimitiveType)		
+		
 	}
 	
 	override ensureClass(QualifiedName qualifiedName) {

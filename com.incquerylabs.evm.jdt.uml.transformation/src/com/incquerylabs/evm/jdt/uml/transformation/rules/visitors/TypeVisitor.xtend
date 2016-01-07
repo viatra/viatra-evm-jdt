@@ -15,6 +15,7 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.ParameterDirectionKind
 import com.google.common.collect.ImmutableList
+import org.eclipse.uml2.uml.Type
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -55,7 +56,9 @@ class TypeVisitor extends ASTVisitor {
 				
 				if(binding != null) {
 					val typeFqn = JDTQualifiedName::create(binding.qualifiedName)
-					val associationType = ensureClass(typeFqn)
+					val primitiveType = typeFqn.findPrimitiveType
+					// if not a primitive type, ensure there is such a class
+					val associationType = primitiveType.map[it as Type].orElseGet[ensureClass(typeFqn)]
 					val targetEnd = association.memberEnds.filter[ targetEnd | 
 						!association.ownedEnds.contains(targetEnd) ||
 						association.navigableOwnedEnds.contains(targetEnd)
@@ -85,7 +88,9 @@ class TypeVisitor extends ASTVisitor {
 				val parameterBinding = node.resolveBinding
 				if(parameterBinding != null) {
 					val typeFqn = JDTQualifiedName::create(parameterBinding.type.qualifiedName)
-					val umlType = ensureClass(typeFqn)
+					val primitiveType = typeFqn.findPrimitiveType
+					// if not a primitive type, ensure there is such a class
+					val umlType = primitiveType.map[it as Type].orElseGet[ensureClass(typeFqn)]
 					umlParameter.type = umlType
 				}
 				umlOperation.ownedParameters += umlParameter
@@ -114,7 +119,11 @@ class TypeVisitor extends ASTVisitor {
 				val typeFqn = JDTQualifiedName::create(returnTypeBinding.qualifiedName)
 				umlOperation.ownedParameters += umlFactory.createParameter => [
 					direction = ParameterDirectionKind.RETURN_LITERAL
-					type = ensureClass(typeFqn)
+					// TODO extract to method
+					val primitiveType = typeFqn.findPrimitiveType
+					// if not a primitive type, ensure there is such a class
+					val umlType = primitiveType.map[it as Type].orElseGet[ensureClass(typeFqn)]
+					type = umlType
 				]
 			}
 			val body = node.body

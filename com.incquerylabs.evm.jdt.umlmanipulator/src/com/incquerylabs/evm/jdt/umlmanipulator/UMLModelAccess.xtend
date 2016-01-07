@@ -4,6 +4,7 @@ import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import org.eclipse.uml2.uml.Association
 import org.eclipse.uml2.uml.Operation
 import java.util.Optional
+import org.eclipse.uml2.uml.PrimitiveType
 
 interface UMLModelAccess {
 	
@@ -67,5 +68,6 @@ interface UMLModelAccess {
 	 */
 	def boolean removeOperation(Operation operation)
 	
+	def Optional<PrimitiveType> findPrimitiveType(QualifiedName qualifiedName)
 	
 }
