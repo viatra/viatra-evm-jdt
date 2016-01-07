@@ -31,6 +31,11 @@ class BidirectionalSynchronization {
 		dir = UMLJavaSynchronizationDirection.UML2JAVA
 	}
 	
+	def dispose() {
+	    java2umlTransformation.dispose
+	    uml2javaTransformation.dispose
+	    dir = UMLJavaSynchronizationDirection.NEITHER
+	}
 }
 
 public enum UMLJavaSynchronizationDirection {

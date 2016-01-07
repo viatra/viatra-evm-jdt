@@ -5,6 +5,7 @@ import org.eclipse.uml2.uml.Model
 import org.eclipse.core.commands.ExecutionEvent
 import org.eclipse.core.commands.ExecutionException
 import org.eclipse.ui.handlers.HandlerUtil
+import com.incquerylabs.evm.jdt.ui.manager.RunningSynchronizationManager
 
 class SynchronizationDirectionHandler extends UMLModelHandler {
 	

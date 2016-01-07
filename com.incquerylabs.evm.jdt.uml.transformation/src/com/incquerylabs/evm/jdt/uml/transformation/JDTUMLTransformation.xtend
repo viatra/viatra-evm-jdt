@@ -120,4 +120,8 @@ class JDTUMLTransformation {
 		]
 	}
 	
+	def dispose() {
+	    //TODO Dispose not working, see https://github.com/IncQueryLabs/incquery-evm-jdt/issues/45
+	    //ruleEngine.dispose
+	}
 }

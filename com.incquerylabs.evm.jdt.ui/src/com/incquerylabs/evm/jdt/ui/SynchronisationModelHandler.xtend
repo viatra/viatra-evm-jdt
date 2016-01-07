@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.ISelection
 import org.eclipse.jface.viewers.IStructuredSelection
 import org.eclipse.ui.handlers.HandlerUtil
 import org.eclipse.uml2.uml.Model
+import com.incquerylabs.evm.jdt.ui.manager.RunningSynchronizationManager
 
 class SynchronisationModelHandler extends UMLModelHandler {
 	

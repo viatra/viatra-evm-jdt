@@ -3,6 +3,7 @@ package com.incquerylabs.evm.jdt.ui
 import org.eclipse.core.expressions.PropertyTester
 import org.eclipse.core.runtime.IAdaptable
 import org.eclipse.uml2.uml.Model
+import com.incquerylabs.evm.jdt.ui.manager.RunningSynchronizationManager
 
 class SelectionAdapterTester extends PropertyTester {
 
@@ -26,6 +27,12 @@ class SelectionAdapterTester extends PropertyTester {
                     case "isUML2Java": {
                         val synch = getSynchronization(model)
                         return synch?.dir == UMLJavaSynchronizationDirection.UML2JAVA
+                    }
+                    case "isSynchronizing": {
+                        return hasAnySynchronizationRunning
+                    }
+                    default: {
+                        return false
                     }
                 }
             }
