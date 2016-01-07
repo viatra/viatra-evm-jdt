@@ -156,6 +156,9 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	}
 	
 	override removeAssociation(Association association) {
+		association.memberEnds.forEach[
+			destroy
+		]
 		if(association.eContainer == null){
 			return false;
 		}
