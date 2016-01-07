@@ -16,6 +16,7 @@ class JDTEventSourceSpecification implements EventSourceSpecification<JDTEventAt
 			var JDTEventSource source = new JDTEventSource(JDTEventSourceSpecification.this, realm as JDTRealm)
 			var JDTEventHandler handler = new JDTEventHandler(source, filter, ruleInstance)
 			source.addHandler(handler)
+			ruleInstance.handler = handler
 		] as AbstractRuleInstanceBuilder<JDTEventAtom>)
 	}
 

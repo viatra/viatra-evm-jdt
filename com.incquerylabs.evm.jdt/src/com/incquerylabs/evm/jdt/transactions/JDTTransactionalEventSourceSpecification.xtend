@@ -15,6 +15,7 @@ class JDTTransactionalEventSourceSpecification extends JDTEventSourceSpecificati
 			val source = new JDTTransactionalEventSource(JDTTransactionalEventSourceSpecification.this, realm as JDTRealm)
 			val handler = new JDTEventHandler(source, filter, ruleInstance)
 			source.addHandler(handler)
+			ruleInstance.handler = handler
 		] as AbstractRuleInstanceBuilder<JDTEventAtom>)
 	}
 }
