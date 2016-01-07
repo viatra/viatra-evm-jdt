@@ -16,6 +16,7 @@ import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.ParameterDirectionKind
 import com.google.common.collect.ImmutableList
 import org.eclipse.uml2.uml.Type
+import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -56,9 +57,7 @@ class TypeVisitor extends ASTVisitor {
 				
 				if(binding != null) {
 					val typeFqn = JDTQualifiedName::create(binding.qualifiedName)
-					val primitiveType = typeFqn.findPrimitiveType
-					// if not a primitive type, ensure there is such a class
-					val associationType = primitiveType.map[it as Type].orElseGet[ensureClass(typeFqn)]
+					val associationType = getClassOrPrimitiveType(typeFqn)
 					val targetEnd = association.memberEnds.filter[ targetEnd | 
 						!association.ownedEnds.contains(targetEnd) ||
 						association.navigableOwnedEnds.contains(targetEnd)
@@ -88,9 +87,7 @@ class TypeVisitor extends ASTVisitor {
 				val parameterBinding = node.resolveBinding
 				if(parameterBinding != null) {
 					val typeFqn = JDTQualifiedName::create(parameterBinding.type.qualifiedName)
-					val primitiveType = typeFqn.findPrimitiveType
-					// if not a primitive type, ensure there is such a class
-					val umlType = primitiveType.map[it as Type].orElseGet[ensureClass(typeFqn)]
+					val umlType = getClassOrPrimitiveType(typeFqn)
 					umlParameter.type = umlType
 				}
 				umlOperation.ownedParameters += umlParameter
@@ -118,11 +115,9 @@ class TypeVisitor extends ASTVisitor {
 			if(returnTypeBinding != null) {
 				val typeFqn = JDTQualifiedName::create(returnTypeBinding.qualifiedName)
 				umlOperation.ownedParameters += umlFactory.createParameter => [
+					name = "__returnvalue"
 					direction = ParameterDirectionKind.RETURN_LITERAL
-					// TODO extract to method
-					val primitiveType = typeFqn.findPrimitiveType
-					// if not a primitive type, ensure there is such a class
-					val umlType = primitiveType.map[it as Type].orElseGet[ensureClass(typeFqn)]
+					val umlType = getClassOrPrimitiveType(typeFqn)
 					type = umlType
 				]
 			}
@@ -144,6 +139,16 @@ class TypeVisitor extends ASTVisitor {
 		
 		super.visit(node)
 		return true
+	}
+	
+	private def getClassOrPrimitiveType(QualifiedName qualifiedName) {
+		if(qualifiedName.toString == "void") {
+			return null
+		}
+		val primitiveType = qualifiedName.findPrimitiveType
+		// if not a primitive type, ensure there is such a class
+		val umlType = primitiveType.map[it as Type].orElseGet[ensureClass(qualifiedName)]
+		return umlType
 	}
 	
 	def void clearVisitedElements() {
