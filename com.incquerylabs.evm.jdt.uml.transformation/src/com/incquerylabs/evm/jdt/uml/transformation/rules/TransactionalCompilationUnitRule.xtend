@@ -1,5 +1,6 @@
 package com.incquerylabs.evm.jdt.uml.transformation.rules
 
+import com.google.common.collect.ImmutableList
 import com.incquerylabs.evm.jdt.JDTEventAtom
 import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
 import com.incquerylabs.evm.jdt.JDTRule
@@ -15,6 +16,7 @@ import java.util.Optional
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
+import org.eclipse.incquery.runtime.evm.specific.Jobs
 import org.eclipse.jdt.core.ICompilationUnit
 import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaElementDelta
@@ -24,9 +26,6 @@ import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTNode
 import org.eclipse.jdt.core.dom.ASTParser
 import org.eclipse.uml2.uml.Class
-import org.eclipse.incquery.runtime.evm.specific.job.EnableJob
-import org.eclipse.incquery.runtime.evm.specific.Jobs
-import org.eclipse.uml2.uml.Operation
 
 class TransactionalCompilationUnitRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
@@ -100,12 +99,12 @@ class TransactionalCompilationUnitRule extends JDTRule {
 		val associationsOfVisitedClasses = visitedClasses.map[
 			getAssociationsOf(it)
 		].flatten
-		val operationsToRemove = operationsOfVisitedClasses.filter[
+		val operationsToRemove = ImmutableList::copyOf(operationsOfVisitedClasses.filter[
 			!visitedElements.contains(it)
-		]
-		val associationsToRemove = associationsOfVisitedClasses.filter[
+		])
+		val associationsToRemove = ImmutableList::copyOf(associationsOfVisitedClasses.filter[
 			!visitedElements.contains(it)
-		]
+		])
 		operationsToRemove.forEach[
 			removeOperation
 		]
@@ -120,7 +119,7 @@ class TransactionalCompilationUnitRule extends JDTRule {
 		val umlQualifiedName = element.getUmlClassQualifiedName
 		val umlClass = findClass(umlQualifiedName)
 		umlClass.ifPresent[
-			val associations = getAssociationsOf(it)
+			val associations = ImmutableList::copyOf(getAssociationsOf(it))
 			associations.forEach[
 				removeAssociation
 			]
