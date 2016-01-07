@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration
 import org.eclipse.jdt.core.dom.MethodDeclaration
 import org.eclipse.uml2.uml.UMLFactory
+import org.eclipse.uml2.uml.ParameterDirectionKind
 
 class CrossReferenceUpdateVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -54,6 +55,14 @@ class CrossReferenceUpdateVisitor extends ASTVisitor {
 			val javaMethodFqn = JDTQualifiedName::create('''«parentBinding.qualifiedName».«node.name.fullyQualifiedName»''')
 			val umlOperation = ensureOperation(javaMethodFqn)
 			umlOperation.ownedParameters.clear
+			val returnTypeBinding = node.returnType2?.resolveBinding
+			if(returnTypeBinding != null) {
+				val typeFqn = JDTQualifiedName::create(returnTypeBinding.qualifiedName)
+				umlOperation.ownedParameters += umlFactory.createParameter => [
+					direction = ParameterDirectionKind.RETURN_LITERAL
+					type = ensureClass(typeFqn)
+				]
+			}
 		}
 		
 		super.visit(node)

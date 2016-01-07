@@ -13,6 +13,7 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.jdt.core.dom.MethodDeclaration
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration
 import org.eclipse.uml2.uml.UMLFactory
+import org.eclipse.uml2.uml.ParameterDirectionKind
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -101,6 +102,14 @@ class TypeVisitor extends ASTVisitor {
 			val javaMethodFqn = JDTQualifiedName::create('''«parentBinding.qualifiedName».«node.name.fullyQualifiedName»''')
 			val umlOperation = ensureOperation(javaMethodFqn)
 			umlOperation.ownedParameters.clear
+			val returnTypeBinding = node.returnType2?.resolveBinding
+			if(returnTypeBinding != null) {
+				val typeFqn = JDTQualifiedName::create(returnTypeBinding.qualifiedName)
+				umlOperation.ownedParameters += umlFactory.createParameter => [
+					direction = ParameterDirectionKind.RETURN_LITERAL
+					type = ensureClass(typeFqn)
+				]
+			}
 			visitedElements.add(umlOperation)
 		}
 		
