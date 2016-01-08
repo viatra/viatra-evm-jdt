@@ -25,6 +25,8 @@ import org.eclipse.jdt.core.dom.BodyDeclaration
 import org.eclipse.jdt.core.dom.Modifier
 import org.eclipse.uml2.uml.NamedElement
 import org.eclipse.uml2.uml.VisibilityKind
+import org.eclipse.uml2.uml.Class
+import org.eclipse.uml2.uml.Classifier
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -43,6 +45,12 @@ class TypeVisitor extends ASTVisitor {
 			val fqn = JDTQualifiedName::create(binding.qualifiedName)
 			val umlClass = ensureClass(fqn)
 			umlClass.setVisibility(node)
+			
+			val superclassType = Optional::ofNullable(node.superclassType)
+			superclassType.ifPresent[
+				umlClass.addGeneralization(it)
+			]
+			
 			visitedElements.add(umlClass)
 		}
 		
@@ -105,6 +113,25 @@ class TypeVisitor extends ASTVisitor {
 		
 		super.visit(node)
 		return true
+	}
+	
+	private def addGeneralization(Class umlClass, org.eclipse.jdt.core.dom.Type superclassType) {
+		if(superclassType == null) {
+			return Optional::empty
+		}
+		
+		val superclassTypeBinding = superclassType.resolveBinding
+		if(superclassTypeBinding != null) {
+			val superclassQualifiedName = JDTQualifiedName::create(superclassTypeBinding.qualifiedName)
+			val superclassUmlType = getClassOrPrimitiveType(superclassQualifiedName)
+			if(superclassUmlType instanceof Classifier) {
+				val generalization = umlFactory.createGeneralization => [
+					general = superclassUmlType
+					specific = umlClass
+				]
+				return Optional::of(generalization)
+			}
+		}
 	}
 	
 	private def Optional<Operation> transformOperation(MethodDeclaration node, TypeDeclaration containingType) {
