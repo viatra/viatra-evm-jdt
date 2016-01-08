@@ -62,6 +62,8 @@ class TypeVisitor extends ASTVisitor {
 		associations.forEach[ifPresent[
 			targetEnd.setType(type)
 			memberEnds.forEach[
+				lower = 0
+				upper = 1
 				setVisibility(node)
 			]
 			setVisibility(node)
@@ -78,6 +80,8 @@ class TypeVisitor extends ASTVisitor {
 			val umlParameter = node.transformParameter(containingMethod)
 			val type = node.type
 			umlParameter.ifPresent[
+				lower = 0
+				upper = 1
 				setType(type)
 			]
 		}
@@ -115,6 +119,8 @@ class TypeVisitor extends ASTVisitor {
 			val returnParameter = umlFactory.createParameter => [
 				name = "__returnvalue"
 				direction = ParameterDirectionKind.RETURN_LITERAL
+				lower = 0
+				upper = 1
 			]
 			returnParameter.setType(returnType)
 			umlOperation.ownedParameters += returnParameter
