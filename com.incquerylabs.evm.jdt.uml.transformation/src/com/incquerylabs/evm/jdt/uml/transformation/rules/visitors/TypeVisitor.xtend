@@ -5,29 +5,28 @@ import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import java.util.List
+import java.util.Optional
 import java.util.Set
 import org.eclipse.jdt.core.dom.ASTVisitor
+import org.eclipse.jdt.core.dom.BodyDeclaration
 import org.eclipse.jdt.core.dom.FieldDeclaration
 import org.eclipse.jdt.core.dom.MethodDeclaration
+import org.eclipse.jdt.core.dom.Modifier
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration
 import org.eclipse.jdt.core.dom.TypeDeclaration
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import org.eclipse.uml2.uml.Association
+import org.eclipse.uml2.uml.Class
+import org.eclipse.uml2.uml.Classifier
 import org.eclipse.uml2.uml.Element
+import org.eclipse.uml2.uml.NamedElement
+import org.eclipse.uml2.uml.Operation
 import org.eclipse.uml2.uml.ParameterDirectionKind
 import org.eclipse.uml2.uml.Type
 import org.eclipse.uml2.uml.TypedElement
 import org.eclipse.uml2.uml.UMLFactory
-import org.eclipse.xtend.lib.annotations.Accessors
-import java.util.Optional
-import org.eclipse.uml2.uml.Operation
-import org.eclipse.jdt.core.dom.BodyDeclaration
-import org.eclipse.jdt.core.dom.Modifier
-import org.eclipse.uml2.uml.NamedElement
 import org.eclipse.uml2.uml.VisibilityKind
-import org.eclipse.uml2.uml.Class
-import org.eclipse.uml2.uml.Classifier
-import org.eclipse.uml2.uml.BehavioralFeature
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -46,7 +45,7 @@ class TypeVisitor extends ASTVisitor {
 			val fqn = JDTQualifiedName::create(binding.qualifiedName)
 			val umlClass = ensureClass(fqn)
 			umlClass.setVisibility(node)
-			umlClass.setAbstractness(node)
+			umlClass.isAbstract = node.isAbstract
 			
 			val superclassType = Optional::ofNullable(node.superclassType)
 			superclassType.ifPresent[
@@ -107,7 +106,7 @@ class TypeVisitor extends ASTVisitor {
 			visitedElements.add(operation)
 			
 			operation.setVisibility(node)
-			operation.setAbstractness(node)
+			operation.isAbstract = node.isAbstract
 			val operationBody = node.transformOperationBody(containingType)
 			operationBody.ifPresent[
 				operation.methods += it
@@ -245,21 +244,12 @@ class TypeVisitor extends ASTVisitor {
 		}
 	}
 	
-	private def setAbstractness(Classifier element, BodyDeclaration node){
+	private def isAbstract(BodyDeclaration node){
 		val modifiers = node.getModifiers
 		if(Modifier::isAbstract(modifiers)) {
-			element.isAbstract = true
+			return true
 		} else {
-			element.isAbstract = false
-		}
-	}
-	
-	private def setAbstractness(BehavioralFeature element, BodyDeclaration node){
-		val modifiers = node.getModifiers
-		if(Modifier::isAbstract(modifiers)) {
-			element.isAbstract = true
-		} else {
-			element.isAbstract = false
+			return false
 		}
 	}
 	
