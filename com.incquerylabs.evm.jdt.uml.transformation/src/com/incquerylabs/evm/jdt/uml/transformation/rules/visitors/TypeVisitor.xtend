@@ -27,6 +27,7 @@ import org.eclipse.uml2.uml.NamedElement
 import org.eclipse.uml2.uml.VisibilityKind
 import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.Classifier
+import org.eclipse.uml2.uml.BehavioralFeature
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -45,6 +46,7 @@ class TypeVisitor extends ASTVisitor {
 			val fqn = JDTQualifiedName::create(binding.qualifiedName)
 			val umlClass = ensureClass(fqn)
 			umlClass.setVisibility(node)
+			umlClass.setAbstractness(node)
 			
 			val superclassType = Optional::ofNullable(node.superclassType)
 			superclassType.ifPresent[
@@ -105,6 +107,7 @@ class TypeVisitor extends ASTVisitor {
 			visitedElements.add(operation)
 			
 			operation.setVisibility(node)
+			operation.setAbstractness(node)
 			val operationBody = node.transformOperationBody(containingType)
 			operationBody.ifPresent[
 				operation.methods += it
@@ -239,6 +242,24 @@ class TypeVisitor extends ASTVisitor {
 			case Modifier::isProtected(modifiers): VisibilityKind::PROTECTED_LITERAL
 			case Modifier::isPrivate(modifiers): VisibilityKind::PRIVATE_LITERAL
 			default: VisibilityKind::PACKAGE_LITERAL
+		}
+	}
+	
+	private def setAbstractness(Classifier element, BodyDeclaration node){
+		val modifiers = node.getModifiers
+		if(Modifier::isAbstract(modifiers)) {
+			element.isAbstract = true
+		} else {
+			element.isAbstract = false
+		}
+	}
+	
+	private def setAbstractness(BehavioralFeature element, BodyDeclaration node){
+		val modifiers = node.getModifiers
+		if(Modifier::isAbstract(modifiers)) {
+			element.isAbstract = true
+		} else {
+			element.isAbstract = false
 		}
 	}
 	
