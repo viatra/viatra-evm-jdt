@@ -19,6 +19,7 @@ import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.PrimitiveType
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.resource.UMLResource
+import org.eclipse.uml2.uml.Type
 
 class UMLModelAccessImpl implements UMLModelAccess {
 	
@@ -76,6 +77,10 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	}
 	
 	override findType(QualifiedName qualifiedName) {
+		val primitiveType = findPrimitiveType(qualifiedName)
+		if(primitiveType.isPresent) {
+			return primitiveType.map[it as Type]
+		}
 		val type = locator.locateType(qualifiedName)
 		return Optional.ofNullable(type)
 	}
