@@ -18,6 +18,7 @@ import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.PrimitiveType
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.resource.UMLResource
+import com.google.common.collect.ImmutableList
 
 class UMLModelAccessImpl implements UMLModelAccess {
 	
@@ -227,6 +228,11 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	}
 	
 	override removeOperation(Operation operation) {
+		val operationBodies = ImmutableList::copyOf(operation.methods)
+		operationBodies.forEach[
+			destroy
+		]
+		
 		if(operation.eContainer == null){
 			return false;
 		}
