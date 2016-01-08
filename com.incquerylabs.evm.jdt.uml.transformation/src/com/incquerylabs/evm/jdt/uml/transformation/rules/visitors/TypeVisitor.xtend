@@ -26,6 +26,8 @@ import org.eclipse.uml2.uml.TypedElement
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.VisibilityKind
 import org.eclipse.xtend.lib.annotations.Accessors
+import org.eclipse.uml2.uml.BehavioredClassifier
+import org.eclipse.uml2.uml.Interface
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -43,6 +45,7 @@ class TypeVisitor extends ASTVisitor {
 		if(binding != null) {
 			val fqn = JDTQualifiedName::create(binding.qualifiedName)
 			val umlType = ensureType(node, fqn)
+			umlType.removeSubelements
 			umlType.setVisibility(node)
 			umlType.isAbstract = node.isAbstract
 			
@@ -51,6 +54,11 @@ class TypeVisitor extends ASTVisitor {
 				umlType.addGeneralization(it)
 			]
 			
+			if(umlType instanceof BehavioredClassifier) {
+				node.superInterfaceTypes.forEach[
+					umlType.addInterfaceRealization(it)
+				]
+			}
 			
 			visitedElements.add(umlType)
 		}
@@ -125,7 +133,7 @@ class TypeVisitor extends ASTVisitor {
 		return true
 	}
 	
-	private def addGeneralization(Classifier umlClass, Type superclassType) {
+	private def addGeneralization(Classifier umlType, Type superclassType) {
 		if(superclassType == null) {
 			return Optional::empty
 		}
@@ -137,11 +145,32 @@ class TypeVisitor extends ASTVisitor {
 			if(superclassUmlType instanceof Classifier) {
 				val generalization = umlFactory.createGeneralization => [
 					general = superclassUmlType
-					specific = umlClass
+					specific = umlType
 				]
 				return Optional::of(generalization)
 			}
 		}
+		return Optional::empty
+	}
+	
+	private def addInterfaceRealization(BehavioredClassifier umlClass, Type interfaceType) {
+		if(interfaceType == null) {
+			return Optional::empty
+		}
+		
+		val interfaceTypeBinding = interfaceType.resolveBinding
+		if(interfaceTypeBinding != null) {
+			val interfaceQualifiedName = JDTQualifiedName::create(interfaceTypeBinding.qualifiedName)
+			val interfaceUmlType = getType(interfaceQualifiedName)
+			if(interfaceUmlType instanceof Interface) {
+				val interfaceRealization = umlFactory.createInterfaceRealization => [
+					contract = interfaceUmlType
+					implementingClassifier = umlClass
+				]
+				return Optional::of(interfaceRealization)
+			}
+		}
+		return Optional::empty
 	}
 	
 	private def Optional<Operation> transformOperation(MethodDeclaration node, TypeDeclaration containingType) {
@@ -174,6 +203,17 @@ class TypeVisitor extends ASTVisitor {
 		ImmutableList::copyOf(umlOperation.methods).forEach[
 			destroy
 		]
+	}
+	
+	private def removeSubelements(Classifier umlType) {
+		ImmutableList::copyOf(umlType.generalizations).forEach[
+			destroy
+		]
+		if(umlType instanceof BehavioredClassifier){
+			ImmutableList::copyOf(umlType.interfaceRealizations).forEach[
+				destroy
+			]
+		}
 	}
 	
 	private def transformOperationBody(MethodDeclaration node, TypeDeclaration containingType) {
