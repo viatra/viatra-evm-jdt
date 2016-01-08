@@ -1,22 +1,26 @@
 package com.incquerylabs.evm.jdt.uml.transformation.rules.visitors
 
+import com.google.common.collect.ImmutableList
 import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
+import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import java.util.List
 import java.util.Set
 import org.eclipse.jdt.core.dom.ASTVisitor
 import org.eclipse.jdt.core.dom.FieldDeclaration
-import org.eclipse.jdt.core.dom.TypeDeclaration
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment
-import org.eclipse.uml2.uml.Element
-import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.jdt.core.dom.MethodDeclaration
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration
-import org.eclipse.uml2.uml.UMLFactory
+import org.eclipse.jdt.core.dom.TypeDeclaration
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment
+import org.eclipse.uml2.uml.Association
+import org.eclipse.uml2.uml.Element
 import org.eclipse.uml2.uml.ParameterDirectionKind
-import com.google.common.collect.ImmutableList
 import org.eclipse.uml2.uml.Type
-import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
+import org.eclipse.uml2.uml.TypedElement
+import org.eclipse.uml2.uml.UMLFactory
+import org.eclipse.xtend.lib.annotations.Accessors
+import java.util.Optional
+import org.eclipse.uml2.uml.Operation
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -37,35 +41,21 @@ class TypeVisitor extends ASTVisitor {
 			visitedElements.add(umlClass)
 		}
 		
-		
 		super.visit(node)
 		return true
 	}
 	
 	override visit(FieldDeclaration node) {
-		val type = node.type
-		val binding = type.resolveBinding
-		
 		val containingType = node.parent as TypeDeclaration
-		val parentBinding = containingType.resolveBinding
-		if(parentBinding != null) {
-			val List<VariableDeclarationFragment> variables = node.fragments
-			variables.forEach[ variable |
-				val javaFieldFqn = JDTQualifiedName::create('''«parentBinding.qualifiedName».«variable.name.fullyQualifiedName»''')
-				val association = ensureAssociation(javaFieldFqn)
-				visitedElements.add(association)
-				
-				if(binding != null) {
-					val typeFqn = JDTQualifiedName::create(binding.qualifiedName)
-					val associationType = getClassOrPrimitiveType(typeFqn)
-					val targetEnd = association.memberEnds.filter[ targetEnd | 
-						!association.ownedEnds.contains(targetEnd) ||
-						association.navigableOwnedEnds.contains(targetEnd)
-					].head
-					targetEnd.type = associationType
-				}
-			]
-		}
+		val List<VariableDeclarationFragment> variables = node.fragments
+		val associations = variables.map[
+			transformField(containingType)
+		]
+		
+		val type = node.type
+		associations.forEach[ifPresent[
+			targetEnd.setType(type)
+		]]
 		
 		super.visit(node)
 		return true
@@ -75,23 +65,11 @@ class TypeVisitor extends ASTVisitor {
 		val containingMethod = node.parent
 		
 		if(containingMethod instanceof MethodDeclaration) {
-			val methodName = containingMethod.name
-			val containingClass = containingMethod.parent as TypeDeclaration
-			val classBinding = containingClass?.resolveBinding
-			if(classBinding != null) {
-				val parentQualifiedName = JDTQualifiedName::create('''«classBinding.qualifiedName».«methodName»''')
-				val umlOperation = ensureOperation(parentQualifiedName)
-				val umlParameter = umlFactory.createParameter => [
-					name = node.name.fullyQualifiedName
-				]
-				val parameterBinding = node.resolveBinding
-				if(parameterBinding != null) {
-					val typeFqn = JDTQualifiedName::create(parameterBinding.type.qualifiedName)
-					val umlType = getClassOrPrimitiveType(typeFqn)
-					umlParameter.type = umlType
-				}
-				umlOperation.ownedParameters += umlParameter
-			}
+			val umlParameter = node.transformParameter(containingMethod)
+			val type = node.type
+			umlParameter.ifPresent[
+				setType(type)
+			]
 		}
 		
 		super.visit(node)
@@ -100,45 +78,117 @@ class TypeVisitor extends ASTVisitor {
 	
 	override visit(MethodDeclaration node) {
 		val containingType = node.parent as TypeDeclaration
+		
+		val umlOperation = node.transformOperation(containingType)
+		
+		umlOperation.ifPresent[ operation |
+			visitedElements.add(operation)
+			
+			val operationBody = node.transformOperationBody(containingType)
+			operationBody.ifPresent[
+				operation.methods += it
+			]
+		]
+		
+		super.visit(node)
+		return true
+	}
+	
+	private def Optional<Operation> transformOperation(MethodDeclaration node, TypeDeclaration containingType) {
 		val parentBinding = containingType.resolveBinding
 		if(parentBinding != null) {
 			val parentClassName = parentBinding.qualifiedName
 			val javaMethodFqn = JDTQualifiedName::create('''«parentClassName».«node.name.fullyQualifiedName»''')
 			val umlOperation = ensureOperation(javaMethodFqn)
-			ImmutableList::copyOf(umlOperation.ownedParameters).forEach[
-				destroy
-			]
-			ImmutableList::copyOf(umlOperation.methods).forEach[
-				destroy
-			]
-			val returnTypeBinding = node.returnType2?.resolveBinding
-			if(returnTypeBinding != null) {
-				val typeFqn = JDTQualifiedName::create(returnTypeBinding.qualifiedName)
-				umlOperation.ownedParameters += umlFactory.createParameter => [
-					name = "__returnvalue"
-					direction = ParameterDirectionKind.RETURN_LITERAL
-					val umlType = getClassOrPrimitiveType(typeFqn)
-					type = umlType
-				]
-			}
-			val body = node.body
-			if(body != null) {
-				val behavior = umlFactory.createOpaqueBehavior => [
-					name = '''«umlOperation.name»__body'''
-					languages += "Java"
-					bodies += body.toString
-				]
-				val parentClassQualifiedName = JDTQualifiedName::create(parentClassName)
-				val parentClass = ensureClass(parentClassQualifiedName)
-				parentClass.ownedBehaviors += behavior
-				umlOperation.methods += behavior
-			}
+			umlOperation.removeSubelements
 			
-			visitedElements.add(umlOperation)
+			val returnType = node.returnType2
+			val returnParameter = umlFactory.createParameter => [
+				name = "__returnvalue"
+				direction = ParameterDirectionKind.RETURN_LITERAL
+			]
+			returnParameter.setType(returnType)
+			umlOperation.ownedParameters += returnParameter
+			
+			return Optional::of(umlOperation)
+		}
+		return Optional::empty
+	}
+	
+	private def removeSubelements(Operation umlOperation) {
+		ImmutableList::copyOf(umlOperation.ownedParameters).forEach[
+			destroy
+		]
+		ImmutableList::copyOf(umlOperation.methods).forEach[
+			destroy
+		]
+	}
+	
+	private def transformOperationBody(MethodDeclaration node, TypeDeclaration containingType) {
+		val parentBinding = containingType.resolveBinding
+		val body = node.body
+		
+		if(parentBinding != null && body != null) {
+			val parentClassName = parentBinding.qualifiedName
+			val behavior = umlFactory.createOpaqueBehavior => [
+				name = '''«node.name.fullyQualifiedName»__body'''
+				languages += "Java"
+				bodies += body.toString
+			]
+			val parentClassQualifiedName = JDTQualifiedName::create(parentClassName)
+			val parentClass = ensureClass(parentClassQualifiedName)
+			parentClass.ownedBehaviors += behavior
+			return Optional::of(behavior)
+		}
+		return Optional::empty
+	}
+	
+	private def getTargetEnd(Association association) {
+		association.memberEnds.filter[ targetEnd | 
+			!association.ownedEnds.contains(targetEnd) ||
+			association.navigableOwnedEnds.contains(targetEnd)
+		].head
+	}
+	
+	private def transformField(VariableDeclarationFragment variable, TypeDeclaration containingType) {
+		val parentBinding = containingType.resolveBinding
+		if(parentBinding != null) {
+			val javaFieldFqn = JDTQualifiedName::create('''«parentBinding.qualifiedName».«variable.name.fullyQualifiedName»''')
+			val association = ensureAssociation(javaFieldFqn)
+			visitedElements.add(association)
+			return Optional::of(association)
+		}
+		return Optional::empty
+	}
+	
+	private def transformParameter(SingleVariableDeclaration node, MethodDeclaration containingMethod) {
+		val containingClass = containingMethod.parent as TypeDeclaration
+		val containingClassBinding = containingClass?.resolveBinding
+		if(containingClassBinding != null) {
+			val methodName = containingMethod.name
+			val methodQualifiedName = JDTQualifiedName::create('''«containingClassBinding.qualifiedName».«methodName»''')
+			val umlOperation = ensureOperation(methodQualifiedName)
+			val umlParameter = umlFactory.createParameter => [
+				name = node.name.fullyQualifiedName
+			]
+			umlOperation.ownedParameters += umlParameter
+			return Optional::of(umlParameter)
+		}
+		return Optional::empty
+	}
+	
+	private def setType(TypedElement typedElement, org.eclipse.jdt.core.dom.Type type) {
+		if(type == null) {
+			typedElement.type = null
+			return
 		}
 		
-		super.visit(node)
-		return true
+		val typeBinding = type.resolveBinding
+		if(typeBinding != null) {
+			val typeFqn = JDTQualifiedName::create(typeBinding.qualifiedName)
+			val associationType = getClassOrPrimitiveType(typeFqn)
+			typedElement.type = associationType
+		}
 	}
 	
 	private def getClassOrPrimitiveType(QualifiedName qualifiedName) {
