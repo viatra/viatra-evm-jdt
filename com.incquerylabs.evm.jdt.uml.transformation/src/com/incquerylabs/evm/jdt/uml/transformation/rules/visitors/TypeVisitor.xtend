@@ -86,6 +86,7 @@ class TypeVisitor extends ASTVisitor {
 		val type = node.type
 		associations.forEach[ifPresent[
 			targetEnd.setType(type)
+			targetEnd.isStatic = node.isStatic 
 			memberEnds.forEach[
 				lower = 0
 				upper = 1
@@ -123,6 +124,7 @@ class TypeVisitor extends ASTVisitor {
 			
 			operation.setVisibility(node)
 			operation.isAbstract = node.isAbstract
+			operation.isStatic = node.isStatic
 			val operationBody = node.transformOperationBody(containingType)
 			operationBody.ifPresent[
 				operation.methods += it
@@ -189,7 +191,11 @@ class TypeVisitor extends ASTVisitor {
 				upper = 1
 			]
 			returnParameter.setType(returnType)
-			umlOperation.ownedParameters += returnParameter
+			if(returnParameter.type != null){
+				umlOperation.ownedParameters += returnParameter
+			} else {
+				returnParameter.destroy
+			}
 			
 			return Optional::of(umlOperation)
 		}
@@ -295,6 +301,15 @@ class TypeVisitor extends ASTVisitor {
 	private def isAbstract(BodyDeclaration node){
 		val modifiers = node.getModifiers
 		if(Modifier::isAbstract(modifiers)) {
+			return true
+		} else {
+			return false
+		}
+	}
+	
+	private def isStatic(BodyDeclaration node) {
+		val modifiers = node.getModifiers
+		if(Modifier::isStatic(modifiers)) {
 			return true
 		} else {
 			return false
