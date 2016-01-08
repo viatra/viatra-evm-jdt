@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.dom.Type
 import org.eclipse.jdt.core.dom.TypeDeclaration
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import org.eclipse.uml2.uml.Association
-import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.Classifier
 import org.eclipse.uml2.uml.Element
 import org.eclipse.uml2.uml.NamedElement
@@ -43,20 +42,29 @@ class TypeVisitor extends ASTVisitor {
 		val binding = node.resolveBinding
 		if(binding != null) {
 			val fqn = JDTQualifiedName::create(binding.qualifiedName)
-			val umlClass = ensureClass(fqn)
-			umlClass.setVisibility(node)
-			umlClass.isAbstract = node.isAbstract
+			val umlType = ensureType(node, fqn)
+			umlType.setVisibility(node)
+			umlType.isAbstract = node.isAbstract
 			
 			val superclassType = Optional::ofNullable(node.superclassType)
 			superclassType.ifPresent[
-				umlClass.addGeneralization(it)
+				umlType.addGeneralization(it)
 			]
 			
-			visitedElements.add(umlClass)
+			
+			visitedElements.add(umlType)
 		}
 		
 		super.visit(node)
 		return true
+	}
+	
+	private def Classifier ensureType(TypeDeclaration node, QualifiedName qualifiedName) {
+		if(node.isInterface) {
+			return ensureInterface(qualifiedName)
+		} else {
+			return ensureClass(qualifiedName)
+		}
 	}
 	
 	override visit(FieldDeclaration node) {
@@ -117,7 +125,7 @@ class TypeVisitor extends ASTVisitor {
 		return true
 	}
 	
-	private def addGeneralization(Class umlClass, Type superclassType) {
+	private def addGeneralization(Classifier umlClass, Type superclassType) {
 		if(superclassType == null) {
 			return Optional::empty
 		}
