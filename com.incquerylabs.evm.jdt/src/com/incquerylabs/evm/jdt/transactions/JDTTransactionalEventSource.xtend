@@ -35,6 +35,8 @@ class JDTTransactionalEventSource extends JDTEventSource implements EventSource<
 				handlers.forEach[handleEvent(event)]
 				Thread.sleep(200)
 			]
+		} else {
+			super.createEvent(delta)
 		}
 		
 		// Always process child-deltas

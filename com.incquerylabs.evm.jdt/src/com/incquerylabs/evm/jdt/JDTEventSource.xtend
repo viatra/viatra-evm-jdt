@@ -1,20 +1,21 @@
 package com.incquerylabs.evm.jdt
 
 import com.google.common.collect.Sets
+import com.incquerylabs.evm.jdt.transactions.JDTTransactionalEventType
 import java.util.Set
+import org.eclipse.incquery.runtime.evm.api.event.EventFilter
+import org.eclipse.incquery.runtime.evm.api.event.EventHandler
 import org.eclipse.incquery.runtime.evm.api.event.EventRealm
 import org.eclipse.incquery.runtime.evm.api.event.EventSource
 import org.eclipse.incquery.runtime.evm.api.event.EventSourceSpecification
-import org.eclipse.jdt.core.IJavaElementDelta
-
-import static extension com.incquerylabs.evm.jdt.util.JDTEventTypeDecoder.toEventType
-import org.eclipse.incquery.runtime.evm.api.event.EventHandler
 import org.eclipse.jdt.core.IJavaElement
-import com.incquerylabs.evm.jdt.transactions.JDTTransactionalEventType
-import org.eclipse.jdt.core.JavaCore
-import org.eclipse.incquery.runtime.evm.api.event.EventFilter
+import org.eclipse.jdt.core.IJavaElementDelta
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IPackageFragmentRoot
+import org.eclipse.jdt.core.JavaCore
+
+import static extension com.incquerylabs.evm.jdt.util.JDTEventTypeDecoder.toEventType
+import org.eclipse.jdt.core.IPackageFragment
 
 class JDTEventSource implements EventSource<JDTEventAtom> {
 	JDTEventSourceSpecification spec
@@ -40,13 +41,23 @@ class JDTEventSource implements EventSource<JDTEventAtom> {
 
 	def void createEvent(IJavaElementDelta delta) {
 		val eventAtom = new JDTEventAtom(delta)
-		val JDTEvent event = new JDTEvent(delta.kind.toEventType, eventAtom)
+		val eventType = delta.kind.toEventType
+		val element = delta.element
+		val JDTEvent event = new JDTEvent(eventType, eventAtom)
 		handlers.forEach[
 			handleEvent(event)
 		]
 		delta.affectedChildren.forEach[affectedChildren |
 			createEvent(affectedChildren)
 		]
+		if(eventType == JDTEventType.APPEARED && element instanceof IPackageFragment){
+			handlers.forEach[ handler |
+				(element as IPackageFragment).compilationUnits.forEach[
+					handler.sendExistingEvents(it)
+				]
+			]
+		}
+		
 	}
 
 	def void createReferenceRefreshEvent(IJavaElement javaElement) {
