@@ -20,6 +20,7 @@ import org.eclipse.uml2.uml.PrimitiveType
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.resource.UMLResource
 import org.eclipse.uml2.uml.Type
+import org.eclipse.uml2.uml.Classifier
 
 class UMLModelAccessImpl implements UMLModelAccess {
 	
@@ -261,14 +262,19 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	private def createOperation(QualifiedName qualifiedName) {
 		val parentFqn = qualifiedName.parent
 		val parent = parentFqn.flatMap[
-			findClass
+			findType
 		]
 		
 		val umlOperation = parent.map[ parentClass |
 			val operation = createOperation => [
 				it.name = '''«qualifiedName.name»'''
 			]
-			parentClass.ownedOperations += operation
+			// yes, UML has a different feature for owned operations of Class and Interface, how convenient
+			if(parentClass instanceof Class){
+				parentClass.ownedOperations += operation
+			} else if(parentClass instanceof Interface) {
+				parentClass.ownedOperations += operation
+			}
 			
 			debug('''Created operation «qualifiedName»''')
 			operation
