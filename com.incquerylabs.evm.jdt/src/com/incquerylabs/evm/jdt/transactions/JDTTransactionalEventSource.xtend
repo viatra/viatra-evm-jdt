@@ -13,6 +13,8 @@ import static extension com.incquerylabs.evm.jdt.util.JDTChangeFlagDecoder.toCha
 import com.incquerylabs.evm.jdt.util.ChangeFlag
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
+import org.eclipse.incquery.runtime.evm.api.event.EventHandler
+import org.eclipse.jdt.core.IJavaElement
 
 class JDTTransactionalEventSource extends JDTEventSource implements EventSource<JDTEventAtom> {
 	extension val Logger logger = Logger.getLogger(this.class)
@@ -35,12 +37,22 @@ class JDTTransactionalEventSource extends JDTEventSource implements EventSource<
 				handlers.forEach[handleEvent(event)]
 				Thread.sleep(200)
 			]
+		} else {
+			createEventsForAppearedPackageContents(delta)
 		}
 		
 		// Always process child-deltas
 		delta.affectedChildren.forEach[affectedChildren |
 			createEvent(affectedChildren)
 		]
+	}
+	
+	override sendExistingEvents(EventHandler<JDTEventAtom> handler, IJavaElement element) {
+		val eventAtom = new JDTEventAtom(element)
+		val JDTEvent createEvent = new JDTEvent(JDTTransactionalEventType::CREATE, eventAtom)
+		handler.handleEvent(createEvent)
+		val JDTEvent commitEvent = new JDTEvent(JDTTransactionalEventType::COMMIT, eventAtom)
+		handler.handleEvent(commitEvent)
 	}
 	
 	private def getTransactionalEventTypes(IJavaElementDelta delta) {

@@ -34,7 +34,8 @@ class JDTEventHandler implements EventHandler<JDTEventAtom>{
 		return filter
 	}
 	override void dispose() {
-		
+		// remove handler from source
+		source.removeHandler(this)
 	}
 	
 	private def getOrCreateActivation(JDTEventAtom eventAtom){

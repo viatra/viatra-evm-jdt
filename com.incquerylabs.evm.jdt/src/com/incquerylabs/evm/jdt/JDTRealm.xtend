@@ -7,23 +7,25 @@ import org.apache.log4j.Logger
 import org.eclipse.incquery.runtime.evm.api.event.EventRealm
 import org.eclipse.jdt.core.ElementChangedEvent
 import org.eclipse.jdt.core.IElementChangedListener
-import org.eclipse.jdt.core.JavaCore
-import org.eclipse.jdt.core.IJavaElementDelta
 import org.eclipse.jdt.core.IJavaElement
+import org.eclipse.jdt.core.IJavaElementDelta
+import org.eclipse.jdt.core.JavaCore
 
 class JDTRealm implements EventRealm {
 	Set<JDTEventSource> sources = Sets.newHashSet()
 	extension val Logger logger = Logger.getLogger(this.class)
+	IElementChangedListener listener
 	
 	private static JDTRealm instance = null
 	/** 
 	 */
 	protected new() {
 		logger.level = Level.DEBUG
-		JavaCore::addElementChangedListener(([ ElementChangedEvent event |
+		listener = [ ElementChangedEvent event |
 			val delta = event.delta
 			notifySources(delta)
-		] as IElementChangedListener))
+		]
+		JavaCore.addElementChangedListener(listener)
 	}
 	
 	static def JDTRealm getInstance() {
@@ -47,6 +49,10 @@ class JDTRealm implements EventRealm {
 	
 	def protected void addSource(JDTEventSource source) {
 		sources.add(source)
+	}
+	
+	def protected void removeSource(JDTEventSource source) {
+		sources.remove(source)
 	}
 
 }
