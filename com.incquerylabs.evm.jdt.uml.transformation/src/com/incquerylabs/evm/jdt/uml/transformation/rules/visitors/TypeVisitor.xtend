@@ -28,6 +28,9 @@ import org.eclipse.uml2.uml.VisibilityKind
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.uml2.uml.BehavioredClassifier
 import org.eclipse.uml2.uml.Interface
+import org.eclipse.uml2.uml.MultiplicityElement
+import org.eclipse.jdt.internal.compiler.lookup.TypeBinding
+import org.eclipse.jdt.core.dom.ITypeBinding
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -85,13 +88,14 @@ class TypeVisitor extends ASTVisitor {
 		
 		val type = node.type
 		associations.forEach[ifPresent[
-			targetEnd.setType(type)
+			val typeBinding = targetEnd.setType(type)
 			targetEnd.isStatic = node.isStatic 
 			memberEnds.forEach[
 				lower = 0
 				upper = 1
 				setVisibility(node)
 			]
+			targetEnd.upper = typeBinding.upperBound
 			setVisibility(node)
 		]]
 		
@@ -107,8 +111,8 @@ class TypeVisitor extends ASTVisitor {
 			val type = node.type
 			umlParameter.ifPresent[
 				lower = 0
-				upper = 1
-				setType(type)
+				val typeBinding = setType(type)
+				upper = typeBinding.upperBound
 			]
 		}
 		
@@ -188,9 +192,9 @@ class TypeVisitor extends ASTVisitor {
 				name = "__returnvalue"
 				direction = ParameterDirectionKind.RETURN_LITERAL
 				lower = 0
-				upper = 1
 			]
-			returnParameter.setType(returnType)
+			val typeBinding = returnParameter.setType(returnType)
+			returnParameter.upper = typeBinding.upperBound
 			if(returnParameter.type != null){
 				umlOperation.ownedParameters += returnParameter
 			} else {
@@ -200,6 +204,14 @@ class TypeVisitor extends ASTVisitor {
 			return Optional::of(umlOperation)
 		}
 		return Optional::empty
+	}
+	
+	private def getUpperBound(ITypeBinding typeBinding) {
+		if(typeBinding.array) {
+			return -1
+		} else {
+			return 1
+		}
 	}
 	
 	private def removeSubelements(Operation umlOperation) {
@@ -275,18 +287,27 @@ class TypeVisitor extends ASTVisitor {
 		return Optional::empty
 	}
 	
+	/**
+	 * Returns the resolved TypeBinding if possible, null otherwise
+	 */
 	private def setType(TypedElement typedElement, Type type) {
 		if(type == null) {
 			typedElement.type = null
-			return
+			return null
 		}
 		
 		val typeBinding = type.resolveBinding
 		if(typeBinding != null) {
-			val typeFqn = JDTQualifiedName::create(typeBinding.qualifiedName)
+			var typeName = typeBinding.qualifiedName
+			if(typeBinding.isArray){
+				val componentType = typeBinding.componentType
+				typeName = componentType.qualifiedName
+			}
+			val typeFqn = JDTQualifiedName::create(typeName)
 			val associationType = getType(typeFqn)
 			typedElement.type = associationType
 		}
+		return typeBinding
 	}
 	
 	private def setVisibility(NamedElement element, BodyDeclaration node) {
