@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.dom.FieldDeclaration
 import org.eclipse.jdt.core.dom.MethodDeclaration
 import org.eclipse.jdt.core.dom.Modifier
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration
+import org.eclipse.jdt.core.dom.Type
 import org.eclipse.jdt.core.dom.TypeDeclaration
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import org.eclipse.uml2.uml.Association
@@ -22,7 +23,6 @@ import org.eclipse.uml2.uml.Element
 import org.eclipse.uml2.uml.NamedElement
 import org.eclipse.uml2.uml.Operation
 import org.eclipse.uml2.uml.ParameterDirectionKind
-import org.eclipse.uml2.uml.Type
 import org.eclipse.uml2.uml.TypedElement
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.VisibilityKind
@@ -117,7 +117,7 @@ class TypeVisitor extends ASTVisitor {
 		return true
 	}
 	
-	private def addGeneralization(Class umlClass, org.eclipse.jdt.core.dom.Type superclassType) {
+	private def addGeneralization(Class umlClass, Type superclassType) {
 		if(superclassType == null) {
 			return Optional::empty
 		}
@@ -125,7 +125,7 @@ class TypeVisitor extends ASTVisitor {
 		val superclassTypeBinding = superclassType.resolveBinding
 		if(superclassTypeBinding != null) {
 			val superclassQualifiedName = JDTQualifiedName::create(superclassTypeBinding.qualifiedName)
-			val superclassUmlType = getClassOrPrimitiveType(superclassQualifiedName)
+			val superclassUmlType = getType(superclassQualifiedName)
 			if(superclassUmlType instanceof Classifier) {
 				val generalization = umlFactory.createGeneralization => [
 					general = superclassUmlType
@@ -221,7 +221,7 @@ class TypeVisitor extends ASTVisitor {
 		return Optional::empty
 	}
 	
-	private def setType(TypedElement typedElement, org.eclipse.jdt.core.dom.Type type) {
+	private def setType(TypedElement typedElement, Type type) {
 		if(type == null) {
 			typedElement.type = null
 			return
@@ -230,7 +230,7 @@ class TypeVisitor extends ASTVisitor {
 		val typeBinding = type.resolveBinding
 		if(typeBinding != null) {
 			val typeFqn = JDTQualifiedName::create(typeBinding.qualifiedName)
-			val associationType = getClassOrPrimitiveType(typeFqn)
+			val associationType = getType(typeFqn)
 			typedElement.type = associationType
 		}
 	}
@@ -253,13 +253,13 @@ class TypeVisitor extends ASTVisitor {
 		}
 	}
 	
-	private def getClassOrPrimitiveType(QualifiedName qualifiedName) {
+	private def getType(QualifiedName qualifiedName) {
 		if(qualifiedName.toString == "void") {
 			return null
 		}
-		val primitiveType = qualifiedName.findPrimitiveType
-		// if not a primitive type, ensure there is such a class
-		val umlType = primitiveType.map[it as Type].orElseGet[ensureClass(qualifiedName)]
+		val existingType = qualifiedName.findType
+		// if not an existing type (e.g. primitive type or interface), ensure there is such a class
+		val umlType = existingType.orElseGet[ensureClass(qualifiedName)]
 		return umlType
 	}
 	
