@@ -21,6 +21,10 @@ import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.xtend.lib.annotations.Accessors
 import java.util.Optional
 import org.eclipse.uml2.uml.Operation
+import org.eclipse.jdt.core.dom.BodyDeclaration
+import org.eclipse.jdt.core.dom.Modifier
+import org.eclipse.uml2.uml.NamedElement
+import org.eclipse.uml2.uml.VisibilityKind
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -38,6 +42,7 @@ class TypeVisitor extends ASTVisitor {
 		if(binding != null) {
 			val fqn = JDTQualifiedName::create(binding.qualifiedName)
 			val umlClass = ensureClass(fqn)
+			umlClass.setVisibility(node)
 			visitedElements.add(umlClass)
 		}
 		
@@ -48,6 +53,7 @@ class TypeVisitor extends ASTVisitor {
 	override visit(FieldDeclaration node) {
 		val containingType = node.parent as TypeDeclaration
 		val List<VariableDeclarationFragment> variables = node.fragments
+		
 		val associations = variables.map[
 			transformField(containingType)
 		]
@@ -55,6 +61,10 @@ class TypeVisitor extends ASTVisitor {
 		val type = node.type
 		associations.forEach[ifPresent[
 			targetEnd.setType(type)
+			memberEnds.forEach[
+				setVisibility(node)
+			]
+			setVisibility(node)
 		]]
 		
 		super.visit(node)
@@ -78,12 +88,11 @@ class TypeVisitor extends ASTVisitor {
 	
 	override visit(MethodDeclaration node) {
 		val containingType = node.parent as TypeDeclaration
-		
 		val umlOperation = node.transformOperation(containingType)
-		
 		umlOperation.ifPresent[ operation |
 			visitedElements.add(operation)
 			
+			operation.setVisibility(node)
 			val operationBody = node.transformOperationBody(containingType)
 			operationBody.ifPresent[
 				operation.methods += it
@@ -188,6 +197,15 @@ class TypeVisitor extends ASTVisitor {
 			val typeFqn = JDTQualifiedName::create(typeBinding.qualifiedName)
 			val associationType = getClassOrPrimitiveType(typeFqn)
 			typedElement.type = associationType
+		}
+	}
+	
+	private def setVisibility(NamedElement element, BodyDeclaration node) {
+		element.visibility = switch modifiers : node.getModifiers {
+			case Modifier::isPublic(modifiers): VisibilityKind::PUBLIC_LITERAL
+			case Modifier::isProtected(modifiers): VisibilityKind::PROTECTED_LITERAL
+			case Modifier::isPrivate(modifiers): VisibilityKind::PRIVATE_LITERAL
+			default: VisibilityKind::PACKAGE_LITERAL
 		}
 	}
 	
