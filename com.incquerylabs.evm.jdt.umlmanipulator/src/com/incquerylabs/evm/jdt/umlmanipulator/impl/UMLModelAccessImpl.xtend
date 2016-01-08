@@ -1,6 +1,6 @@
 package com.incquerylabs.evm.jdt.umlmanipulator.impl
 
-import com.incquerylabs.evm.jdt.common.queries.UmlQueries
+import com.google.common.collect.ImmutableList
 import com.incquerylabs.evm.jdt.fqnutil.IUMLElementLocator
 import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.impl.UMLElementLocator
@@ -12,13 +12,13 @@ import org.eclipse.emf.common.util.URI
 import org.eclipse.incquery.runtime.api.IncQueryEngine
 import org.eclipse.uml2.uml.Association
 import org.eclipse.uml2.uml.Class
+import org.eclipse.uml2.uml.Interface
 import org.eclipse.uml2.uml.Model
 import org.eclipse.uml2.uml.Operation
 import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.PrimitiveType
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.resource.UMLResource
-import com.google.common.collect.ImmutableList
 
 class UMLModelAccessImpl implements UMLModelAccess {
 	
@@ -73,6 +73,11 @@ class UMLModelAccessImpl implements UMLModelAccess {
 		pckg.destroy
 		debug('''Deleted package «fqn»''')
 		return true
+	}
+	
+	override findType(QualifiedName qualifiedName) {
+		val type = locator.locateType(qualifiedName)
+		return Optional.ofNullable(type)
 	}
 	
 	override findClass(QualifiedName qualifiedName) {
@@ -135,6 +140,46 @@ class UMLModelAccessImpl implements UMLModelAccess {
 		val fqn = clss.qualifiedName
 		clss.destroy
 		debug('''Deleted class «fqn»''')
+		return true
+	}
+	
+	override findInterface(QualifiedName qualifiedName) {
+		val umlInterface = locator.locateInterface(qualifiedName)
+		return Optional.ofNullable(umlInterface)
+	}
+	
+	override ensureInterface(QualifiedName qualifiedName) {
+		val existingInterface = qualifiedName.findInterface
+		
+		return existingInterface.orElseGet[
+			createInterface(qualifiedName)
+		]
+	}
+	
+	private def createInterface(QualifiedName qualifiedName) {
+		val parentFqn = qualifiedName.parent
+		
+		val parent = parentFqn.map[
+			ensurePackage
+		].orElseGet[locator.UMLModel]
+		
+		val umlInterface = createInterface => [
+			name = qualifiedName.name
+		]
+		
+		parent.packagedElements += umlInterface
+		debug('''Created interface «qualifiedName»''')
+		return umlInterface
+	}
+	
+	override removeInterface(Interface umlInterface) {
+		if(umlInterface.eContainer == null){
+			return false;
+		}
+		
+		val fqn = umlInterface.qualifiedName
+		umlInterface.destroy
+		debug('''Deleted interface «fqn»''')
 		return true
 	}
 	

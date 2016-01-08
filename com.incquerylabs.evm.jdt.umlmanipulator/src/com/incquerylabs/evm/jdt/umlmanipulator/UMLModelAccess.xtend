@@ -5,6 +5,8 @@ import org.eclipse.uml2.uml.Association
 import org.eclipse.uml2.uml.Operation
 import java.util.Optional
 import org.eclipse.uml2.uml.PrimitiveType
+import org.eclipse.uml2.uml.Interface
+import org.eclipse.uml2.uml.Type
 
 interface UMLModelAccess {
 	
@@ -24,6 +26,11 @@ interface UMLModelAccess {
 	def boolean removePackage(org.eclipse.uml2.uml.Package pckg)
 
 	/**
+	 * Return the UML Type with the given qualified name, Optional.absent otherwise. 
+	 */
+	def Optional<Type> findType(QualifiedName qualifiedName)
+	
+	/**
 	 * Return the UML Class with the given qualified name, Optional.absent otherwise. 
 	 */
 	def Optional<org.eclipse.uml2.uml.Class> findClass(QualifiedName qualifiedName)
@@ -37,6 +44,21 @@ interface UMLModelAccess {
 	 * Remove the UML Class from the model, return true if change occurred, false otherwise. 
 	 */
 	def boolean removeClass(org.eclipse.uml2.uml.Class clss)
+
+	/**
+	 * Return the UML Interface with the given qualified name, Optional.absent otherwise. 
+	 */
+	def Optional<Interface> findInterface(QualifiedName qualifiedName)
+	
+	/**
+	 * Return the UML Interface with the given qualified name if it exists, create otherwise. 
+	 */
+	def Interface ensureInterface(QualifiedName qualifiedName)
+	
+	/**
+	 * Remove the UML Interface from the model, return true if change occurred, false otherwise. 
+	 */
+	def boolean removeInterface(Interface umlInterface)
 	
 	/**
 	 * Return the UML Association with the given qualified name, Optional.absent otherwise. 

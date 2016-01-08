@@ -11,6 +11,8 @@ import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.Property
 import com.incquerylabs.evm.jdt.common.queries.UmlQueries
 import org.eclipse.incquery.runtime.api.IncQueryEngine
+import org.eclipse.uml2.uml.Type
+import org.eclipse.uml2.uml.Interface
 
 class UMLElementLocator implements IUMLElementLocator {
 	extension val UmlQueries umlQueries = UmlQueries::instance
@@ -27,8 +29,16 @@ class UMLElementLocator implements IUMLElementLocator {
 		locateElement(qualifiedName, Package)
 	}
 	
+	override locateType(QualifiedName qualifiedName) {
+		locateElement(qualifiedName, Type)
+	}
+	
 	override locateClass(QualifiedName qualifiedName) {
 		locateElement(qualifiedName, Class)
+	}
+	
+	override locateInterface(QualifiedName qualifiedName) {
+		locateElement(qualifiedName, Interface)
 	}
 	
 	override locateAssociation(QualifiedName qualifiedName) {
@@ -66,4 +76,5 @@ class UMLElementLocator implements IUMLElementLocator {
 		val correctedUmlQualifiedName = UMLQualifiedName.create('''«umlModel.qualifiedName»::«umlQualifiedName»''')
 		return correctedUmlQualifiedName
 	}
+	
 }
