@@ -1,6 +1,6 @@
 package color;
 
-public class ColoredElement {
+public abstract class ColoredElement {
 
 	String color;
 	
