@@ -355,8 +355,9 @@ class TypeVisitor extends ASTVisitor {
 				if(element.interface){
 					ensureInterface(qualifiedName)
 				}
+			} else {
+				ensureClass(qualifiedName)
 			}
-			ensureClass(qualifiedName)
 		]
 		return umlType
 	}
