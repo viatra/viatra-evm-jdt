@@ -26,6 +26,8 @@ import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTNode
 import org.eclipse.jdt.core.dom.ASTParser
 import org.eclipse.uml2.uml.Class
+import org.eclipse.uml2.uml.Interface
+import org.eclipse.uml2.uml.StructuredClassifier
 
 class TransactionalCompilationUnitRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
@@ -47,7 +49,7 @@ class TransactionalCompilationUnitRule extends JDTRule {
 			debug('''Compilation unit is deleted: «activation.atom.element»''')
 			try {
 				val compilationUnit = activation.atom.element as ICompilationUnit
-				compilationUnit.deleteCorrespondingClass
+				compilationUnit.deleteCorrespondingType
 			} catch (IllegalArgumentException e) {
 				error('''Error during updating compilation unit''', e)
 			}
@@ -115,22 +117,28 @@ class TransactionalCompilationUnitRule extends JDTRule {
 		return
 	}
 	
-	def deleteCorrespondingClass(ICompilationUnit element) {
+	def deleteCorrespondingType(ICompilationUnit element) {
 		val umlQualifiedName = element.getUmlClassQualifiedName
-		val umlClass = findClass(umlQualifiedName)
+		val umlClass = findType(umlQualifiedName)
 		umlClass.ifPresent[
-			val associations = ImmutableList::copyOf(getAssociationsOf(it))
-			associations.forEach[
-				removeAssociation
-			]
+			if(it instanceof StructuredClassifier){
+				val associations = ImmutableList::copyOf(getAssociationsOf(it))
+				associations.forEach[
+					removeAssociation
+				]
+			}
 		]
 		
 		umlClass.ifPresent[
-			removeClass
+			if(it instanceof Interface){
+				removeInterface
+			} else if(it instanceof Class){
+				removeClass
+			}
 		]
 	}
 	
-	private def getAssociationsOf(Class umlClass) {
+	private def getAssociationsOf(StructuredClassifier umlClass) {
 		val associations = umlClass.ownedAttributes.map[ attribute |
 			Optional::ofNullable(attribute.association)
 		].filter[isPresent].map[get]

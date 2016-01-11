@@ -12,15 +12,15 @@ import org.eclipse.emf.common.util.URI
 import org.eclipse.incquery.runtime.api.IncQueryEngine
 import org.eclipse.uml2.uml.Association
 import org.eclipse.uml2.uml.Class
+import org.eclipse.uml2.uml.Classifier
 import org.eclipse.uml2.uml.Interface
 import org.eclipse.uml2.uml.Model
 import org.eclipse.uml2.uml.Operation
 import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.PrimitiveType
+import org.eclipse.uml2.uml.Type
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.resource.UMLResource
-import org.eclipse.uml2.uml.Type
-import org.eclipse.uml2.uml.Classifier
 
 class UMLModelAccessImpl implements UMLModelAccess {
 	
@@ -118,6 +118,14 @@ class UMLModelAccessImpl implements UMLModelAccess {
 		val existingClass = qualifiedName.findClass
 		
 		return existingClass.orElseGet[
+			val existingType = qualifiedName.findType
+			if(existingType.present){
+				val typeValue = existingType.get
+				// if enums are supported, extend this part
+				if(typeValue instanceof Interface){
+					removeInterface(typeValue)
+				}
+			}
 			createClass(qualifiedName)
 		]
 	}
@@ -158,6 +166,14 @@ class UMLModelAccessImpl implements UMLModelAccess {
 		val existingInterface = qualifiedName.findInterface
 		
 		return existingInterface.orElseGet[
+			val existingType = qualifiedName.findType
+			if(existingType.present){
+				val typeValue = existingType.get
+				// if enums are supported, extend this part
+				if(typeValue instanceof Class){
+					removeClass(typeValue)
+				}
+			}
 			createInterface(qualifiedName)
 		]
 	}
