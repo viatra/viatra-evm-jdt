@@ -10,6 +10,7 @@ import java.util.Set
 import org.eclipse.jdt.core.dom.ASTVisitor
 import org.eclipse.jdt.core.dom.BodyDeclaration
 import org.eclipse.jdt.core.dom.FieldDeclaration
+import org.eclipse.jdt.core.dom.ITypeBinding
 import org.eclipse.jdt.core.dom.MethodDeclaration
 import org.eclipse.jdt.core.dom.Modifier
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration
@@ -17,8 +18,10 @@ import org.eclipse.jdt.core.dom.Type
 import org.eclipse.jdt.core.dom.TypeDeclaration
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import org.eclipse.uml2.uml.Association
+import org.eclipse.uml2.uml.BehavioredClassifier
 import org.eclipse.uml2.uml.Classifier
 import org.eclipse.uml2.uml.Element
+import org.eclipse.uml2.uml.Interface
 import org.eclipse.uml2.uml.NamedElement
 import org.eclipse.uml2.uml.Operation
 import org.eclipse.uml2.uml.ParameterDirectionKind
@@ -26,13 +29,6 @@ import org.eclipse.uml2.uml.TypedElement
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.VisibilityKind
 import org.eclipse.xtend.lib.annotations.Accessors
-import org.eclipse.uml2.uml.BehavioredClassifier
-import org.eclipse.uml2.uml.Interface
-import org.eclipse.uml2.uml.MultiplicityElement
-import org.eclipse.jdt.internal.compiler.lookup.TypeBinding
-import org.eclipse.jdt.core.dom.ITypeBinding
-import org.eclipse.jdt.core.IJavaElement
-import org.eclipse.jdt.internal.core.SourceType
 
 class TypeVisitor extends ASTVisitor {
 	val UMLFactory umlFactory = UMLFactory::eINSTANCE
@@ -154,7 +150,7 @@ class TypeVisitor extends ASTVisitor {
 		val superclassTypeBinding = superclassType.resolveBinding
 		if(superclassTypeBinding != null) {
 			val superclassQualifiedName = JDTQualifiedName::create(superclassTypeBinding.qualifiedName)
-			val superclassUmlType = getType(superclassQualifiedName, superclassTypeBinding.javaElement)
+			val superclassUmlType = getType(superclassQualifiedName, superclassTypeBinding)
 			if(superclassUmlType instanceof Classifier) {
 				val generalization = umlFactory.createGeneralization => [
 					general = superclassUmlType
@@ -174,7 +170,7 @@ class TypeVisitor extends ASTVisitor {
 		val interfaceTypeBinding = interfaceType.resolveBinding
 		if(interfaceTypeBinding != null) {
 			val interfaceQualifiedName = JDTQualifiedName::create(interfaceTypeBinding.qualifiedName)
-			val interfaceUmlType = getType(interfaceQualifiedName, interfaceTypeBinding.javaElement)
+			val interfaceUmlType = getType(interfaceQualifiedName, interfaceTypeBinding)
 			if(interfaceUmlType instanceof Interface) {
 				val interfaceRealization = umlFactory.createInterfaceRealization => [
 					contract = interfaceUmlType
@@ -311,7 +307,7 @@ class TypeVisitor extends ASTVisitor {
 				typeName = elementType.qualifiedName
 			}
 			val typeFqn = JDTQualifiedName::create(typeName)
-			val associationType = getType(typeFqn, typeBinding.javaElement)
+			val associationType = getType(typeFqn, typeBinding)
 			typedElement.type = associationType
 		}
 		return typeBinding
@@ -344,17 +340,15 @@ class TypeVisitor extends ASTVisitor {
 		}
 	}
 	
-	private def getType(QualifiedName qualifiedName, IJavaElement element) {
+	private def getType(QualifiedName qualifiedName, ITypeBinding element) {
 		if(qualifiedName.toString == "void") {
 			return null
 		}
 		val existingType = qualifiedName.findType
 		// if not an existing type (e.g. primitive type or interface), ensure there is such a class
 		val umlType = existingType.orElseGet[
-			if(element instanceof SourceType){
-				if(element.interface){
-					ensureInterface(qualifiedName)
-				}
+			if(element.interface){
+				ensureInterface(qualifiedName)
 			} else {
 				ensureClass(qualifiedName)
 			}
