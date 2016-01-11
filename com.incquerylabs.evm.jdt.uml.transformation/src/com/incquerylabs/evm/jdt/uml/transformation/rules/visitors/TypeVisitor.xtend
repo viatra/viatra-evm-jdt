@@ -210,7 +210,7 @@ class TypeVisitor extends ASTVisitor {
 	}
 	
 	private def getUpperBound(ITypeBinding typeBinding) {
-		if(typeBinding.array) {
+		if(typeBinding != null && typeBinding.array) {
 			return -1
 		} else {
 			return 1
