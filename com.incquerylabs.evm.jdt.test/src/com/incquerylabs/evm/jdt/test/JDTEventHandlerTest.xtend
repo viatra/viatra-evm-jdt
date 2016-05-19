@@ -3,8 +3,8 @@ package com.incquerylabs.evm.jdt.test
 import com.incquerylabs.evm.jdt.JDTEvent
 import com.incquerylabs.evm.jdt.JDTEventHandler
 import com.incquerylabs.evm.jdt.JDTEventType
-import org.eclipse.incquery.runtime.evm.api.Activation
-import org.eclipse.incquery.runtime.evm.api.RuleInstance
+import org.eclipse.viatra.transformation.evm.api.Activation
+import org.eclipse.viatra.transformation.evm.api.RuleInstance
 import org.eclipse.jdt.core.IJavaElement
 import org.junit.Before
 import org.junit.Test

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><plugin>
-  <extension id="com.incquerylabs.evm.jdt.common.queries.UmlQueries" point="org.eclipse.incquery.runtime.queryspecification">
-    <group group="org.eclipse.incquery.runtime.extensibility.SingletonExtensionFactory:com.incquerylabs.evm.jdt.common.queries.UmlQueries" id="com.incquerylabs.evm.jdt.common.queries.UmlQueries"/>
+  <extension id="com.incquerylabs.evm.jdt.common.queries.UmlQueries" point="org.eclipse.viatra.query.runtime.queryspecification">
+    <group group="org.eclipse.viatra.query.runtime.extensibility.SingletonExtensionFactory:com.incquerylabs.evm.jdt.common.queries.UmlQueries" id="com.incquerylabs.evm.jdt.common.queries.UmlQueries"/>
   </extension>
 </plugin>

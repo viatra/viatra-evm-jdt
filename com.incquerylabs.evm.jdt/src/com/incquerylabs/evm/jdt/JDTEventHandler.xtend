@@ -1,11 +1,11 @@
 package com.incquerylabs.evm.jdt
 
-import org.eclipse.incquery.runtime.evm.api.RuleInstance
-import org.eclipse.incquery.runtime.evm.api.event.Event
-import org.eclipse.incquery.runtime.evm.api.event.EventFilter
-import org.eclipse.incquery.runtime.evm.api.event.EventHandler
-import org.eclipse.incquery.runtime.evm.api.event.EventSource
-import org.eclipse.incquery.runtime.evm.api.event.EventType
+import org.eclipse.viatra.transformation.evm.api.RuleInstance
+import org.eclipse.viatra.transformation.evm.api.event.Event
+import org.eclipse.viatra.transformation.evm.api.event.EventFilter
+import org.eclipse.viatra.transformation.evm.api.event.EventHandler
+import org.eclipse.viatra.transformation.evm.api.event.EventSource
+import org.eclipse.viatra.transformation.evm.api.event.EventType
 
 class JDTEventHandler implements EventHandler<JDTEventAtom>{
 	

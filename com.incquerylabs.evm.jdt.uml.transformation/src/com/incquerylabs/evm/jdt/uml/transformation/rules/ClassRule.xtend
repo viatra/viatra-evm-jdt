@@ -8,7 +8,7 @@ import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
+import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IType
 

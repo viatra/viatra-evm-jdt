@@ -4,10 +4,10 @@ import com.incquerylabs.evm.jdt.JDTEventAtom
 import com.incquerylabs.evm.jdt.JDTEventHandler
 import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
 import com.incquerylabs.evm.jdt.JDTRealm
-import org.eclipse.incquery.runtime.evm.api.RuleInstance
-import org.eclipse.incquery.runtime.evm.api.event.AbstractRuleInstanceBuilder
-import org.eclipse.incquery.runtime.evm.api.event.EventFilter
-import org.eclipse.incquery.runtime.evm.api.event.EventRealm
+import org.eclipse.viatra.transformation.evm.api.RuleInstance
+import org.eclipse.viatra.transformation.evm.api.event.AbstractRuleInstanceBuilder
+import org.eclipse.viatra.transformation.evm.api.event.EventFilter
+import org.eclipse.viatra.transformation.evm.api.event.EventRealm
 
 class JDTTransactionalEventSourceSpecification extends JDTEventSourceSpecification {
 	override getRuleInstanceBuilder(EventRealm realm) {

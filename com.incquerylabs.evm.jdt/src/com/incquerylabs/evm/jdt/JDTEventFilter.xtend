@@ -1,6 +1,6 @@
 package com.incquerylabs.evm.jdt
 
-import org.eclipse.incquery.runtime.evm.api.event.EventFilter
+import org.eclipse.viatra.transformation.evm.api.event.EventFilter
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.xtend.lib.annotations.Accessors
 

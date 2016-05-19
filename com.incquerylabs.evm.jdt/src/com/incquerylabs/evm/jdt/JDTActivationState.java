@@ -1,6 +1,6 @@
 package com.incquerylabs.evm.jdt;
 
-import org.eclipse.incquery.runtime.evm.api.event.ActivationState;
+import org.eclipse.viatra.transformation.evm.api.event.ActivationState;
 
 public enum JDTActivationState implements ActivationState {
 	INACTIVE,

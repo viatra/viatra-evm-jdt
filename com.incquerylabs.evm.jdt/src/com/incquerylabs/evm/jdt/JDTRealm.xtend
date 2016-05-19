@@ -4,7 +4,7 @@ import com.google.common.collect.Sets
 import java.util.Set
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.incquery.runtime.evm.api.event.EventRealm
+import org.eclipse.viatra.transformation.evm.api.event.EventRealm
 import org.eclipse.jdt.core.ElementChangedEvent
 import org.eclipse.jdt.core.IElementChangedListener
 import org.eclipse.jdt.core.IJavaElement

@@ -9,7 +9,7 @@ import java.util.Optional
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.emf.common.util.URI
-import org.eclipse.incquery.runtime.api.IncQueryEngine
+import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine
 import org.eclipse.uml2.uml.Association
 import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.Classifier
@@ -28,10 +28,10 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	extension val UMLFactory umlFactory = UMLFactory.eINSTANCE
 	val Model model
 	val IUMLElementLocator locator
-	val IncQueryEngine engine
+	val ViatraQueryEngine engine
 	
 	
-	new(Model umlModel, IncQueryEngine engine) {
+	new(Model umlModel, ViatraQueryEngine engine) {
 		this.model = umlModel
 		this.engine = engine
 		this.locator = new UMLElementLocator(umlModel, engine)

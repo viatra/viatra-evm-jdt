@@ -4,7 +4,8 @@ Bundle-Name: AST-Manipulator
 Bundle-SymbolicName: com.incquerylabs.evm.jdt.jdtmanipulator
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: IncQueryLabs Ltd.
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: com.incquerylabs.evm.jdt.jdtmanipulator,
+ com.incquerylabs.evm.jdt.jdtmanipulator.impl
 Require-Bundle: com.google.guava,
  org.eclipse.xtext.xbase.lib,
  org.eclipse.xtend.lib,
@@ -15,6 +16,4 @@ Require-Bundle: com.google.guava,
  org.eclipse.core.resources;bundle-version="3.10.1",
  org.eclipse.jface.text;bundle-version="3.10.0",
  org.apache.log4j;bundle-version="1.2.15"
-Export-Package: com.incquerylabs.evm.jdt.jdtmanipulator,
- com.incquerylabs.evm.jdt.jdtmanipulator.impl
-
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8

@@ -5,7 +5,7 @@ import com.incquerylabs.evm.jdt.JDTEventAtom
 import com.incquerylabs.evm.jdt.JDTEventSource
 import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
 import com.incquerylabs.evm.jdt.JDTRealm
-import org.eclipse.incquery.runtime.evm.api.event.EventSource
+import org.eclipse.viatra.transformation.evm.api.event.EventSource
 import org.eclipse.jdt.core.ICompilationUnit
 import org.eclipse.jdt.core.IJavaElementDelta
 
@@ -13,7 +13,7 @@ import static extension com.incquerylabs.evm.jdt.util.JDTChangeFlagDecoder.toCha
 import com.incquerylabs.evm.jdt.util.ChangeFlag
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
-import org.eclipse.incquery.runtime.evm.api.event.EventHandler
+import org.eclipse.viatra.transformation.evm.api.event.EventHandler
 import org.eclipse.jdt.core.IJavaElement
 
 class JDTTransactionalEventSource extends JDTEventSource implements EventSource<JDTEventAtom> {

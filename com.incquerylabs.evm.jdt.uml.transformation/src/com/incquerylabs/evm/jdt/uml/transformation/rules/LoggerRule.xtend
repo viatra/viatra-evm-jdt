@@ -5,7 +5,7 @@ import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
 import com.incquerylabs.evm.jdt.JDTRule
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
+import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
 import org.eclipse.jdt.core.IJavaProject
 
 class LoggerRule extends JDTRule {

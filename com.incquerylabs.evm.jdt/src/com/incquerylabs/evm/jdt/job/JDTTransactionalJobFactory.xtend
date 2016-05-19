@@ -2,10 +2,10 @@ package com.incquerylabs.evm.jdt.job
 
 import com.incquerylabs.evm.jdt.JDTEventAtom
 import org.eclipse.emf.transaction.TransactionalEditingDomain
-import org.eclipse.incquery.runtime.evm.api.Activation
-import org.eclipse.incquery.runtime.evm.api.Context
-import org.eclipse.incquery.runtime.evm.api.event.ActivationState
-import org.eclipse.incquery.runtime.evm.specific.job.ErrorLoggingJob
+import org.eclipse.viatra.transformation.evm.api.Activation
+import org.eclipse.viatra.transformation.evm.api.Context
+import org.eclipse.viatra.transformation.evm.api.event.ActivationState
+import org.eclipse.viatra.transformation.evm.specific.job.ErrorLoggingJob
 
 class JDTTransactionalJobFactory extends JDTJobFactory {
 	val TransactionalEditingDomain domain

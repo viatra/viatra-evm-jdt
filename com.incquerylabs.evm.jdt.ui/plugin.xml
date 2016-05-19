@@ -149,11 +149,6 @@
             name="Start JDT notification logging">
       </command>
       <command
-            defaultHandler="com.incquerylabs.evm.jdt.ui.UMLToJavaSynchronizationHandler"
-            id="com.incquerylabs.evm.jdt.ui.uml2java"
-            name="Start UML to Java transformation">
-      </command>
-      <command
             defaultHandler="com.incquerylabs.evm.jdt.ui.SynchronisationModelHandler"
             id="com.incquerylabs.evm.jdt.ui.modelcodesync"
             name="Start code synchronisation">
@@ -162,25 +157,6 @@
                name="name"
                optional="true">
          </commandParameter>
-      </command>
-      <command
-            defaultHandler="com.incquerylabs.evm.jdt.ui.SynchronizationDirectionHandler"
-            id="com.incquerylabs.evm.jdt.ui.syncdir"
-            name="Change synchronization direction">
-         <state
-               id="org.eclipse.ui.commands.toggleState">
-            <class
-                  class="org.eclipse.ui.handlers.RegistryToggleState">
-               <parameter
-                     name="default"
-                     value="false">
-               </parameter>
-               <parameter
-                     name="persisted"
-                     value="false">
-               </parameter>
-            </class>
-         </state>
       </command>
       <command
             id="com.incquerylabs.evm.jdt.ui.resetall"

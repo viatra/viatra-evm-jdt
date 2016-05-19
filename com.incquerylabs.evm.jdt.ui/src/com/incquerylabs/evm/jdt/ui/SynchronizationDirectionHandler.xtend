@@ -22,11 +22,7 @@ class SynchronizationDirectionHandler extends UMLModelHandler {
 		
 		val synch = getSynchronization(model)
 		if(synch != null){
-			if(synch.dir == UMLJavaSynchronizationDirection.JAVA2UML){
-				synch.allowUML2Java
-			} else {
-				synch.allowJava2UML
-			}
+			synch.allowJava2UML
 		}
 	}
 	

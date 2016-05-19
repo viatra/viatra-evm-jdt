@@ -1,10 +1,10 @@
 package com.incquerylabs.evm.jdt
 
-import org.eclipse.incquery.runtime.evm.api.RuleInstance
-import org.eclipse.incquery.runtime.evm.api.event.AbstractRuleInstanceBuilder
-import org.eclipse.incquery.runtime.evm.api.event.EventFilter
-import org.eclipse.incquery.runtime.evm.api.event.EventRealm
-import org.eclipse.incquery.runtime.evm.api.event.EventSourceSpecification
+import org.eclipse.viatra.transformation.evm.api.RuleInstance
+import org.eclipse.viatra.transformation.evm.api.event.AbstractRuleInstanceBuilder
+import org.eclipse.viatra.transformation.evm.api.event.EventFilter
+import org.eclipse.viatra.transformation.evm.api.event.EventRealm
+import org.eclipse.viatra.transformation.evm.api.event.EventSourceSpecification
 
 class JDTEventSourceSpecification implements EventSourceSpecification<JDTEventAtom> {
 	override EventFilter<JDTEventAtom> createEmptyFilter() {

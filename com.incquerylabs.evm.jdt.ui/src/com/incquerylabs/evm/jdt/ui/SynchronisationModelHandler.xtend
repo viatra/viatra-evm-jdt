@@ -1,6 +1,5 @@
 package com.incquerylabs.evm.jdt.ui
 
-import com.incquerylabs.evm.jdt.java.transformation.UMLToJavaTransformation
 import com.incquerylabs.evm.jdt.uml.transformation.JDTUMLTransformation
 import org.eclipse.core.commands.ExecutionEvent
 import org.eclipse.core.commands.ExecutionException
@@ -62,17 +61,12 @@ class SynchronisationModelHandler extends UMLModelHandler {
 	override protected startTransformation(IProject project, Model model) {
 		val javaProject = JavaCore.create(project);
 		val umlTransformation = new JDTUMLTransformation()
-		val transformation = new UMLToJavaTransformation(javaProject, model)
-		val synch = new BidirectionalSynchronization(umlTransformation, transformation)
+		val synch = new BidirectionalSynchronization(umlTransformation)
 		
 		synch.allowJava2UML
 		
 		println('''Starting Java2UML Transformation «javaProject.elementName»'''.toString)
 		umlTransformation.start(javaProject, model)
-		
-		println('''Starting UML2Java Transformation «javaProject.elementName»'''.toString)
-		transformation.initialize()
-		transformation.execute
 		
 		synchronizationStarted(model, synch)
 	}
