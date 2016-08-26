@@ -7,21 +7,19 @@ import com.incquerylabs.evm.jdt.java.transformation.rules.ClassRules
 import com.incquerylabs.evm.jdt.java.transformation.rules.PackageRules
 import com.incquerylabs.evm.jdt.java.transformation.rules.RuleProvider
 import com.incquerylabs.evm.jdt.jdtmanipulator.impl.JDTManipulator
+import java.util.List
 import java.util.Map
-import org.eclipse.incquery.runtime.api.GenericPatternGroup
-import org.eclipse.incquery.runtime.emf.EMFScope
-import org.eclipse.incquery.runtime.evm.api.Scheduler.ISchedulerFactory
-import org.eclipse.incquery.runtime.evm.specific.TransactionalSchedulers
-import org.eclipse.incquery.runtime.evm.specific.resolver.InvertedDisappearancePriorityConflictResolver
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.papyrus.infra.core.resource.ModelSet
 import org.eclipse.uml2.uml.Element
 import org.eclipse.uml2.uml.Model
-import org.eclipse.viatra.emf.runtime.transformation.eventdriven.EventDrivenTransformation
-import org.eclipse.viatra.emf.runtime.transformation.eventdriven.ExecutionSchemaBuilder
-import org.apache.log4j.Level
-import java.util.List
-import org.eclipse.incquery.runtime.api.AdvancedIncQueryEngine
+import org.eclipse.viatra.query.runtime.api.AdvancedViatraQueryEngine
+import org.eclipse.viatra.query.runtime.api.GenericQueryGroup
+import org.eclipse.viatra.query.runtime.emf.EMFScope
+import org.eclipse.viatra.transformation.evm.api.Scheduler.ISchedulerFactory
+import org.eclipse.viatra.transformation.evm.specific.resolver.InvertedDisappearancePriorityConflictResolver
+import org.eclipse.viatra.transformation.evm.transactions.specific.TransactionalSchedulers
+import org.eclipse.viatra.transformation.runtime.emf.transformation.eventdriven.EventDrivenTransformation
 
 class UMLToJavaTransformation {
 
@@ -30,7 +28,7 @@ class UMLToJavaTransformation {
 	// TODO: this is a temporary solution
 	Map<Element, String> elementNameRegistry = newHashMap
 	
-	AdvancedIncQueryEngine engine
+	AdvancedViatraQueryEngine engine
 	ISchedulerFactory schedulerFactory
 	EventDrivenTransformation transformation
 
@@ -42,7 +40,7 @@ class UMLToJavaTransformation {
 	
 	new(IJavaProject project, Model model) {
 		manipulator = new JDTManipulator(new JDTElementLocator(project))
-		engine = AdvancedIncQueryEngine::createUnmanagedEngine(new EMFScope(model))
+		engine = AdvancedViatraQueryEngine::createUnmanagedEngine(new EMFScope(model))
 		this.model = model
 	}
 	
@@ -61,7 +59,7 @@ class UMLToJavaTransformation {
 			
 			ruleProviders.forEach[initialize(manipulator, elementNameRegistry)]
 			
-			val queries = GenericPatternGroup::of(umlQueries)
+			val queries = GenericQueryGroup::of(umlQueries)
 			queries.prepare(engine)
 			
 			val transformationBuilder = EventDrivenTransformation::forEngine(engine)
@@ -69,14 +67,10 @@ class UMLToJavaTransformation {
 			val fixedPriorityResolver = new InvertedDisappearancePriorityConflictResolver
 			ruleProviders.forEach[registerRules(fixedPriorityResolver)]
 			
-			val executionSchemaBuilder = new ExecutionSchemaBuilder
-			executionSchemaBuilder.engine = engine
-			executionSchemaBuilder.scheduler = schedulerFactory
-			executionSchemaBuilder.conflictResolver = fixedPriorityResolver
-			val executionSchema = executionSchemaBuilder.build
-			//executionSchema.logger.level = Level::TRACE
+			transformationBuilder.queryEngine = engine
+			transformationBuilder.schedulerFactory = schedulerFactory
+			transformationBuilder.conflictResolver = fixedPriorityResolver
 			
-			transformationBuilder.schema = executionSchema
 			ruleProviders.forEach[addRules(transformationBuilder)]
 			transformation = transformationBuilder.build
 			

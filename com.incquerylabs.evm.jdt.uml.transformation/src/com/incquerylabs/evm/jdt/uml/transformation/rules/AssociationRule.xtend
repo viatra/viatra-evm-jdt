@@ -9,7 +9,7 @@ import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.core.runtime.NullProgressMonitor
-import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
+import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
 import org.eclipse.jdt.core.IField
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IType

@@ -1,7 +1,7 @@
 package com.incquerylabs.evm.jdt.transactions
 
-import org.eclipse.incquery.runtime.evm.api.event.EventType.RuleEngineEventType
-import org.eclipse.incquery.runtime.evm.specific.lifecycle.UnmodifiableActivationLifeCycle
+import org.eclipse.viatra.transformation.evm.api.event.EventType.RuleEngineEventType
+import org.eclipse.viatra.transformation.evm.specific.lifecycle.UnmodifiableActivationLifeCycle
 
 	 /**
 	  * <ul>

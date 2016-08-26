@@ -1,7 +1,7 @@
 package com.incquerylabs.evm.jdt
 
-import org.eclipse.incquery.runtime.evm.api.event.Event
-import org.eclipse.incquery.runtime.evm.api.event.EventType
+import org.eclipse.viatra.transformation.evm.api.event.Event
+import org.eclipse.viatra.transformation.evm.api.event.EventType
 
 class JDTEvent implements Event<JDTEventAtom> {
 	EventType type

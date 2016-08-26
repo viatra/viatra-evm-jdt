@@ -8,8 +8,8 @@ import com.incquerylabs.evm.jdt.uml.transformation.rules.filters.PackageFragment
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
-import org.eclipse.incquery.runtime.evm.specific.Jobs
+import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
+import org.eclipse.viatra.transformation.evm.specific.Jobs
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IPackageFragment
 import com.incquerylabs.evm.jdt.job.JDTJobFactory

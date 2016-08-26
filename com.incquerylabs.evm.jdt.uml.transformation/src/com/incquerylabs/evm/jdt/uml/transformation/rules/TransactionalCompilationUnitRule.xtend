@@ -15,8 +15,8 @@ import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import java.util.Optional
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
-import org.eclipse.incquery.runtime.evm.specific.Jobs
+import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
+import org.eclipse.viatra.transformation.evm.specific.Jobs
 import org.eclipse.jdt.core.ICompilationUnit
 import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaElementDelta

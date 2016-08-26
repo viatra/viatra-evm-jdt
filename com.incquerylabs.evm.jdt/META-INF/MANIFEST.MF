@@ -3,13 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Experiment
 Bundle-SymbolicName: com.incquerylabs.evm.jdt;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: com.incquerylabs.evm.jdt,
  com.incquerylabs.evm.jdt.job,
  com.incquerylabs.evm.jdt.transactions,
  com.incquerylabs.evm.jdt.util
-Require-Bundle: org.eclipse.incquery.runtime.evm;bundle-version="1.0.1",
- org.eclipse.jdt.core;bundle-version="3.11.1",
+Require-Bundle: org.eclipse.jdt.core;bundle-version="3.11.1",
  com.google.guava;bundle-version="15.0.0",
  org.apache.log4j;bundle-version="1.2.15",
  org.eclipse.xtext.xbase.lib,
@@ -18,4 +16,7 @@ Require-Bundle: org.eclipse.incquery.runtime.evm;bundle-version="1.0.1",
  org.eclipse.core.runtime;bundle-version="3.11.1",
  org.eclipse.core.resources;bundle-version="3.10.1",
  com.incquerylabs.evm.jdt.fqnutil;bundle-version="1.0.0",
- org.eclipse.emf.transaction;bundle-version="1.9.0"
+ org.eclipse.emf.transaction;bundle-version="1.9.0",
+ org.eclipse.viatra.transformation.evm;bundle-version="[1.2.0,2.0.0)"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.apache.log4j

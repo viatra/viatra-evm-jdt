@@ -2,11 +2,11 @@ package com.incquerylabs.evm.jdt
 
 import java.util.HashSet
 import java.util.Set
-import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
-import org.eclipse.incquery.runtime.evm.api.Job
-import org.eclipse.incquery.runtime.evm.api.RuleSpecification
+import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
+import org.eclipse.viatra.transformation.evm.api.Job
+import org.eclipse.viatra.transformation.evm.api.RuleSpecification
 import org.eclipse.jdt.core.IJavaProject
-import org.eclipse.incquery.runtime.evm.api.event.EventFilter
+import org.eclipse.viatra.transformation.evm.api.event.EventFilter
 import com.incquerylabs.evm.jdt.job.JDTJobFactory
 import org.eclipse.xtend.lib.annotations.Accessors
 

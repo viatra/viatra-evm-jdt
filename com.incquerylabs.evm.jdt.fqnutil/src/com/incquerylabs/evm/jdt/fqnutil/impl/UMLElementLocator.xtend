@@ -10,17 +10,17 @@ import org.eclipse.uml2.uml.Operation
 import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.Property
 import com.incquerylabs.evm.jdt.common.queries.UmlQueries
-import org.eclipse.incquery.runtime.api.IncQueryEngine
+import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine
 import org.eclipse.uml2.uml.Type
 import org.eclipse.uml2.uml.Interface
 
 class UMLElementLocator implements IUMLElementLocator {
 	extension val UmlQueries umlQueries = UmlQueries::instance
-	val IncQueryEngine engine
+	val ViatraQueryEngine engine
 	
 	val Model umlModel
 	
-	new(Model umlModel, IncQueryEngine engine) {
+	new(Model umlModel, ViatraQueryEngine engine) {
 		this.umlModel = umlModel
 		this.engine = engine
 	}

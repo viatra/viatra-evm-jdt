@@ -13,22 +13,22 @@ import com.incquerylabs.evm.jdt.uml.transformation.rules.PackageRule
 import com.incquerylabs.evm.jdt.uml.transformation.rules.TransactionalCompilationUnitRule
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import com.incquerylabs.evm.jdt.umlmanipulator.impl.UMLModelAccessImpl
+import java.util.Set
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.emf.ecore.resource.ResourceSet
-import org.eclipse.incquery.runtime.api.GenericPatternGroup
-import org.eclipse.incquery.runtime.api.IncQueryEngine
-import org.eclipse.incquery.runtime.emf.EMFScope
-import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
-import org.eclipse.incquery.runtime.evm.api.Executor
-import org.eclipse.incquery.runtime.evm.api.RuleEngine
-import org.eclipse.incquery.runtime.evm.api.Scheduler
-import org.eclipse.incquery.runtime.evm.specific.Schedulers
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.papyrus.infra.core.resource.ModelSet
 import org.eclipse.uml2.uml.Model
-import java.util.Set
-import org.eclipse.incquery.runtime.evm.specific.job.EnableJob
+import org.eclipse.viatra.query.runtime.api.GenericQueryGroup
+import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine
+import org.eclipse.viatra.query.runtime.emf.EMFScope
+import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
+import org.eclipse.viatra.transformation.evm.api.RuleEngine
+import org.eclipse.viatra.transformation.evm.api.ScheduledExecution
+import org.eclipse.viatra.transformation.evm.api.Scheduler
+import org.eclipse.viatra.transformation.evm.specific.Schedulers
+import org.eclipse.viatra.transformation.evm.specific.job.EnableJob
 
 class JDTUMLTransformation {
 	extension val Logger logger = Logger.getLogger(this.class)
@@ -37,16 +37,16 @@ class JDTUMLTransformation {
 	val JDTRealm jdtRealm
 	val RuleEngine ruleEngine
 	UMLModelAccess umlModelAccess
-	Executor executor
+	ScheduledExecution executor
 	Scheduler scheduler
 
 	Set<JDTRule> rules = newHashSet
 
-	IncQueryEngine engine
+	ViatraQueryEngine engine
 	
 	new() {
 		this.jdtRealm = JDTRealm::instance
-		this.executor = new Executor(jdtRealm)
+		this.executor = new ScheduledExecution(jdtRealm)
 		this.ruleEngine = RuleEngine.create(executor.ruleBase);
 	}
 
@@ -55,9 +55,9 @@ class JDTUMLTransformation {
 		logger.level = Level.DEBUG
 		debug('''Started Java to UML transformation.''')
 		
-		// Initialize IncQueryEngine
-		this.engine = IncQueryEngine::on(new EMFScope(model))
-		val queries = GenericPatternGroup::of(umlQueries)
+		// Initialize ViatraQueryEngine
+		this.engine = ViatraQueryEngine::on(new EMFScope(model))
+		val queries = GenericQueryGroup::of(umlQueries)
 		queries.prepare(engine)
 		
 		// Initialize the UMLManipulator

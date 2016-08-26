@@ -11,7 +11,7 @@ import com.incquerylabs.evm.jdt.uml.transformation.rules.visitors.TypeVisitor
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.incquery.runtime.evm.api.ActivationLifeCycle
+import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
 import org.eclipse.jdt.core.ICompilationUnit
 import org.eclipse.jdt.core.IJavaElementDelta
 import org.eclipse.jdt.core.IJavaProject

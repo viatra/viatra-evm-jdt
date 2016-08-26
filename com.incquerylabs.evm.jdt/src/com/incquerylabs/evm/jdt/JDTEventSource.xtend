@@ -3,11 +3,11 @@ package com.incquerylabs.evm.jdt
 import com.google.common.collect.Sets
 import com.incquerylabs.evm.jdt.transactions.JDTTransactionalEventType
 import java.util.Set
-import org.eclipse.incquery.runtime.evm.api.event.EventFilter
-import org.eclipse.incquery.runtime.evm.api.event.EventHandler
-import org.eclipse.incquery.runtime.evm.api.event.EventRealm
-import org.eclipse.incquery.runtime.evm.api.event.EventSource
-import org.eclipse.incquery.runtime.evm.api.event.EventSourceSpecification
+import org.eclipse.viatra.transformation.evm.api.event.EventFilter
+import org.eclipse.viatra.transformation.evm.api.event.EventHandler
+import org.eclipse.viatra.transformation.evm.api.event.EventRealm
+import org.eclipse.viatra.transformation.evm.api.event.EventSource
+import org.eclipse.viatra.transformation.evm.api.event.EventSourceSpecification
 import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaElementDelta
 import org.eclipse.jdt.core.IJavaProject

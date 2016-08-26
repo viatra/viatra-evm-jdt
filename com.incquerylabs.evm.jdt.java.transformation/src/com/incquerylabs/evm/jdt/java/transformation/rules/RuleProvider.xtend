@@ -2,11 +2,11 @@ package com.incquerylabs.evm.jdt.java.transformation.rules
 
 import com.incquerylabs.evm.jdt.jdtmanipulator.impl.JDTManipulator
 import java.util.Map
-import org.eclipse.incquery.runtime.evm.specific.resolver.InvertedDisappearancePriorityConflictResolver
+import org.eclipse.viatra.transformation.evm.specific.resolver.InvertedDisappearancePriorityConflictResolver
 import org.eclipse.uml2.uml.Element
-import org.eclipse.viatra.emf.runtime.rules.eventdriven.EventDrivenTransformationRule
-import org.eclipse.viatra.emf.runtime.rules.eventdriven.EventDrivenTransformationRuleFactory
-import org.eclipse.viatra.emf.runtime.transformation.eventdriven.EventDrivenTransformation.EventDrivenTransformationBuilder
+import org.eclipse.viatra.transformation.runtime.emf.rules.eventdriven.EventDrivenTransformationRule
+import org.eclipse.viatra.transformation.runtime.emf.rules.eventdriven.EventDrivenTransformationRuleFactory
+import org.eclipse.viatra.transformation.runtime.emf.transformation.eventdriven.EventDrivenTransformation.EventDrivenTransformationBuilder
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend.lib.annotations.Accessors
 

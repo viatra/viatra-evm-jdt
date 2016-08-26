@@ -8,7 +8,7 @@ import com.incquerylabs.evm.jdt.fqnutil.impl.UMLElementLocator
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.incquery.runtime.api.IncQueryEngine
+import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine
 import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.Model
 import org.eclipse.uml2.uml.Package
@@ -23,10 +23,10 @@ class UMLManipulator implements IUMLManipulator {
 	val Model model
 	val IUMLElementLocator locator
 	static val umlQueries = UmlQueries::instance
-	val IncQueryEngine engine
+	val ViatraQueryEngine engine
 	
 	
-	new(Model umlModel, IncQueryEngine engine) {
+	new(Model umlModel, ViatraQueryEngine engine) {
 		this.model = umlModel
 		this.engine = engine
 		this.locator = new UMLElementLocator(umlModel, engine)
