@@ -42,28 +42,6 @@
             </visibleWhen>
          </command>
          <command
-               commandId="com.incquerylabs.evm.jdt.ui.uml2java"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <instanceof
-                           value="org.eclipse.core.runtime.IAdaptable">
-                     </instanceof>
-                     <test
-                           forcePluginActivation="true"
-                           property="com.incquerylabs.evm.jdt.ui.isumlmodel">
-                     </test>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
                commandId="com.incquerylabs.evm.jdt.ui.syncdir"
                label="Switch to Java2UML"
                style="push">
