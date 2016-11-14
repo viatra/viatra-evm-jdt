@@ -1,11 +1,9 @@
 package com.incquerylabs.evm.jdt.uml.transformation.rules.visitors
 
+import com.google.common.base.Optional
 import com.google.common.collect.ImmutableList
-import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
-import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import java.util.List
-import java.util.Optional
 import java.util.Set
 import org.eclipse.jdt.core.dom.ASTVisitor
 import org.eclipse.jdt.core.dom.BodyDeclaration
@@ -28,6 +26,8 @@ import org.eclipse.uml2.uml.ParameterDirectionKind
 import org.eclipse.uml2.uml.TypedElement
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.VisibilityKind
+import org.eclipse.viatra.integration.evm.jdt.util.JDTQualifiedName
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
 import org.eclipse.xtend.lib.annotations.Accessors
 
 class TypeVisitor extends ASTVisitor {
@@ -50,8 +50,8 @@ class TypeVisitor extends ASTVisitor {
 			umlType.setVisibility(node)
 			umlType.isAbstract = node.isAbstract
 			
-			val superclassType = Optional::ofNullable(node.superclassType)
-			superclassType.ifPresent[
+			val superclassType = Optional::fromNullable(node.superclassType)
+			superclassType.asSet.forEach[
 				umlType.addGeneralization(it)
 			]
 			if(umlType instanceof BehavioredClassifier) {
@@ -88,7 +88,7 @@ class TypeVisitor extends ASTVisitor {
 		]
 		
 		val type = node.type
-		associations.forEach[ifPresent[
+		associations.forEach[asSet.forEach[
 			val target = targetEnd
 			val typeBinding = target.setType(type)
 			target.isStatic = node.isStatic 
@@ -112,7 +112,7 @@ class TypeVisitor extends ASTVisitor {
 		if(containingMethod instanceof MethodDeclaration) {
 			val umlParameter = node.transformParameter(containingMethod)
 			val type = node.type
-			umlParameter.ifPresent[
+			umlParameter.asSet.forEach[
 				lower = 0
 				val typeBinding = setType(type)
 				upper = typeBinding.upperBound
@@ -126,14 +126,14 @@ class TypeVisitor extends ASTVisitor {
 	override visit(MethodDeclaration node) {
 		val containingType = node.parent as TypeDeclaration
 		val umlOperation = node.transformOperation(containingType)
-		umlOperation.ifPresent[ operation |
+		umlOperation.asSet.forEach[ operation |
 			visitedElements.add(operation)
 			
 			operation.setVisibility(node)
 			operation.isAbstract = node.isAbstract
 			operation.isStatic = node.isStatic
 			val operationBody = node.transformOperationBody(containingType)
-			operationBody.ifPresent[
+			operationBody.asSet.forEach[
 				operation.methods += it
 			]
 		]
@@ -144,7 +144,7 @@ class TypeVisitor extends ASTVisitor {
 	
 	private def addGeneralization(Classifier umlType, Type superclassType) {
 		if(superclassType == null) {
-			return Optional::empty
+			return Optional::absent
 		}
 		
 		val superclassTypeBinding = superclassType.resolveBinding
@@ -159,12 +159,12 @@ class TypeVisitor extends ASTVisitor {
 				return Optional::of(generalization)
 			}
 		}
-		return Optional::empty
+		return Optional::absent
 	}
 	
 	private def addInterfaceRealization(BehavioredClassifier umlClass, Type interfaceType) {
 		if(interfaceType == null) {
-			return Optional::empty
+			return Optional::absent
 		}
 		
 		val interfaceTypeBinding = interfaceType.resolveBinding
@@ -179,7 +179,7 @@ class TypeVisitor extends ASTVisitor {
 				return Optional::of(interfaceRealization)
 			}
 		}
-		return Optional::empty
+		return Optional::absent
 	}
 	
 	private def Optional<Operation> transformOperation(MethodDeclaration node, TypeDeclaration containingType) {
@@ -206,7 +206,7 @@ class TypeVisitor extends ASTVisitor {
 			
 			return Optional::of(umlOperation)
 		}
-		return Optional::empty
+		return Optional::absent
 	}
 	
 	private def getUpperBound(ITypeBinding typeBinding) {
@@ -253,7 +253,7 @@ class TypeVisitor extends ASTVisitor {
 			parentClass.ownedBehaviors += behavior
 			return Optional::of(behavior)
 		}
-		return Optional::empty
+		return Optional::absent
 	}
 	
 	private def getTargetEnd(Association association) {
@@ -271,7 +271,7 @@ class TypeVisitor extends ASTVisitor {
 			visitedElements.add(association)
 			return Optional::of(association)
 		}
-		return Optional::empty
+		return Optional::absent
 	}
 	
 	private def transformParameter(SingleVariableDeclaration node, MethodDeclaration containingMethod) {
@@ -287,7 +287,7 @@ class TypeVisitor extends ASTVisitor {
 			umlOperation.ownedParameters += umlParameter
 			return Optional::of(umlParameter)
 		}
-		return Optional::empty
+		return Optional::absent
 	}
 	
 	/**
@@ -346,7 +346,7 @@ class TypeVisitor extends ASTVisitor {
 		}
 		val existingType = qualifiedName.findType
 		// if not an existing type (e.g. primitive type or interface), ensure there is such a class
-		val umlType = existingType.orElseGet[
+		val umlType = existingType.or[
 			if(element.interface){
 				ensureInterface(qualifiedName)
 			} else {

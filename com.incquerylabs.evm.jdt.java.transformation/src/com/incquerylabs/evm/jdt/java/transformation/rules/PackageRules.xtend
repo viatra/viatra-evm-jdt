@@ -7,9 +7,9 @@ import com.incquerylabs.evm.jdt.jdtmanipulator.impl.JDTManipulator
 import java.util.Map
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
+import org.eclipse.uml2.uml.Element
 import org.eclipse.viatra.transformation.evm.specific.Lifecycles
 import org.eclipse.viatra.transformation.evm.specific.crud.CRUDActivationStateEnum
-import org.eclipse.uml2.uml.Element
 
 import static extension com.incquerylabs.evm.jdt.java.transformation.util.QualifiedNameUtil.*
 

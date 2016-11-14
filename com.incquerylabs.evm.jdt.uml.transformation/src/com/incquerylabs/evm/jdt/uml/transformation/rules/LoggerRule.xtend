@@ -1,12 +1,12 @@
 package com.incquerylabs.evm.jdt.uml.transformation.rules
 
-import com.incquerylabs.evm.jdt.JDTActivationState
-import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
-import com.incquerylabs.evm.jdt.JDTRule
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
 import org.eclipse.jdt.core.IJavaProject
+import org.eclipse.viatra.integration.evm.jdt.JDTActivationState
+import org.eclipse.viatra.integration.evm.jdt.JDTEventSourceSpecification
+import org.eclipse.viatra.integration.evm.jdt.JDTRule
+import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
 
 class LoggerRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)

@@ -1,9 +1,9 @@
 package com.incquerylabs.evm.jdt.jdtmanipulator
 
-import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import org.eclipse.jdt.core.IField
-import org.eclipse.jdt.core.IType
 import org.eclipse.jdt.core.IPackageFragment
+import org.eclipse.jdt.core.IType
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
 
 interface IJDTManipulator {
 

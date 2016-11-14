@@ -1,8 +1,8 @@
 package com.incquerylabs.evm.jdt.fqnutil.impl
 
 import com.incquerylabs.evm.jdt.fqnutil.IJDTElementLocator
-import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import org.eclipse.jdt.core.IJavaProject
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
 
 class JDTElementLocator implements IJDTElementLocator {
 

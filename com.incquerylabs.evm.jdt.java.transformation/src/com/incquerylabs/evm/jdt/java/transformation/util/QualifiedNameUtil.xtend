@@ -1,7 +1,7 @@
 package com.incquerylabs.evm.jdt.java.transformation.util
 
-import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
+import org.eclipse.viatra.integration.evm.jdt.util.JDTQualifiedName
 
 class QualifiedNameUtil {
 

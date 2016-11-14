@@ -1,14 +1,6 @@
 package com.incquerylabs.evm.jdt.uml.transformation
 
-import com.incquerylabs.evm.jdt.JDTActivationLifeCycle
-import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
-import com.incquerylabs.evm.jdt.JDTRealm
-import com.incquerylabs.evm.jdt.JDTRule
 import com.incquerylabs.evm.jdt.common.queries.UmlQueries
-import com.incquerylabs.evm.jdt.job.JDTJobFactory
-import com.incquerylabs.evm.jdt.job.JDTTransactionalJobFactory
-import com.incquerylabs.evm.jdt.transactions.JDTTransactionalEventSourceSpecification
-import com.incquerylabs.evm.jdt.transactions.JDTTransactionalLifecycle
 import com.incquerylabs.evm.jdt.uml.transformation.rules.PackageRule
 import com.incquerylabs.evm.jdt.uml.transformation.rules.TransactionalCompilationUnitRule
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
@@ -20,6 +12,13 @@ import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.papyrus.infra.core.resource.ModelSet
 import org.eclipse.uml2.uml.Model
+import org.eclipse.viatra.integration.evm.jdt.JDTActivationLifeCycle
+import org.eclipse.viatra.integration.evm.jdt.JDTEventSourceSpecification
+import org.eclipse.viatra.integration.evm.jdt.JDTRealm
+import org.eclipse.viatra.integration.evm.jdt.JDTRule
+import org.eclipse.viatra.integration.evm.jdt.job.JDTJobFactory
+import org.eclipse.viatra.integration.evm.jdt.transactions.JDTTransactionalEventSourceSpecification
+import org.eclipse.viatra.integration.evm.jdt.transactions.JDTTransactionalLifecycle
 import org.eclipse.viatra.query.runtime.api.GenericQueryGroup
 import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine
 import org.eclipse.viatra.query.runtime.emf.EMFScope
@@ -29,6 +28,7 @@ import org.eclipse.viatra.transformation.evm.api.ScheduledExecution
 import org.eclipse.viatra.transformation.evm.api.Scheduler
 import org.eclipse.viatra.transformation.evm.specific.Schedulers
 import org.eclipse.viatra.transformation.evm.specific.job.EnableJob
+import com.incquerylabs.evm.jdt.uml.transformation.rules.JDTTransactionalJobFactory
 
 class JDTUMLTransformation {
 	extension val Logger logger = Logger.getLogger(this.class)

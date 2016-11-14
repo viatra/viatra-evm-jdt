@@ -1,22 +1,14 @@
 package com.incquerylabs.evm.jdt.uml.transformation.rules
 
+import com.google.common.base.Optional
 import com.google.common.collect.ImmutableList
-import com.incquerylabs.evm.jdt.JDTEventAtom
-import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
-import com.incquerylabs.evm.jdt.JDTRule
-import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
-import com.incquerylabs.evm.jdt.job.JDTJobFactory
-import com.incquerylabs.evm.jdt.transactions.JDTTransactionalActivationState
 import com.incquerylabs.evm.jdt.uml.transformation.rules.filters.CompilationUnitFilter
 import com.incquerylabs.evm.jdt.uml.transformation.rules.visitors.CrossReferenceUpdateVisitor
 import com.incquerylabs.evm.jdt.uml.transformation.rules.visitors.TypeVisitor
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
-import java.util.Optional
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
-import org.eclipse.viatra.transformation.evm.specific.Jobs
 import org.eclipse.jdt.core.ICompilationUnit
 import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaElementDelta
@@ -28,6 +20,14 @@ import org.eclipse.jdt.core.dom.ASTParser
 import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.Interface
 import org.eclipse.uml2.uml.StructuredClassifier
+import org.eclipse.viatra.integration.evm.jdt.JDTEventAtom
+import org.eclipse.viatra.integration.evm.jdt.JDTEventSourceSpecification
+import org.eclipse.viatra.integration.evm.jdt.JDTRule
+import org.eclipse.viatra.integration.evm.jdt.job.JDTJobFactory
+import org.eclipse.viatra.integration.evm.jdt.transactions.JDTTransactionalActivationState
+import org.eclipse.viatra.integration.evm.jdt.util.JDTQualifiedName
+import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
+import org.eclipse.viatra.transformation.evm.specific.Jobs
 
 class TransactionalCompilationUnitRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
@@ -84,11 +84,12 @@ class TransactionalCompilationUnitRule extends JDTRule {
 			debug('''Delta was not present in the event atom: «element»''')
 			ast = element.ast
 		} else {
-			ast = optionalDelta.map[ delta |
+			ast = optionalDelta.transform[ delta |
 				delta.ast
-			].orElseThrow[
-				new IllegalStateException('''AST was null, compilation unit is not transformed: «element»''')
-			]
+			].orNull
+			if(ast == null){
+				throw new IllegalStateException('''AST was null, compilation unit is not transformed: «element»''')
+			}
 		}
 		typeVisitor.clearVisitedElements
 		ast.accept(typeVisitor)
@@ -120,7 +121,7 @@ class TransactionalCompilationUnitRule extends JDTRule {
 	def deleteCorrespondingType(ICompilationUnit element) {
 		val umlQualifiedName = element.getUmlClassQualifiedName
 		val umlClass = findType(umlQualifiedName)
-		umlClass.ifPresent[
+		umlClass.asSet.forEach[
 			if(it instanceof StructuredClassifier){
 				val associations = ImmutableList::copyOf(getAssociationsOf(it))
 				associations.forEach[
@@ -129,7 +130,7 @@ class TransactionalCompilationUnitRule extends JDTRule {
 			}
 		]
 		
-		umlClass.ifPresent[
+		umlClass.asSet.forEach[
 			if(it instanceof Interface){
 				removeInterface
 			} else if(it instanceof Class){
@@ -140,7 +141,7 @@ class TransactionalCompilationUnitRule extends JDTRule {
 	
 	private def getAssociationsOf(StructuredClassifier umlClass) {
 		val associations = umlClass.ownedAttributes.map[ attribute |
-			Optional::ofNullable(attribute.association)
+			Optional::fromNullable(attribute.association)
 		].filter[isPresent].map[get]
 		
 		return associations

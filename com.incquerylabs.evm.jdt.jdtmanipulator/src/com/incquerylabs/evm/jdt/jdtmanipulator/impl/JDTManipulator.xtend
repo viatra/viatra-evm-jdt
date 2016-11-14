@@ -1,7 +1,6 @@
 package com.incquerylabs.evm.jdt.jdtmanipulator.impl
 
 import com.incquerylabs.evm.jdt.fqnutil.IJDTElementLocator
-import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.jdtmanipulator.IJDTManipulator
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
@@ -18,6 +17,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit
 import org.eclipse.jdt.core.dom.FieldDeclaration
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment
 import org.eclipse.jface.text.Document
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
 
 class JDTManipulator implements IJDTManipulator {
 
@@ -43,7 +43,7 @@ class JDTManipulator implements IJDTManipulator {
 		}
 		val genFolder = rootProject.project.getFolder(GENERATION_FOLDER)
 		val packageRoot = rootProject.getPackageFragmentRoot(genFolder)
-		val packageName = qualifiedName.parent.map[toString].orElse("")
+		val packageName = qualifiedName.parent.transform[toString].or("")
 
 		val package = packageRoot.createPackageFragment(packageName, false, new NullProgressMonitor)
 		val className = qualifiedName.name

@@ -1,9 +1,9 @@
 package com.incquerylabs.evm.jdt.umlmanipulator.impl.logger
 
-import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
 
 class UMLManipulationLogger implements IUMLManipulator {
 	extension Logger logger = Logger.getLogger(this.class)

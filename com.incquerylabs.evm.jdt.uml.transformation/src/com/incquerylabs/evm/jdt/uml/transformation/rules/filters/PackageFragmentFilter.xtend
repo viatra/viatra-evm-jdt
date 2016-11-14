@@ -1,9 +1,9 @@
 package com.incquerylabs.evm.jdt.uml.transformation.rules.filters
 
-import com.incquerylabs.evm.jdt.CompositeEventFilter
-import com.incquerylabs.evm.jdt.JDTEventAtom
-import org.eclipse.viatra.transformation.evm.api.event.EventFilter
 import org.eclipse.jdt.core.IPackageFragment
+import org.eclipse.viatra.integration.evm.jdt.CompositeEventFilter
+import org.eclipse.viatra.integration.evm.jdt.JDTEventAtom
+import org.eclipse.viatra.transformation.evm.api.event.EventFilter
 
 class PackageFragmentFilter extends CompositeEventFilter<JDTEventAtom> {
 	

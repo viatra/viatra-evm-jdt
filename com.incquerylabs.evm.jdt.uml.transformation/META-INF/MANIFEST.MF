@@ -8,7 +8,7 @@ Export-Package: com.incquerylabs.evm.jdt.uml.transformation
 Require-Bundle: org.eclipse.jdt.core;bundle-version="3.11.1",
  org.eclipse.xtend.lib,
  org.eclipse.uml2.uml;bundle-version="5.1.0",
- com.incquerylabs.evm.jdt;bundle-version="1.0.0",
+ org.eclipse.viatra.integration.evm.jdt;bundle-version="0.15.0",
  com.incquerylabs.evm.jdt.fqnutil;bundle-version="1.0.0",
  org.eclipse.core.resources;bundle-version="3.10.1",
  org.eclipse.emf;bundle-version="2.6.0",
@@ -20,5 +20,5 @@ Require-Bundle: org.eclipse.jdt.core;bundle-version="3.11.1",
  com.incquerylabs.evm.jdt.common;bundle-version="1.0.0",
  org.eclipse.viatra.transformation.evm;bundle-version="[1.2.0,2.0.0)",
  org.eclipse.viatra.query.runtime;bundle-version="[1.2.0,2.0.0)"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: org.apache.log4j;version="1.2.15"

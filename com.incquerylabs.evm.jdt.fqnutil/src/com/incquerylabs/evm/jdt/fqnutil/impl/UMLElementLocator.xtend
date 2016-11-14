@@ -1,18 +1,18 @@
 package com.incquerylabs.evm.jdt.fqnutil.impl
 
+import com.incquerylabs.evm.jdt.common.queries.UmlQueries
 import com.incquerylabs.evm.jdt.fqnutil.IUMLElementLocator
-import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
 import org.eclipse.uml2.uml.Class
+import org.eclipse.uml2.uml.Interface
 import org.eclipse.uml2.uml.Model
 import org.eclipse.uml2.uml.NamedElement
 import org.eclipse.uml2.uml.Operation
 import org.eclipse.uml2.uml.Package
 import org.eclipse.uml2.uml.Property
-import com.incquerylabs.evm.jdt.common.queries.UmlQueries
-import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine
 import org.eclipse.uml2.uml.Type
-import org.eclipse.uml2.uml.Interface
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
+import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine
 
 class UMLElementLocator implements IUMLElementLocator {
 	extension val UmlQueries umlQueries = UmlQueries::instance

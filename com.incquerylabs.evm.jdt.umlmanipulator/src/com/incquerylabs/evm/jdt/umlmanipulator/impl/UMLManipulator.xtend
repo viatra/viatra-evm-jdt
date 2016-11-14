@@ -2,13 +2,11 @@ package com.incquerylabs.evm.jdt.umlmanipulator.impl
 
 import com.incquerylabs.evm.jdt.common.queries.UmlQueries
 import com.incquerylabs.evm.jdt.fqnutil.IUMLElementLocator
-import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.impl.UMLElementLocator
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine
 import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.Model
 import org.eclipse.uml2.uml.Package
@@ -16,6 +14,8 @@ import org.eclipse.uml2.uml.Property
 import org.eclipse.uml2.uml.Type
 import org.eclipse.uml2.uml.TypedElement
 import org.eclipse.uml2.uml.UMLFactory
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
+import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine
 
 class UMLManipulator implements IUMLManipulator {
 	extension val Logger logger = Logger.getLogger(this.class)

@@ -15,5 +15,6 @@ Require-Bundle: com.google.guava,
  com.incquerylabs.evm.jdt.fqnutil;bundle-version="1.0.0",
  org.eclipse.core.resources;bundle-version="3.10.1",
  org.eclipse.jface.text;bundle-version="3.10.0",
- org.apache.log4j;bundle-version="1.2.15"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+ org.apache.log4j;bundle-version="1.2.15",
+ org.eclipse.viatra.integration.evm.jdt;bundle-version="0.15.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

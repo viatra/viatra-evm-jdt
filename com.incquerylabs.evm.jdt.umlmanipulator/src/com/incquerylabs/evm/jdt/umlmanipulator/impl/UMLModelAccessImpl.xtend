@@ -2,10 +2,8 @@ package com.incquerylabs.evm.jdt.umlmanipulator.impl
 
 import com.google.common.collect.ImmutableList
 import com.incquerylabs.evm.jdt.fqnutil.IUMLElementLocator
-import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.impl.UMLElementLocator
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
-import java.util.Optional
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.eclipse.emf.common.util.URI
@@ -19,7 +17,9 @@ import org.eclipse.uml2.uml.PrimitiveType
 import org.eclipse.uml2.uml.Type
 import org.eclipse.uml2.uml.UMLFactory
 import org.eclipse.uml2.uml.resource.UMLResource
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
 import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine
+import com.google.common.base.Optional
 
 class UMLModelAccessImpl implements UMLModelAccess {
 	
@@ -39,22 +39,22 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	
 	override findPackage(QualifiedName qualifiedName) {
 		val packageFragment = locator.locatePackage(qualifiedName)
-		return Optional.ofNullable(packageFragment)
+		return Optional.fromNullable(packageFragment)
 	}
 	
 	override ensurePackage(QualifiedName qualifiedName) {
 		val existingPackage = qualifiedName.findPackage
 		
-		return existingPackage.orElseGet[
+		return existingPackage.or[
 			createPackage(qualifiedName)
 		]
 	}
 	
 	private def createPackage(QualifiedName qualifiedName) {
 		val parentFqn = qualifiedName.parent
-		val parentPackage = parentFqn.map[
+		val parentPackage = parentFqn.transform[
 			ensurePackage
-		].orElseGet[locator.UMLModel]
+		].or[locator.UMLModel]
 		
 		val packageFragment = umlFactory.createPackage() => [
 			name = qualifiedName.name
@@ -79,15 +79,15 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	override findType(QualifiedName qualifiedName) {
 		val primitiveType = findPrimitiveType(qualifiedName)
 		if(primitiveType.isPresent) {
-			return primitiveType.map[it as Type]
+			return primitiveType.transform[it as Type]
 		}
 		val type = locator.locateType(qualifiedName)
-		return Optional.ofNullable(type)
+		return Optional.fromNullable(type)
 	}
 	
 	override findClass(QualifiedName qualifiedName) {
 		val clsFragment = locator.locateClass(qualifiedName)
-		return Optional.ofNullable(clsFragment)
+		return Optional.fromNullable(clsFragment)
 	}
 	
 	override findPrimitiveType(QualifiedName qualifiedName) {
@@ -103,20 +103,20 @@ class UMLModelAccessImpl implements UMLModelAccess {
 			val stringType = umlPrimitiveTypesResource.allContents.filter(PrimitiveType).findFirst[
 				name.equals("String")
 			]
-			return Optional.ofNullable(stringType)
+			return Optional.fromNullable(stringType)
 		}
 		
 		val javaPrimitiveType = javaPrimitiveTypesResource.allContents.filter(PrimitiveType).findFirst[
 			name.equals(qualifiedName.name)
 		]
-		return Optional.ofNullable(javaPrimitiveType)		
+		return Optional.fromNullable(javaPrimitiveType)		
 		
 	}
 	
 	override ensureClass(QualifiedName qualifiedName) {
 		val existingClass = qualifiedName.findClass
 		
-		return existingClass.orElseGet[
+		return existingClass.or[
 			val existingType = qualifiedName.findType
 			if(existingType.present){
 				val typeValue = existingType.get
@@ -132,9 +132,9 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	private def createClass(QualifiedName qualifiedName) {
 		val parentFqn = qualifiedName.parent
 		
-		val parent = parentFqn.map[
+		val parent = parentFqn.transform[
 			ensurePackage
-		].orElseGet[locator.UMLModel]
+		].or[locator.UMLModel]
 		
 		val umlClass = createClass => [
 			name = qualifiedName.name
@@ -158,13 +158,13 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	
 	override findInterface(QualifiedName qualifiedName) {
 		val umlInterface = locator.locateInterface(qualifiedName)
-		return Optional.ofNullable(umlInterface)
+		return Optional.fromNullable(umlInterface)
 	}
 	
 	override ensureInterface(QualifiedName qualifiedName) {
 		val existingInterface = qualifiedName.findInterface
 		
-		return existingInterface.orElseGet[
+		return existingInterface.or[
 			val existingType = qualifiedName.findType
 			if(existingType.present){
 				val typeValue = existingType.get
@@ -180,9 +180,9 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	private def createInterface(QualifiedName qualifiedName) {
 		val parentFqn = qualifiedName.parent
 		
-		val parent = parentFqn.map[
+		val parent = parentFqn.transform[
 			ensurePackage
-		].orElseGet[locator.UMLModel]
+		].or[locator.UMLModel]
 		
 		val umlInterface = createInterface => [
 			name = qualifiedName.name
@@ -206,24 +206,22 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	
 	override findAssociation(QualifiedName qualifiedName) {
 		val association = locator.locateAssociation(qualifiedName)
-		return Optional.ofNullable(association)
+		return Optional.fromNullable(association)
 	}
 	
 	override ensureAssociation(QualifiedName qualifiedName) {
 		val existingAssociation = qualifiedName.findAssociation
 		
-		return existingAssociation.orElseGet[
-			createAssociation(qualifiedName)
-		]
+		return existingAssociation.or(createAssociation(qualifiedName))
 	}
 	
 	private def createAssociation(QualifiedName qualifiedName) {
 		val parentFqn = qualifiedName.parent
-		val parent = parentFqn.flatMap[
-			findClass
+		val parent = parentFqn.transform[
+			findClass.get
 		]
 		
-		val umlAssociation = parent.map[ parentClass |
+		val umlAssociation = parent.transform[ parentClass |
 			val association = createAssociation => [
 				it.name = '''«parentClass.name»_«qualifiedName.name»'''
 			]
@@ -244,7 +242,10 @@ class UMLModelAccessImpl implements UMLModelAccess {
 			association
 		]
 		
-		return umlAssociation.orElseThrow[new RuntimeException('''Was not able to create UML association: «qualifiedName»''')]
+		if(!umlAssociation.present) {
+		    throw new RuntimeException('''Was not able to create UML association: «qualifiedName»''')
+		}
+		return umlAssociation.get
 	}
 	
 	override removeAssociation(Association association) {
@@ -263,24 +264,22 @@ class UMLModelAccessImpl implements UMLModelAccess {
 	
 	override findOperation(QualifiedName qualifiedName) {
 		val operation = locator.locateOperation(qualifiedName)
-		return Optional.ofNullable(operation)
+		return Optional.fromNullable(operation)
 	}
 	
 	override ensureOperation(QualifiedName qualifiedName) {
 		val existingOperation = qualifiedName.findOperation
 		
-		return existingOperation.orElseGet[
-			createOperation(qualifiedName)
-		]
+		return existingOperation.or(createOperation(qualifiedName))
 	}
 	
 	private def createOperation(QualifiedName qualifiedName) {
 		val parentFqn = qualifiedName.parent
-		val parent = parentFqn.flatMap[
+		val parent = parentFqn.transform[
 			findType
 		]
 		
-		val umlOperation = parent.map[ parentClass |
+		val umlOperation = parent.transform[ parentClass |
 			val operation = createOperation => [
 				it.name = '''«qualifiedName.name»'''
 			]
@@ -295,7 +294,10 @@ class UMLModelAccessImpl implements UMLModelAccess {
 			operation
 		]
 		
-		return umlOperation.orElseThrow[new RuntimeException('''Was not able to create UML operation: «qualifiedName»''')]
+		if(!umlOperation.present){
+		    throw new RuntimeException('''Was not able to create UML operation: «qualifiedName»''') 
+		}
+		return umlOperation.get
 	}
 	
 	override removeOperation(Operation operation) {

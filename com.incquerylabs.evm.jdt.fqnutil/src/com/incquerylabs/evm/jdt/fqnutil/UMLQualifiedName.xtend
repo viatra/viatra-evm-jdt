@@ -1,6 +1,7 @@
 package com.incquerylabs.evm.jdt.fqnutil
 
 import com.google.common.base.Joiner
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
 
 class UMLQualifiedName extends QualifiedName {
 	

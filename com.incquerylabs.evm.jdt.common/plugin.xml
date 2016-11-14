@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?><plugin>
   <extension id="com.incquerylabs.evm.jdt.common.queries.UmlQueries" point="org.eclipse.viatra.query.runtime.queryspecification">
-    <group group="org.eclipse.viatra.query.runtime.extensibility.SingletonExtensionFactory:com.incquerylabs.evm.jdt.common.queries.UmlQueries" id="com.incquerylabs.evm.jdt.common.queries.UmlQueries"/>
+    <group group="org.eclipse.viatra.query.runtime.extensibility.SingletonExtensionFactory:com.incquerylabs.evm.jdt.common.queries.UmlQueries" id="com.incquerylabs.evm.jdt.common.queries.UmlQueries">
+      <query-specification fqn="com.incquerylabs.evm.jdt.common.queries.umlClass"/>
+      <query-specification fqn="com.incquerylabs.evm.jdt.common.queries.qualifiedNamedElement"/>
+      <query-specification fqn="com.incquerylabs.evm.jdt.common.queries.umlComponent"/>
+      <query-specification fqn="com.incquerylabs.evm.jdt.common.queries.umlClassInModel"/>
+      <query-specification fqn="com.incquerylabs.evm.jdt.common.queries.umlClassInPackage"/>
+      <query-specification fqn="com.incquerylabs.evm.jdt.common.queries.umlPackage"/>
+      <query-specification fqn="com.incquerylabs.evm.jdt.common.queries.leafPackage"/>
+      <query-specification fqn="com.incquerylabs.evm.jdt.common.queries.packageInPackage"/>
+      <query-specification fqn="com.incquerylabs.evm.jdt.common.queries.umlAssociation"/>
+      <query-specification fqn="com.incquerylabs.evm.jdt.common.queries.associationOfClass"/>
+    </group>
   </extension>
 </plugin>

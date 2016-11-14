@@ -6,6 +6,7 @@ import org.eclipse.jdt.core.IMethod
 import org.eclipse.jdt.core.IPackageFragment
 import org.eclipse.jdt.core.IPackageFragmentRoot
 import org.eclipse.jdt.core.IType
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
 
 interface IJDTElementLocator {
 	def IPackageFragmentRoot locateSourceRoot()

@@ -1,21 +1,21 @@
 package com.incquerylabs.evm.jdt.uml.transformation.rules
 
-import com.incquerylabs.evm.jdt.JDTActivationState
-import com.incquerylabs.evm.jdt.JDTEventAtom
-import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
-import com.incquerylabs.evm.jdt.JDTRule
-import com.incquerylabs.evm.jdt.fqnutil.JDTQualifiedName
 import com.incquerylabs.evm.jdt.fqnutil.UMLQualifiedName
 import com.incquerylabs.evm.jdt.uml.transformation.rules.filters.CompilationUnitFilter
 import com.incquerylabs.evm.jdt.uml.transformation.rules.visitors.TypeVisitor
 import com.incquerylabs.evm.jdt.umlmanipulator.UMLModelAccess
 import org.apache.log4j.Level
 import org.apache.log4j.Logger
-import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
 import org.eclipse.jdt.core.ICompilationUnit
 import org.eclipse.jdt.core.IJavaElementDelta
 import org.eclipse.jdt.core.IJavaProject
 import org.eclipse.jdt.core.IPackageFragment
+import org.eclipse.viatra.integration.evm.jdt.JDTActivationState
+import org.eclipse.viatra.integration.evm.jdt.JDTEventAtom
+import org.eclipse.viatra.integration.evm.jdt.JDTEventSourceSpecification
+import org.eclipse.viatra.integration.evm.jdt.JDTRule
+import org.eclipse.viatra.integration.evm.jdt.util.JDTQualifiedName
+import org.eclipse.viatra.transformation.evm.api.ActivationLifeCycle
 
 class CompilationUnitRule extends JDTRule {
 	extension Logger logger = Logger.getLogger(this.class)
@@ -80,7 +80,7 @@ class CompilationUnitRule extends JDTRule {
 	def deleteCorrespondingClass(ICompilationUnit element) {
 		val umlQualifiedName = element.getUmlClassQualifiedName
 		val umlClass = findClass(umlQualifiedName)
-		umlClass.ifPresent[
+		umlClass.asSet.forEach[
 			removeClass
 		]
 	}

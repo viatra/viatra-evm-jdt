@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.incquerylabs.evm.jdt.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: INCQUERYLABS
 Export-Package: com.incquerylabs.evm.jdt.test
-Require-Bundle: com.incquerylabs.evm.jdt;bundle-version="1.0.0",
+Require-Bundle: org.eclipse.viatra.integration.evm.jdt;bundle-version="0.15.0",
  org.hamcrest;bundle-version="1.1.0",
  org.mockito;bundle-version="1.9.5",
  org.junit,
@@ -15,4 +15,4 @@ Require-Bundle: com.incquerylabs.evm.jdt;bundle-version="1.0.0",
  org.eclipse.xtend.lib.macro,
  org.eclipse.jdt.core;bundle-version="3.11.1",
  org.eclipse.viatra.transformation.evm;bundle-version="[1.2.0,2.0.0)"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

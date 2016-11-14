@@ -1,9 +1,9 @@
 package com.incquerylabs.evm.jdt.umlmanipulator.impl
 
-import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
 import com.incquerylabs.evm.jdt.umlmanipulator.IUMLManipulator
 import org.eclipse.emf.transaction.RecordingCommand
 import org.eclipse.emf.transaction.TransactionalEditingDomain
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
 
 class TransactionalManipulator implements IUMLManipulator {
 	val IUMLManipulator manipulator

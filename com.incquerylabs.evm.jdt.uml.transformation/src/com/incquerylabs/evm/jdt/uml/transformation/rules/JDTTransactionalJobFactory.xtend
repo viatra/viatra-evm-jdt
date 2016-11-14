@@ -1,7 +1,9 @@
-package com.incquerylabs.evm.jdt.job
+package com.incquerylabs.evm.jdt.uml.transformation.rules
 
-import com.incquerylabs.evm.jdt.JDTEventAtom
 import org.eclipse.emf.transaction.TransactionalEditingDomain
+import org.eclipse.viatra.integration.evm.jdt.JDTEventAtom
+import org.eclipse.viatra.integration.evm.jdt.job.JDTJobFactory
+import org.eclipse.viatra.integration.evm.jdt.job.JDTJobTask
 import org.eclipse.viatra.transformation.evm.api.Activation
 import org.eclipse.viatra.transformation.evm.api.Context
 import org.eclipse.viatra.transformation.evm.api.event.ActivationState

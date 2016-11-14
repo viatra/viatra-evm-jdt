@@ -1,6 +1,6 @@
 package com.incquerylabs.evm.jdt.umlmanipulator
 
-import com.incquerylabs.evm.jdt.fqnutil.QualifiedName
+import org.eclipse.viatra.integration.evm.jdt.util.QualifiedName
 
 interface IUMLManipulator {
 	def void createClass(QualifiedName fqn)

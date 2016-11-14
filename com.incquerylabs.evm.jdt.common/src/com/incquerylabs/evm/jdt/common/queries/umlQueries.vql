@@ -59,7 +59,7 @@ pattern umlClassInPackage(umlPackage: Package, umlClass: Class) {
 	find umlPackage(umlPackage);
 }
 
-pattern umlPackage(umlPackage) {
+pattern umlPackage(umlPackage : Package) {
 	Package(umlPackage);
 	neg find model(umlPackage);
 	neg find profile(umlPackage);

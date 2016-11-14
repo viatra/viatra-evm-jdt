@@ -1,11 +1,12 @@
 package com.incquerylabs.evm.jdt.test
 
-import com.incquerylabs.evm.jdt.JDTEvent
-import com.incquerylabs.evm.jdt.JDTEventHandler
-import com.incquerylabs.evm.jdt.JDTEventSource
-import com.incquerylabs.evm.jdt.JDTEventSourceSpecification
-import com.incquerylabs.evm.jdt.JDTRealm
+import org.eclipse.jdt.core.IJavaElement
 import org.eclipse.jdt.core.IJavaElementDelta
+import org.eclipse.viatra.integration.evm.jdt.JDTEvent
+import org.eclipse.viatra.integration.evm.jdt.JDTEventHandler
+import org.eclipse.viatra.integration.evm.jdt.JDTEventSource
+import org.eclipse.viatra.integration.evm.jdt.JDTEventSourceSpecification
+import org.eclipse.viatra.integration.evm.jdt.JDTRealm
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentCaptor
@@ -15,7 +16,6 @@ import org.mockito.MockitoAnnotations
 
 import static org.junit.Assert.*
 import static org.mockito.Mockito.*
-import org.eclipse.jdt.core.IJavaElement
 
 /**
  * Class under test: {@link JDTEventSource}

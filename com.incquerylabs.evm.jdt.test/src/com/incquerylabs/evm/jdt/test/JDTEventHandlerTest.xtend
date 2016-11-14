@@ -1,19 +1,20 @@
 package com.incquerylabs.evm.jdt.test
 
-import com.incquerylabs.evm.jdt.JDTEvent
-import com.incquerylabs.evm.jdt.JDTEventHandler
-import com.incquerylabs.evm.jdt.JDTEventType
+import org.eclipse.jdt.core.IJavaElement
+import org.eclipse.viatra.integration.evm.jdt.JDTEvent
+import org.eclipse.viatra.integration.evm.jdt.JDTEventAtom
+import org.eclipse.viatra.integration.evm.jdt.JDTEventHandler
+import org.eclipse.viatra.integration.evm.jdt.JDTEventType
 import org.eclipse.viatra.transformation.evm.api.Activation
 import org.eclipse.viatra.transformation.evm.api.RuleInstance
-import org.eclipse.jdt.core.IJavaElement
 import org.junit.Before
 import org.junit.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
+import static org.mockito.Matchers.*
 import static org.mockito.Mockito.*
-import com.incquerylabs.evm.jdt.JDTEventAtom
 
 class JDTEventHandlerTest {
 	@Mock(name = "ruleInstanceMock") 
